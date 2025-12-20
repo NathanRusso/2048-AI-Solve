@@ -86,8 +86,40 @@ class Game2048:
 
         self.game_over = True
 
-    def merge():
-        return
+
+
+
+
+
+
+    def merge(self, list_values: list):
+        """
+        This merges and combines numbers from right to right for a single row/column.\n
+        It start are the right and merges values in the right direction.\n
+        Row - [Left, Right], Col - [Bottom, Top]
+
+        Args:
+            list_values (list): The row/column list of values to combine
+
+        Returns:
+            list: The updated row/column list of values after the shift/merge.
+        """
+        list_values = [v for v in list_values if v != 0]
+        final_values = []
+        i = len(list_values) - 1
+        while i >= 0:
+            if i - 1 >= 0 and list_values[i] == list_values[i - 1]:
+                final_values.append(list_values[i] * 2)
+                self.score += list_values[i] * 2
+                i -= 2
+            else:
+                final_values.append(list_values[i])
+                i -= 1
+
+        while len(final_values) < 4:
+            final_values.append(0)
+        final_values.reverse()
+        return final_values
 
     def shift(self, direction: int) -> bool:
         """
@@ -98,7 +130,38 @@ class Game2048:
         :return: True if the tiles on the board have changed positions, False otherwise.
         :rtype: bool
         """
-        return
+        if self.game_over: return False
+
+        original_board = [row[:] for row in self.board]
+
+        if direction == Direction.UP.value:
+            for col in range(self.MAX_BOARD_DIMENSION):
+                initial_values = [self.board[row][col] for row in range(self.MAX_BOARD_DIMENSION - 1, -1, -1)]
+                final_values = self.merge(initial_values)
+                for row in range(self.MAX_BOARD_DIMENSION):
+                    self.board[row][col] = final_values[3 - row]
+        elif direction == Direction.DOWN.value:
+            for col in range(self.MAX_BOARD_DIMENSION):
+                initial_values = [self.board[row][col] for row in range(self.MAX_BOARD_DIMENSION)]
+                final_values = self.merge(initial_values)
+                for row in range(self.MAX_BOARD_DIMENSION):
+                    self.board[row][col] = final_values[row]
+        elif direction == Direction.LEFT.value:
+            for row in range(self.MAX_BOARD_DIMENSION):
+                initial_values = [self.board[row][col] for col in range(self.MAX_BOARD_DIMENSION - 1, -1, -1)]
+                final_values = self.merge(initial_values)
+                for col in range(self.MAX_BOARD_DIMENSION):
+                    self.board[row][col] = final_values[3 - col]
+        elif direction == Direction.RIGHT.value:
+            for row in range(self.MAX_BOARD_DIMENSION):
+                initial_values = [self.board[row][col] for col in range(self.MAX_BOARD_DIMENSION)]
+                final_values = self.merge(initial_values)
+                for col in range(self.MAX_BOARD_DIMENSION):
+                    self.board[row][col] = final_values[col]
+        else:
+            return False # Invalid direction
+
+        return original_board != self.board
 
     def playAction(self, direction: int):
         """
@@ -186,7 +249,7 @@ class Game2048:
         print("Welcome to 2048!")
         print("Here is your starting board")
         self.displayBoardScore()
-        print("Use WASD to shift the tiles: 'W' is Up, 'A' is Left, 'S' is Down, & 'D' is Right.")
+        print("Use WASD to shift the tiles: 'W' is Up, 'A' is Left, 'S' is Down, & 'D' is Right. To quit, press 'X'.")
 
         while not self.game_over:
             direction = input("Direction: ").lower()
@@ -199,6 +262,9 @@ class Game2048:
                     self.playActionCLI(Direction.LEFT.value)
                 case "d":
                     self.playActionCLI(Direction.RIGHT.value)
+                case "x":
+                    print("You quit the game.")
+                    return
                 case _:
                     print("Invalid input try again.")
 
