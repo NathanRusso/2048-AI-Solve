@@ -23,7 +23,7 @@ class Game2048:
 
     def __init__(self):
         """
-        This initializes the 2048 game with an zero scores and a board with two, random 2 or 4, tiles.
+        This initializes the 2048 game with a zero scores and a board with two, random 2 or 4, tiles.
         """
         self.board = [
             [0, 0, 0, 0],
@@ -72,9 +72,9 @@ class Game2048:
         """
         This checks if the game is over, i.e, no tiles can merge into each other.
         """
-        for row in range(self.MAX_BOARD_DIMENSION):
-            for col in range(self.MAX_BOARD_DIMENSION):
-                if (self.board[row][col] == self.BLANK_TILE):
+        for y in range(self.MAX_BOARD_DIMENSION):
+            for x in range(self.MAX_BOARD_DIMENSION):
+                if (self.board[y][x] == self.BLANK_TILE):
                     self.game_over = False
                     return
 
@@ -112,11 +112,6 @@ class Game2048:
         if board_changed:
             self.addTile()
             self.updateGameOver()
-
-
-
-
-
 
     def getBoard(self) -> list:
         """
@@ -159,3 +154,88 @@ class Game2048:
                 if tile > highest_tile:
                     highest_tile = tile
         return highest_tile
+
+    def displayBoardScore(self):
+        """
+        This displays the current CLI board and score.
+        """
+        print("----------------------------------------")
+        print(f"Score: {self.score}")
+        for y in range(self.MAX_BOARD_DIMENSION):
+            for x in range(self.MAX_BOARD_DIMENSION):
+                print(f"{self.board[y][x]}  ", end='')
+            print(" ")
+        
+    def playActionCLI(self, direction: int):
+        """
+        This shifts the tiles in one of the 4 cardinal directions. Then it adds a 2 or 4 tiles to the board if possible.\\
+        Then it displays the current board.
+        
+        :param direction: The direction to shift the board tiles.
+        :type direction: int
+        """
+        self.playAction(direction)
+        self.displayBoardScore()
+
+    def playCLI(self):
+        """
+        This runs 1 game using the current 2048 game board.
+        
+        :param self: Description
+        """
+        print("Welcome to 2048!")
+        print("Here is your starting board")
+        self.displayBoardScore()
+        print("Use WASD to shift the tiles: 'W' is Up, 'A' is Left, 'S' is Down, & 'D' is Right.")
+
+        while not self.game_over:
+            direction = input("Direction: ").lower()
+            match direction:
+                case "w":
+                    self.playActionCLI(Direction.UP.value)
+                case "s":
+                    self.playActionCLI(Direction.DOWN.value)
+                case "a":
+                    self.playActionCLI(Direction.LEFT.value)
+                case "d":
+                    self.playActionCLI(Direction.RIGHT.value)
+                case _:
+                    print("Invalid input try again.")
+
+        print("----------------------------------------")
+        print("GAME OVER!")
+        print(f"Your score was {self.score}")
+        print(f"Your highest tile was {self.getHighestTile()}")
+        print("Thanks for playing.")
+
+    def restart(self):
+        """
+        This restarts the 2048 game with a zero scores and a board with two, random 2 or 4, tiles.
+        """
+        self.board = [
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+        ]
+        self.score = 0
+        self.game_over = False
+        self.addTile()
+        self.addTile()
+
+def main():
+    print("Welcome!")
+    game = Game2048()
+    while True:
+        print("To play a game of 2048, press 'Y'. To end the program, press any other key.")
+        action = input("Action: ").lower()
+        match action:
+            case "y":
+                game.playCLI()
+                game.restart()
+            case _:
+                print("Goodbye!")
+                return
+
+if __name__ == '__main__':
+    main()
