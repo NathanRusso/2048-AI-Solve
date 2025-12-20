@@ -57,16 +57,43 @@ class Game2048:
         return False
     
     def getBoard(self) -> list:
+        """
+        This gets the current 2048 game board.
+        
+        :return: The 4x4 game board.
+        :rtype: list
+        """
         return self.board
 
     def getScore(self) -> int:
+        """
+        This gets the current 2048 game score.
+        
+        :return: The total game score.
+        :rtype: int
+        """
         return self.score
 
     def gameOver(self) -> bool:
+        """
+        This gets whether the current 2048 game is over.
+        
+        :return: True if the game is over, False otherwise.
+        :rtype: bool
+        """
         return self.game_over
     
     def getHighestTile(self) -> int:
-        pass
-
-hi = Game2048()
-print(hi)
+        """
+        This gets the highest tile on the current 2048 game board.
+        
+        :return: The highest tile.
+        :rtype: int
+        """
+        highest_tile = 2
+        for y in range(self.MAX_BOARD_DIMENSION):
+            for x in range(self.MAX_BOARD_DIMENSION):
+                tile = self.board[y][x]
+                if tile > highest_tile:
+                    highest_tile = tile
+        return highest_tile
