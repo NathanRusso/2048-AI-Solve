@@ -1,11 +1,23 @@
+from enum import Enum
 import random as r
+
+class Direction(Enum):
+    """
+    A class that sets the 4 cardinal directions of movements as integers.
+    """
+    UP = 1
+    DOWN = 2
+    LEFT = 3
+    RIGHT = 4
 
 class Game2048:
     """
     This holds the functions to setup, run, and play the game 2048.
     """
 
+
     MAX_BOARD_DIMENSION = 4
+    BLANK_TILE = 0
     TILE_2_CHANCE = 0.9
     TILE_4_CHANCE = 0.1
 
@@ -20,7 +32,7 @@ class Game2048:
             [0, 0, 0, 0],
         ]
         self.score = 0
-        self.game_over = 0
+        self.game_over = False
         self.addTile()
         self.addTile()
 
@@ -34,7 +46,7 @@ class Game2048:
         open_cells = []
         for y in range(self.MAX_BOARD_DIMENSION):
             for x in range(self.MAX_BOARD_DIMENSION):
-                if self.board[y][x] == 0:
+                if self.board[y][x] == self.BLANK_TILE:
                     open_cells.append((y, x))
         return open_cells
 
@@ -56,6 +68,56 @@ class Game2048:
             return True
         return False
     
+    def updateGameOver(self):
+        """
+        This checks if the game is over, i.e, no tiles can merge into each other.
+        """
+        for row in range(self.MAX_BOARD_DIMENSION):
+            for col in range(self.MAX_BOARD_DIMENSION):
+                if (self.board[row][col] == self.BLANK_TILE):
+                    self.game_over = False
+                    return
+
+        for i in range(self.MAX_BOARD_DIMENSION):
+            for j in range(self.MAX_BOARD_DIMENSION - 1):
+                if (self.board[i][j] == self.board[i][j+1] or self.board[j][i] == self.board[j+1][i]):
+                    self.game_over = False
+                    return
+
+        self.game_over = True
+
+    def merge():
+        return
+
+    def shift(self, direction: int) -> bool:
+        """
+        This shifts the tiles on the board in one of the 4 cardinal directions.
+        
+        :param direction: The direction to shift the board tiles.
+        :type direction: int
+        :return: True if the tiles on the board have changed positions, False otherwise.
+        :rtype: bool
+        """
+        return
+
+    def playAction(self, direction: int):
+        """
+        This shifts the tiles in one of the 4 cardinal directions. Then it adds a 2 or 4 tiles to the board if possible.
+        
+        :param direction: The direction to shift the board tiles.
+        :type direction: int
+        """
+        if self.game_over: return
+        board_changed = self.shift(direction)
+        if board_changed:
+            self.addTile()
+            self.updateGameOver()
+
+
+
+
+
+
     def getBoard(self) -> list:
         """
         This gets the current 2048 game board.
