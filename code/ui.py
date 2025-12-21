@@ -5,58 +5,71 @@ class UI2048:
     """
     This holds the functions generate and manipulate the GIU the game 2048.
     """
+    MAX_BOARD_DIMENSION = 4
     SCREEN_WIDTH = 800
     SCREEN_HEIGHT = 600
     COLOR_BACKGROUND = "#faf8f0"
-    COLOR_BACK = "#998876"
+    COLOR_BOARD = "#998876"
     RUN = True
 
     def __init__(self, model):
         pg.init() # Starts pygame
         self.model = model
         self.screen = None
-        self.player = None
+        self.board = None
+        self.tiles = None
 
     def run(self):
-        self.screen = pg.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         pg.display.set_caption("2048 Game with AI Solving!")
-        self.player = pg.Rect((300, 250, 50, 50))
+        self.screen = pg.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+        self.board = pg.Rect((10, 140, 450, 450))
+        self.tiles = [
+            pg.Rect((20, 150, 100, 100)),
+            pg.Rect((130, 150, 100, 100)),
+            pg.Rect((240, 150, 100, 100)),
+            pg.Rect((350, 150, 100, 100)),
+            pg.Rect((20, 260, 100, 100)),
+            pg.Rect((130, 260, 100, 100)),
+            pg.Rect((240, 260, 100, 100)),
+            pg.Rect((350, 260, 100, 100)),
+            pg.Rect((20, 370, 100, 100)),
+            pg.Rect((130, 370, 100, 100)),
+            pg.Rect((240, 370, 100, 100)),
+            pg.Rect((350, 370, 100, 100)),
+            pg.Rect((20, 480, 100, 100)),
+            pg.Rect((130, 480, 100, 100)),
+            pg.Rect((240, 480, 100, 100)),
+            pg.Rect((350, 480, 100, 100))
+        ]
 
         while self.RUN:
+            self.displayCurrentGame()
 
-            self.screen.fill(self.COLOR_BACKGROUND) # Fills (Resets) the screen to not leave trails
-
-            pg.draw.rect(self.screen, "#ea6438", self.player)
-
-            self.handleMovementInput()
 
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.RUN = False
+                
+                self.handleMovementInput()
+
 
             pg.display.update() # Updates the screen to show changes
 
         pg.quit() # Ends pygame
 
-    def handleMovementInput(self):
+    def displayCurrentGame(self):
         """
-        This calls the model to shift the tiles and add a new tile on the board.
+        This draws the current game state.
         """
-        key = pg.key.get_pressed()
-        if key[pg.K_w] or key[pg.K_UP]:
-            self.player.move_ip(0, -1)
-            #self.model.playAction(Direction.UP.value)
-        elif key[pg.K_s] or key[pg.K_DOWN]:
-            self.player.move_ip(0, 1)
-            #self.model.playAction(Direction.DOWN.value)
-        elif key[pg.K_a] or key[pg.K_LEFT]:
-            self.player.move_ip(-1, 0)
-            #self.model.playAction(Direction.LEFT.value)
-        elif key[pg.K_d] or key[pg.K_RIGHT]:
-            self.player.move_ip(1, 0)
-            #self.model.playAction(Direction.RIGHT.value)
+        self.screen.fill(self.COLOR_BACKGROUND) # Fills (Resets) the screen to not leave trails
+        pg.draw.rect(self.screen, self.COLOR_BOARD, self.board)
+        for row in range(self.MAX_BOARD_DIMENSION):
+            for col in range(self.MAX_BOARD_DIMENSION):
+                tile = self.model.getBoard()[row][col]
+                rect_index = row * self.MAX_BOARD_DIMENSION + col
+                pg.draw.rect(self.screen, self.getTileColor(tile), self.tiles[rect_index])
     
-    def getTileColor(tile: int) -> str:
+    def getTileColor(self, tile: int) -> str:
         """
         This gets the color of the given tile.
         
@@ -83,6 +96,20 @@ class UI2048:
             case 16384: return "#1D72C1"
             case 32768: return "#7050d2"
             case _: return "#000000"
+        
+    def handleMovementInput(self):
+        """
+        This calls the model to shift the tiles and add a new tile on the board.
+        """
+        key = pg.key.get_pressed()
+        if key[pg.K_w] or key[pg.K_UP]:
+            self.model.playAction(Direction.UP.value)
+        elif key[pg.K_s] or key[pg.K_DOWN]:
+            self.model.playAction(Direction.DOWN.value)
+        elif key[pg.K_a] or key[pg.K_LEFT]:
+            self.model.playAction(Direction.LEFT.value)
+        elif key[pg.K_d] or key[pg.K_RIGHT]:
+            self.model.playAction(Direction.RIGHT.value)
 
 def main():
     model = Model2048()
