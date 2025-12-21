@@ -15,7 +15,6 @@ class Game2048:
     This holds the functions to setup, run, and play the game 2048.
     """
 
-
     MAX_BOARD_DIMENSION = 4
     BLANK_TILE = 0
     TILE_2_CHANCE = 0.9
@@ -29,7 +28,7 @@ class Game2048:
             [0, 0, 0, 0],
             [0, 0, 0, 0],
             [0, 0, 0, 0],
-            [0, 0, 0, 0],
+            [0, 0, 0, 0]
         ]
         self.score = 0
         self.game_over = False
@@ -263,6 +262,18 @@ class Game2048:
         print(f"Your highest tile was {self.getHighestTile()}")
         print("Thanks for playing.")
 
+    def autoRandomCLI(self):
+        print("Welcome to 2048!")
+        print("The game will now auto play.")
+        while not self.game_over:
+            self.playActionCLI(r.randint(1, 4))
+
+        print("----------------------------------------")
+        print("GAME OVER!")
+        print(f"Your score was {self.score}")
+        print(f"Your highest tile was {self.getHighestTile()}")
+        print("Thanks for playing.")
+
     def restart(self):
         """
         This restarts the 2048 game with a zero scores and a board with two, random 2 or 4, tiles.
@@ -282,11 +293,14 @@ def main():
     print("Welcome!")
     game = Game2048()
     while True:
-        print("To play a game of 2048, press 'Y'. To end the program, press any other key.")
+        print("To play a game of 2048, press 'Y'. To auto play, press 'A'. To end the program, press any other key.")
         action = input("Action: ").lower()
         match action:
             case "y":
                 game.playCLI()
+                game.restart()
+            case "a":
+                game.autoRandomCLI()
                 game.restart()
             case _:
                 print("Goodbye!")
