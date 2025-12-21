@@ -206,6 +206,21 @@ class Game2048:
                     highest_tile = tile
         return highest_tile
 
+    def restart(self):
+        """
+        This restarts the 2048 game with a zero scores and a board with two, random 2 or 4, tiles.
+        """
+        self.board = [
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+        ]
+        self.score = 0
+        self.game_over = False
+        self.addTile()
+        self.addTile()
+
     def displayBoardScore(self):
         """
         This displays the current CLI board and score.
@@ -231,8 +246,6 @@ class Game2048:
     def playCLI(self):
         """
         This runs 1 game using the current 2048 game board.
-        
-        :param self: Description
         """
         print("Welcome to 2048!")
         print("Here is your starting board")
@@ -263,6 +276,9 @@ class Game2048:
         print("Thanks for playing.")
 
     def autoRandomCLI(self):
+        """
+        This automatically runs 1 game using the current 2048 game board by moving in random directions.
+        """
         print("Welcome to 2048!")
         print("The game will now auto play.")
         while not self.game_over:
@@ -273,21 +289,6 @@ class Game2048:
         print(f"Your score was {self.score}")
         print(f"Your highest tile was {self.getHighestTile()}")
         print("Thanks for playing.")
-
-    def restart(self):
-        """
-        This restarts the 2048 game with a zero scores and a board with two, random 2 or 4, tiles.
-        """
-        self.board = [
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-        ]
-        self.score = 0
-        self.game_over = False
-        self.addTile()
-        self.addTile()
 
 def main():
     print("Welcome!")
