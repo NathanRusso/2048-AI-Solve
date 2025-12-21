@@ -10,7 +10,7 @@ class Direction(Enum):
     LEFT = 3
     RIGHT = 4
 
-class Game2048:
+class Model2048:
     """
     This holds the functions to setup, run, and play the game 2048.
     """
@@ -292,7 +292,7 @@ class Game2048:
 
 def main():
     print("Welcome!")
-    game = Game2048()
+    game = Model2048()
     while True:
         print("To play a game of 2048, press 'Y'. To auto play, press 'A'. To end the program, press any other key.")
         action = input("Action: ").lower()
