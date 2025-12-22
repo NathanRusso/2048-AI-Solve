@@ -1,6 +1,16 @@
-import pygame as pg
+from enum import Enum
 import random as r
+import pygame as pg
 from model import Model2048, Direction
+
+
+class Mode(Enum):
+    """
+    A class that holds the different game modes.
+    """
+    MANUAL = 0
+    RANDOM = 1
+
 
 class UI2048:
     """
@@ -11,6 +21,8 @@ class UI2048:
     SCREEN_HEIGHT = 650
     COLOR_BACKGROUND = "#faf8f0"
     COLOR_BOARD = "#998876"
+    COLOR_BACKGROUND_TEXT = "#f2f0e5"
+    COLOR_TEXT = "#736452"
     RUN = True
 
     def __init__(self, model):
@@ -37,9 +49,12 @@ class UI2048:
             pg.Rect((280, 510, 120, 120)),
             pg.Rect((410, 510, 120, 120))
         ]
+        self.buttons = [
+            pg.Rect((300, 10, 260, 30))
+        ]
         self.tile_font = pg.font.SysFont("Clear Sans Bold", 64)
         self.info_font = pg.font.SysFont("Clear Sans Bold", 32)
-        self.mode = 0
+        self.mode = Mode.MANUAL.value
 
     def run(self):
         """
@@ -50,12 +65,26 @@ class UI2048:
 
         while self.RUN:
             self.displayCurrentGame()
+
+            mouse = pg.mouse.get_pos()
+
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.RUN = False
-                self.handleMovementInput()
 
-            if self.mode != 0:
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    mouse_x = mouse[0]
+                    mouse_y = mouse[1]
+                    button = self.buttons[0]
+                    button_min_x, button_min_y = button.topleft
+                    button_max_x, button_max_y = button.bottomright
+                    if (button_min_x <= mouse_x <= button_max_x) and (button_min_y <= mouse_y <= button_max_y):
+                        self.mode = Mode.RANDOM.value
+
+                if self.mode == Mode.MANUAL.value:
+                    self.handleMovementInput()
+
+            if self.mode != Mode.MANUAL.value:
                 self.handleMovementInput()
             
             pg.display.update() # Updates the screen to show changes
@@ -69,18 +98,24 @@ class UI2048:
         self.screen.fill(self.COLOR_BACKGROUND) # Fills (Resets) the screen to not leave trails
         pg.draw.rect(self.screen, self.COLOR_BOARD, self.board)
 
-        best_text = self.info_font.render(f"Best Score: {self.model.getBestScore()}", True, "#000000")
+        best_text = self.info_font.render(f"Best Score: {self.model.getBestScore()}", True, self.COLOR_TEXT)
         best_text_rect = best_text.get_rect(topleft=(10, 10))
         self.screen.blit(best_text, best_text_rect)
 
-        current_text = self.info_font.render(f"Current Score: {self.model.getScore()}", True, "#000000")
+        current_text = self.info_font.render(f"Current Score: {self.model.getScore()}", True, self.COLOR_TEXT)
         current_text_rect = current_text.get_rect(topleft=(10, 40))
         self.screen.blit(current_text, current_text_rect)
 
         if self.model.gameOver():
-            over_text = self.info_font.render("GAME OVER!", True, "#000000")
+            over_text = self.info_font.render("GAME OVER!", True, self.COLOR_TEXT)
             over_text_rect = over_text.get_rect(topleft=(10, 70))
             self.screen.blit(over_text, over_text_rect)
+
+        random_rect = self.buttons[0]
+        pg.draw.rect(self.screen, self.COLOR_BACKGROUND_TEXT, random_rect)
+        random_button_text = self.info_font.render("Click for Random Play!", True, self.COLOR_TEXT)
+        random_button_text_rect = random_button_text.get_rect(center=random_rect.center)
+        self.screen.blit(random_button_text, random_button_text_rect)
 
         for row in range(self.MAX_BOARD_DIMENSION):
             for col in range(self.MAX_BOARD_DIMENSION):
@@ -128,9 +163,10 @@ class UI2048:
         key = pg.key.get_pressed()
         if key[pg.K_r]:
             self.model.restart()
+            self.mode = Mode.MANUAL.value
             return
 
-        if self.mode == 0:
+        if self.mode == Mode.MANUAL.value:
             if key[pg.K_w] or key[pg.K_UP]:
                 self.model.playAction(Direction.UP.value)
             elif key[pg.K_s] or key[pg.K_DOWN]:
@@ -140,11 +176,11 @@ class UI2048:
             elif key[pg.K_d] or key[pg.K_RIGHT]:
                 self.model.playAction(Direction.RIGHT.value)
             elif key[pg.K_1]:
-                #self.mode = 1
+                self.mode = Mode.RANDOM.value
                 return
-        elif self.mode == 1:
+        elif self.mode == Mode.RANDOM.value:
             if key[pg.K_0]:
-                self.mode = 1
+                self.mode = Mode.MANUAL.value
                 return
             self.model.playAction(r.randint(1, 4))
 
