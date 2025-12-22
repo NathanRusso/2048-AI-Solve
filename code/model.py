@@ -31,6 +31,7 @@ class Model2048:
             [0, 0, 0, 0]
         ]
         self.score = 0
+        self.best_score = 0
         self.game_over = False
         self.addTile()
         self.addTile()
@@ -103,6 +104,7 @@ class Model2048:
                 new_tile = list_values[i] * 2
                 final_values.append(new_tile)
                 self.score += new_tile
+                if self.score > self.best_score: self.best_score = self.score
                 i -= 2
             else:
                 final_values.append(list_values[i])
@@ -181,6 +183,15 @@ class Model2048:
         :rtype: int
         """
         return self.score
+
+    def getBestScore(self) -> int:
+        """
+        This gets the best score out of all of the 2048 games.
+        
+        :return: The best game score.
+        :rtype: int
+        """
+        return self.best_score
 
     def gameOver(self) -> bool:
         """
