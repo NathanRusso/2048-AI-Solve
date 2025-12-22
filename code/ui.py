@@ -38,6 +38,7 @@ class UI2048:
             pg.Rect((410, 510, 120, 120))
         ]
         self.tile_font = pg.font.SysFont("Clear Sans Bold", 64)
+        self.info_font = pg.font.SysFont("Clear Sans Bold", 32)
         self.mode = 0
 
     def run(self):
@@ -67,6 +68,19 @@ class UI2048:
         """
         self.screen.fill(self.COLOR_BACKGROUND) # Fills (Resets) the screen to not leave trails
         pg.draw.rect(self.screen, self.COLOR_BOARD, self.board)
+
+        best_text = self.info_font.render(f"Best Score: {self.model.getBestScore()}", True, "#000000")
+        best_text_rect = best_text.get_rect(topleft=(10, 10))
+        self.screen.blit(best_text, best_text_rect)
+
+        current_text = self.info_font.render(f"Current Score: {self.model.getScore()}", True, "#000000")
+        current_text_rect = current_text.get_rect(topleft=(10, 40))
+        self.screen.blit(current_text, current_text_rect)
+
+        if self.model.gameOver():
+            over_text = self.info_font.render("GAME OVER!", True, "#000000")
+            over_text_rect = over_text.get_rect(topleft=(10, 70))
+            self.screen.blit(over_text, over_text_rect)
 
         for row in range(self.MAX_BOARD_DIMENSION):
             for col in range(self.MAX_BOARD_DIMENSION):
