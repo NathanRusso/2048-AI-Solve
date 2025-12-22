@@ -4,7 +4,7 @@ import pygame as pg
 from model import Model2048, Direction
 
 
-class Mode(Enum):
+class UIMode(Enum):
     """
     A class that holds the different game modes.
     """
@@ -30,6 +30,7 @@ class UI2048:
         pg.font.init()
         self.model = model
         self.screen = None
+        self.clock = pg.time.Clock()
         self.board = pg.Rect((10, 110, 530, 530))
         self.tiles = [
             pg.Rect((20, 120, 120, 120)),
@@ -54,7 +55,7 @@ class UI2048:
         ]
         self.tile_font = pg.font.SysFont("Clear Sans Bold", 64)
         self.info_font = pg.font.SysFont("Clear Sans Bold", 32)
-        self.mode = Mode.MANUAL.value
+        self.mode = UIMode.MANUAL.value
 
     def run(self):
         """
@@ -79,16 +80,18 @@ class UI2048:
                     button_min_x, button_min_y = button.topleft
                     button_max_x, button_max_y = button.bottomright
                     if (button_min_x <= mouse_x <= button_max_x) and (button_min_y <= mouse_y <= button_max_y):
-                        self.mode = Mode.RANDOM.value
+                        self.setMode(UIMode.RANDOM.value)
 
-                if self.mode == Mode.MANUAL.value:
+                if self.mode == UIMode.MANUAL.value:
                     self.handleMovementInput()
 
-            if self.mode != Mode.MANUAL.value:
+            if self.mode != UIMode.MANUAL.value:
                 self.handleMovementInput()
             
             pg.display.update() # Updates the screen to show changes
-
+            if self.mode != UIMode.MANUAL.value:
+                self.clock.tick(10) # Update runs at 10 frames/second
+            
         pg.quit() # Ends pygame
 
     def displayCurrentGame(self):
@@ -127,7 +130,34 @@ class UI2048:
                     tile_text = self.tile_font.render(str(tile), True, "#FFFFFF" if tile >= 8 else "#736452")
                     tile_text_rect = tile_text.get_rect(center=rect.center)
                     self.screen.blit(tile_text, tile_text_rect)
-    
+        
+    def handleMovementInput(self):
+        """
+        This calls the model to shift the tiles and add a new tile on the board.
+        """
+        key = pg.key.get_pressed()
+
+        if key[pg.K_r]: # Reset
+            self.setMode(UIMode.MANUAL.value)
+            return
+
+        if self.mode == UIMode.MANUAL.value:
+            if key[pg.K_1]:
+                self.setMode(UIMode.RANDOM.value)
+            elif key[pg.K_w] or key[pg.K_UP]:
+                self.model.playAction(Direction.UP.value)
+            elif key[pg.K_s] or key[pg.K_DOWN]:
+                self.model.playAction(Direction.DOWN.value)
+            elif key[pg.K_a] or key[pg.K_LEFT]:
+                self.model.playAction(Direction.LEFT.value)
+            elif key[pg.K_d] or key[pg.K_RIGHT]:
+                self.model.playAction(Direction.RIGHT.value)
+        elif self.mode == UIMode.RANDOM.value:
+            if key[pg.K_0]:
+                self.setMode(UIMode.MANUAL.value)
+            else:
+                self.model.playAction(r.randint(1, 4))
+
     def getTileColor(self, tile: int) -> str:
         """
         This gets the color of the given tile.
@@ -155,34 +185,17 @@ class UI2048:
             case 16384: return "#1D72C1"
             case 32768: return "#7050d2"
             case _: return "#000000"
+    
+    def setMode(self, mode: int):
+        """
+        This resets the board and switches modes.
         
-    def handleMovementInput(self):
+        :param mode: The ints value for the mode.
+        :type mode: int
         """
-        This calls the model to shift the tiles and add a new tile on the board.
-        """
-        key = pg.key.get_pressed()
-        if key[pg.K_r]:
-            self.model.restart()
-            self.mode = Mode.MANUAL.value
-            return
+        self.model.restart()
+        self.mode = mode
 
-        if self.mode == Mode.MANUAL.value:
-            if key[pg.K_w] or key[pg.K_UP]:
-                self.model.playAction(Direction.UP.value)
-            elif key[pg.K_s] or key[pg.K_DOWN]:
-                self.model.playAction(Direction.DOWN.value)
-            elif key[pg.K_a] or key[pg.K_LEFT]:
-                self.model.playAction(Direction.LEFT.value)
-            elif key[pg.K_d] or key[pg.K_RIGHT]:
-                self.model.playAction(Direction.RIGHT.value)
-            elif key[pg.K_1]:
-                self.mode = Mode.RANDOM.value
-                return
-        elif self.mode == Mode.RANDOM.value:
-            if key[pg.K_0]:
-                self.mode = Mode.MANUAL.value
-                return
-            self.model.playAction(r.randint(1, 4))
 
 def main():
     model = Model2048()
