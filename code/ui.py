@@ -1,4 +1,5 @@
 import pygame as pg
+import random as r
 from model import Model2048, Direction
 
 class UI2048:
@@ -17,26 +18,27 @@ class UI2048:
         pg.font.init()
         self.model = model
         self.screen = None
-        self.board = pg.Rect((10, 190, 450, 450))
+        self.board = pg.Rect((10, 110, 530, 530))
         self.tiles = [
-            pg.Rect((20, 200, 100, 100)),
-            pg.Rect((130, 200, 100, 100)),
-            pg.Rect((240, 200, 100, 100)),
-            pg.Rect((350, 200, 100, 100)),
-            pg.Rect((20, 310, 100, 100)),
-            pg.Rect((130, 310, 100, 100)),
-            pg.Rect((240, 310, 100, 100)),
-            pg.Rect((350, 310, 100, 100)),
-            pg.Rect((20, 420, 100, 100)),
-            pg.Rect((130, 420, 100, 100)),
-            pg.Rect((240, 420, 100, 100)),
-            pg.Rect((350, 420, 100, 100)),
-            pg.Rect((20, 530, 100, 100)),
-            pg.Rect((130, 530, 100, 100)),
-            pg.Rect((240, 530, 100, 100)),
-            pg.Rect((350, 530, 100, 100))
+            pg.Rect((20, 120, 120, 120)),
+            pg.Rect((150, 120, 120, 120)),
+            pg.Rect((280, 120, 120, 120)),
+            pg.Rect((410, 120, 120, 120)),
+            pg.Rect((20, 250, 120, 120)),
+            pg.Rect((150, 250, 120, 120)),
+            pg.Rect((280, 250, 120, 120)),
+            pg.Rect((410, 250, 120, 120)),
+            pg.Rect((20, 380, 120, 120)),
+            pg.Rect((150, 380, 120, 120)),
+            pg.Rect((280, 380, 120, 120)),
+            pg.Rect((410, 380, 120, 120)),
+            pg.Rect((20, 510, 120, 120)),
+            pg.Rect((150, 510, 120, 120)),
+            pg.Rect((280, 510, 120, 120)),
+            pg.Rect((410, 510, 120, 120))
         ]
         self.tile_font = pg.font.SysFont("Clear Sans Bold", 64)
+        self.mode = 0
 
     def run(self):
         """
@@ -51,6 +53,10 @@ class UI2048:
                 if event.type == pg.QUIT:
                     self.RUN = False
                 self.handleMovementInput()
+
+            if self.mode != 0:
+                self.handleMovementInput()
+            
             pg.display.update() # Updates the screen to show changes
 
         pg.quit() # Ends pygame
@@ -106,16 +112,27 @@ class UI2048:
         This calls the model to shift the tiles and add a new tile on the board.
         """
         key = pg.key.get_pressed()
-        if key[pg.K_w] or key[pg.K_UP]:
-            self.model.playAction(Direction.UP.value)
-        elif key[pg.K_s] or key[pg.K_DOWN]:
-            self.model.playAction(Direction.DOWN.value)
-        elif key[pg.K_a] or key[pg.K_LEFT]:
-            self.model.playAction(Direction.LEFT.value)
-        elif key[pg.K_d] or key[pg.K_RIGHT]:
-            self.model.playAction(Direction.RIGHT.value)
-        elif key[pg.K_r]:
+        if key[pg.K_r]:
             self.model.restart()
+            return
+
+        if self.mode == 0:
+            if key[pg.K_w] or key[pg.K_UP]:
+                self.model.playAction(Direction.UP.value)
+            elif key[pg.K_s] or key[pg.K_DOWN]:
+                self.model.playAction(Direction.DOWN.value)
+            elif key[pg.K_a] or key[pg.K_LEFT]:
+                self.model.playAction(Direction.LEFT.value)
+            elif key[pg.K_d] or key[pg.K_RIGHT]:
+                self.model.playAction(Direction.RIGHT.value)
+            elif key[pg.K_1]:
+                #self.mode = 1
+                return
+        elif self.mode == 1:
+            if key[pg.K_0]:
+                self.mode = 1
+                return
+            self.model.playAction(r.randint(1, 4))
 
 def main():
     model = Model2048()
