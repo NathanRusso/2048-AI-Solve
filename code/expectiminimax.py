@@ -222,7 +222,7 @@ class Expectiminimax2048():
 
 def main():
     model = Model2048()
-    expectiminimax = Expectiminimax2048(7) # Search depth of 5 is a good balance
+    expectiminimax = Expectiminimax2048(5) # Search depth of 5 is a good balance
     while not model.gameOver():
         direction = expectiminimax.getNextDirection(model.getBoard())
         print(direction)
