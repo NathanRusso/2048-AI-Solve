@@ -2,6 +2,7 @@ from enum import Enum
 import random as r
 import pygame as pg
 from model import Model2048, Direction
+from expectiminimax import Expectiminimax2048
 
 
 class UIMode(Enum):
@@ -10,7 +11,7 @@ class UIMode(Enum):
     """
     MANUAL = 0
     RANDOM = 1
-    NEXT1 = 2
+    EXPECTIMINIMAX = 2
     NEXT2 = 3
 
 
@@ -28,10 +29,17 @@ class UI2048:
     COLOR_BUTTON_BACKGROUND = COLOR_BOARD
     RUN = True
 
-    def __init__(self, model):
+    def __init__(self, model, expectiminimax):
+        """
+        This sets up the variables need for the UI to function.
+        
+        :param model: A game model for 2048.
+        :param expectiminimax: A expectiminimax solver to chose the next direction.
+        """
         pg.init() # Starts pygame
         pg.font.init()
         self.model = model
+        self.expectiminimax = expectiminimax
         self.screen = None
         self.clock = pg.time.Clock()
         self.board = pg.Rect((10, 110, 530, 530))
@@ -54,10 +62,10 @@ class UI2048:
             pg.Rect((410, 510, 120, 120))
         ]
         self.buttons = [
-            pg.Rect((590, 10, 150, 30)),
-            pg.Rect((590, 50, 150, 30)),
-            pg.Rect((590, 90, 150, 30)),
-            pg.Rect((590, 130, 150, 30))
+            pg.Rect((565, 10, 200, 30)),
+            pg.Rect((565, 50, 200, 30)),
+            pg.Rect((565, 90, 200, 30)),
+            pg.Rect((565, 130, 200, 30))
         ]
         self.tile_font = pg.font.SysFont("Clear Sans Bold", 64)
         self.info_font = pg.font.SysFont("Clear Sans Bold", 32)
@@ -109,12 +117,13 @@ class UI2048:
 
         self.drawButton(UIMode.MANUAL.value, "Manual Play!")
         self.drawButton(UIMode.RANDOM.value, "Random Play!")
-        self.drawButton(UIMode.NEXT1.value, "- - - Next? - - -")
+        self.drawButton(UIMode.EXPECTIMINIMAX.value, "Expectiminimax!")
         self.drawButton(UIMode.NEXT2.value, "- - - Next? - - -")
 
+        current_board = self.model.getBoard()
         for row in range(self.MAX_BOARD_DIMENSION):
             for col in range(self.MAX_BOARD_DIMENSION):
-                tile = self.model.getBoard()[row][col]
+                tile = current_board[row][col]
                 rect_index = row * self.MAX_BOARD_DIMENSION + col
                 rect = self.tiles[rect_index]
                 pg.draw.rect(self.screen, self.getTileColor(tile), rect)
@@ -194,7 +203,7 @@ class UI2048:
                 if key[pg.K_1]:
                     self.setMode(UIMode.RANDOM.value)
                 elif key[pg.K_2]:
-                    self.setMode(UIMode.NEXT1.value)
+                    self.setMode(UIMode.EXPECTIMINIMAX.value)
                 elif key[pg.K_3]:
                     self.setMode(UIMode.NEXT2.value)
                 elif key[pg.K_w] or key[pg.K_UP]:
@@ -209,12 +218,12 @@ class UI2048:
                 if key[pg.K_0]:
                     self.setMode(UIMode.MANUAL.value)
                 elif key[pg.K_2]:
-                    self.setMode(UIMode.NEXT1.value)
+                    self.setMode(UIMode.EXPECTIMINIMAX.value)
                 elif key[pg.K_3]:
                     self.setMode(UIMode.NEXT2.value)
                 else:
                     self.model.playAction(r.randint(1, 4))
-            case UIMode.NEXT1.value:
+            case UIMode.EXPECTIMINIMAX.value:
                 if key[pg.K_0]:
                     self.setMode(UIMode.MANUAL.value)
                 elif key[pg.K_1]:
@@ -222,14 +231,17 @@ class UI2048:
                 elif key[pg.K_3]:
                     self.setMode(UIMode.NEXT2.value)
                 else:
-                    pass
+                    #board = 
+                    #print(board)
+                    self.model.playAction(self.expectiminimax.getNextDirection(self.model.getBoard()))
+                    #self.setMode(UIMode.MANUAL.value)
             case UIMode.NEXT2.value:
                 if key[pg.K_0]:
                     self.setMode(UIMode.MANUAL.value)
                 elif key[pg.K_1]:
                     self.setMode(UIMode.RANDOM.value)
                 elif key[pg.K_2]:
-                    self.setMode(UIMode.NEXT1.value)
+                    self.setMode(UIMode.EXPECTIMINIMAX.value)
                 else:
                     pass
     
@@ -245,7 +257,8 @@ class UI2048:
 
 def main():
     model = Model2048()
-    game = UI2048(model)
+    expectiminimax = Expectiminimax2048(5) # Search depth of 5 is a good balance
+    game = UI2048(model, expectiminimax)
     game.run()
 
 if __name__ == '__main__':
