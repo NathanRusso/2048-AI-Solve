@@ -3,3 +3,6 @@ I am going to recreate and improve a class project that uses AI search algorithm
 
 ## 2048 Game Requirements
 1. pip install pygame
+
+## Resources
+
