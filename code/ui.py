@@ -105,8 +105,7 @@ class UI2048:
 
         self.drawLabel(f"Best Score: {self.model.getBestScore()}", (10, 10))
         self.drawLabel(f"Current Score: {self.model.getScore()}", (10, 40))
-        if self.model.gameOver():
-            self.drawLabel("GAME OVER!", (10, 70))
+        if self.model.gameOver(): self.drawLabel("GAME OVER!", (10, 70))
 
         self.drawButton(UIMode.MANUAL.value, "Manual Play!")
         self.drawButton(UIMode.RANDOM.value, "Random Play!")
@@ -189,23 +188,50 @@ class UI2048:
         if key[pg.K_r]: # Reset
             self.setMode(UIMode.MANUAL.value)
             return
-
-        if self.mode == UIMode.MANUAL.value:
-            if key[pg.K_1]:
-                self.setMode(UIMode.RANDOM.value)
-            elif key[pg.K_w] or key[pg.K_UP]:
-                self.model.playAction(Direction.UP.value)
-            elif key[pg.K_s] or key[pg.K_DOWN]:
-                self.model.playAction(Direction.DOWN.value)
-            elif key[pg.K_a] or key[pg.K_LEFT]:
-                self.model.playAction(Direction.LEFT.value)
-            elif key[pg.K_d] or key[pg.K_RIGHT]:
-                self.model.playAction(Direction.RIGHT.value)
-        elif self.mode == UIMode.RANDOM.value:
-            if key[pg.K_0]:
-                self.setMode(UIMode.MANUAL.value)
-            else:
-                self.model.playAction(r.randint(1, 4))
+        
+        match self.mode:
+            case UIMode.MANUAL.value:
+                if key[pg.K_1]:
+                    self.setMode(UIMode.RANDOM.value)
+                elif key[pg.K_2]:
+                    self.setMode(UIMode.NEXT1.value)
+                elif key[pg.K_3]:
+                    self.setMode(UIMode.NEXT2.value)
+                elif key[pg.K_w] or key[pg.K_UP]:
+                    self.model.playAction(Direction.UP.value)
+                elif key[pg.K_s] or key[pg.K_DOWN]:
+                    self.model.playAction(Direction.DOWN.value)
+                elif key[pg.K_a] or key[pg.K_LEFT]:
+                    self.model.playAction(Direction.LEFT.value)
+                elif key[pg.K_d] or key[pg.K_RIGHT]:
+                    self.model.playAction(Direction.RIGHT.value)
+            case UIMode.RANDOM.value:
+                if key[pg.K_0]:
+                    self.setMode(UIMode.MANUAL.value)
+                elif key[pg.K_2]:
+                    self.setMode(UIMode.NEXT1.value)
+                elif key[pg.K_3]:
+                    self.setMode(UIMode.NEXT2.value)
+                else:
+                    self.model.playAction(r.randint(1, 4))
+            case UIMode.NEXT1.value:
+                if key[pg.K_0]:
+                    self.setMode(UIMode.MANUAL.value)
+                elif key[pg.K_1]:
+                    self.setMode(UIMode.RANDOM.value)
+                elif key[pg.K_3]:
+                    self.setMode(UIMode.NEXT2.value)
+                else:
+                    pass
+            case UIMode.NEXT2.value:
+                if key[pg.K_0]:
+                    self.setMode(UIMode.MANUAL.value)
+                elif key[pg.K_1]:
+                    self.setMode(UIMode.RANDOM.value)
+                elif key[pg.K_2]:
+                    self.setMode(UIMode.NEXT1.value)
+                else:
+                    pass
     
     def setMode(self, mode: int):
         """
@@ -216,7 +242,6 @@ class UI2048:
         """
         self.model.restart()
         self.mode = mode
-
 
 def main():
     model = Model2048()
