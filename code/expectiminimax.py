@@ -1,4 +1,4 @@
-from model import Direction
+from model import Model2048, Direction
 import math as m
 
 class Expectiminimax2048():
@@ -73,9 +73,12 @@ class Expectiminimax2048():
         :return: The average heuristic score of the board overall.
         :rtype: int
         """
-        if current_depth == 0 or self.__gameOver(board):
-            return self.getHeuristicScore(board)
-        elif current_depth % 2 != 0: # Odd: Player move, tiles shift
+        if current_depth == 0: return self.getHeuristicScore(board)
+ 
+        open_cells = self.__getAllOpenCells(board)
+        if len(open_cells) == 0 and not self.__potentialMerges(board): return self.getHeuristicScore(board)
+
+        if current_depth % 2 != 0: # Odd: Player move, tiles shift
             highest_heuristic = 0
             original_board = [row[:] for row in board]
             for direction in Direction:
@@ -86,7 +89,7 @@ class Expectiminimax2048():
                     if heuristic > highest_heuristic: highest_heuristic = heuristic
             return highest_heuristic
         else: # Even: Game move, random tile spawn
-            open_cells = self.__getAllOpenCells(board) ###########################################3
+            #open_cells = self.__getAllOpenCells(board) ###########################################3
             if len(open_cells) != 0:
                 sum_heuristic_2 = 0
                 sum_heuristic_4 = 0
@@ -122,6 +125,20 @@ class Expectiminimax2048():
                     open_cells.append((y, x))
         return open_cells
 
+    def __potentialMerges(self, board: list) -> bool:
+        """
+        This checks if any cells can be merged together.
+
+        :param board: The current 4x4 2048 board to check.
+        :type board: list
+        :return: True if the board can merge cells, False otherwise.
+        :rtype: bool
+        """
+        for i in range(self.MAX_BOARD_DIMENSION):
+            for j in range(self.MAX_BOARD_DIMENSION - 1):
+                if (board[i][j] == board[i][j+1] or board[j][i] == board[j+1][i]): return True
+        return False
+
     def __gameOver(self, board: list) -> bool:
         """
         This gets if the game is over, i.e, no tiles can merge into each other.
@@ -135,11 +152,7 @@ class Expectiminimax2048():
             for x in range(self.MAX_BOARD_DIMENSION):
                 if (board[y][x] == self.BLANK_TILE): return False
 
-        for i in range(self.MAX_BOARD_DIMENSION):
-            for j in range(self.MAX_BOARD_DIMENSION - 1):
-                if (board[i][j] == board[i][j+1] or board[j][i] == board[j+1][i]): return False
-
-        return True
+        return not self.__potentialMerges(board)
 
     def __shift(self, board: list, original_board: list, direction: int) -> list:
         """
@@ -206,3 +219,18 @@ class Expectiminimax2048():
         while len(final_values) < self.MAX_BOARD_DIMENSION:
             final_values.append(0)
         return final_values[::-1]
+
+def main():
+    model = Model2048()
+    expectiminimax = Expectiminimax2048(7) # Search depth of 5 is a good balance
+    while not model.gameOver():
+        direction = expectiminimax.getNextDirection(model.getBoard())
+        print(direction)
+        board_changed = model.shift(direction)
+        if board_changed:
+            model.addTile()
+            model.updateGameOver()
+    model.displayBoardScore()
+
+if __name__ == '__main__':
+    main()
