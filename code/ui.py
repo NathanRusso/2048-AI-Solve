@@ -231,10 +231,7 @@ class UI2048:
                 elif key[pg.K_3]:
                     self.setMode(UIMode.NEXT2.value)
                 else:
-                    #board = 
-                    #print(board)
                     self.model.playAction(self.expectiminimax.getNextDirection(self.model.getBoard()))
-                    #self.setMode(UIMode.MANUAL.value)
             case UIMode.NEXT2.value:
                 if key[pg.K_0]:
                     self.setMode(UIMode.MANUAL.value)

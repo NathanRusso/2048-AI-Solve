@@ -225,7 +225,6 @@ def main():
     expectiminimax = Expectiminimax2048(5) # Search depth of 5 is a good balance
     while not model.gameOver():
         direction = expectiminimax.getNextDirection(model.getBoard())
-        print(direction)
         board_changed = model.shift(direction)
         if board_changed:
             model.addTile()
