@@ -10,6 +10,8 @@ class UIMode(Enum):
     """
     MANUAL = 0
     RANDOM = 1
+    NEXT1 = 2
+    NEXT2 = 3
 
 
 class UI2048:
@@ -19,10 +21,11 @@ class UI2048:
     MAX_BOARD_DIMENSION = 4
     SCREEN_WIDTH = 800
     SCREEN_HEIGHT = 650
-    COLOR_BACKGROUND = "#faf8f0"
+    COLOR_SCREEN = "#faf8f0"
     COLOR_BOARD = "#998876"
-    COLOR_BACKGROUND_TEXT = "#f2f0e5"
-    COLOR_TEXT = "#736452"
+    COLOR_LABEL_TEXT = "#736452"
+    COLOR_BUTTON_TEXT = "#FFFFFF" # "#f2f0e5"
+    COLOR_BUTTON_BACKGROUND = COLOR_BOARD
     RUN = True
 
     def __init__(self, model):
@@ -51,7 +54,10 @@ class UI2048:
             pg.Rect((410, 510, 120, 120))
         ]
         self.buttons = [
-            pg.Rect((300, 10, 260, 30))
+            pg.Rect((590, 10, 150, 30)),
+            pg.Rect((590, 50, 150, 30)),
+            pg.Rect((590, 90, 150, 30)),
+            pg.Rect((590, 130, 150, 30))
         ]
         self.tile_font = pg.font.SysFont("Clear Sans Bold", 64)
         self.info_font = pg.font.SysFont("Clear Sans Bold", 32)
@@ -70,23 +76,19 @@ class UI2048:
             mouse = pg.mouse.get_pos()
 
             for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    self.RUN = False
+                if event.type == pg.QUIT: self.RUN = False
 
                 if event.type == pg.MOUSEBUTTONDOWN:
-                    mouse_x = mouse[0]
-                    mouse_y = mouse[1]
-                    button = self.buttons[0]
-                    button_min_x, button_min_y = button.topleft
-                    button_max_x, button_max_y = button.bottomright
-                    if (button_min_x <= mouse_x <= button_max_x) and (button_min_y <= mouse_y <= button_max_y):
-                        self.setMode(UIMode.RANDOM.value)
+                    mouse_x, mouse_y = mouse
+                    for index, button in enumerate(self.buttons):
+                        button_min_x, button_min_y = button.topleft
+                        button_max_x, button_max_y = button.bottomright
+                        if (button_min_x <= mouse_x <= button_max_x) and (button_min_y <= mouse_y <= button_max_y):
+                            self.setMode(index)
 
-                if self.mode == UIMode.MANUAL.value:
-                    self.handleMovementInput()
+                if self.mode == UIMode.MANUAL.value: self.handleMovementInput() # Handle per event if manual
 
-            if self.mode != UIMode.MANUAL.value:
-                self.handleMovementInput()
+            if self.mode != UIMode.MANUAL.value: self.handleMovementInput()
             
             pg.display.update() # Updates the screen to show changes
             if self.mode != UIMode.MANUAL.value:
@@ -98,27 +100,18 @@ class UI2048:
         """
         This draws the current game state.
         """
-        self.screen.fill(self.COLOR_BACKGROUND) # Fills (Resets) the screen to not leave trails
+        self.screen.fill(self.COLOR_SCREEN) # Fills (Resets) the screen to not leave trails
         pg.draw.rect(self.screen, self.COLOR_BOARD, self.board)
 
-        best_text = self.info_font.render(f"Best Score: {self.model.getBestScore()}", True, self.COLOR_TEXT)
-        best_text_rect = best_text.get_rect(topleft=(10, 10))
-        self.screen.blit(best_text, best_text_rect)
-
-        current_text = self.info_font.render(f"Current Score: {self.model.getScore()}", True, self.COLOR_TEXT)
-        current_text_rect = current_text.get_rect(topleft=(10, 40))
-        self.screen.blit(current_text, current_text_rect)
-
+        self.drawLabel(f"Best Score: {self.model.getBestScore()}", (10, 10))
+        self.drawLabel(f"Current Score: {self.model.getScore()}", (10, 40))
         if self.model.gameOver():
-            over_text = self.info_font.render("GAME OVER!", True, self.COLOR_TEXT)
-            over_text_rect = over_text.get_rect(topleft=(10, 70))
-            self.screen.blit(over_text, over_text_rect)
+            self.drawLabel("GAME OVER!", (10, 70))
 
-        random_rect = self.buttons[0]
-        pg.draw.rect(self.screen, self.COLOR_BACKGROUND_TEXT, random_rect)
-        random_button_text = self.info_font.render("Click for Random Play!", True, self.COLOR_TEXT)
-        random_button_text_rect = random_button_text.get_rect(center=random_rect.center)
-        self.screen.blit(random_button_text, random_button_text_rect)
+        self.drawButton(UIMode.MANUAL.value, "Manual Play!")
+        self.drawButton(UIMode.RANDOM.value, "Random Play!")
+        self.drawButton(UIMode.NEXT1.value, "- - - Next? - - -")
+        self.drawButton(UIMode.NEXT2.value, "- - - Next? - - -")
 
         for row in range(self.MAX_BOARD_DIMENSION):
             for col in range(self.MAX_BOARD_DIMENSION):
@@ -130,33 +123,34 @@ class UI2048:
                     tile_text = self.tile_font.render(str(tile), True, "#FFFFFF" if tile >= 8 else "#736452")
                     tile_text_rect = tile_text.get_rect(center=rect.center)
                     self.screen.blit(tile_text, tile_text_rect)
+
+    def drawLabel(self, label_display_text: str, label_top_left: tuple):
+        """
+        This draws a label on the screen.
         
-    def handleMovementInput(self):
+        :param label_display_text: The text the label will show.
+        :type label_display_text: str
+        :param label_top_left: The top left location on the text rectangle.
+        :type label_top_left: tuple
         """
-        This calls the model to shift the tiles and add a new tile on the board.
+        text = self.info_font.render(label_display_text, True, self.COLOR_LABEL_TEXT)
+        text_rect = text.get_rect(topleft=label_top_left)
+        self.screen.blit(text, text_rect)        
+
+    def drawButton(self, button_rect_index: int, button_display_text: str):
         """
-        key = pg.key.get_pressed()
-
-        if key[pg.K_r]: # Reset
-            self.setMode(UIMode.MANUAL.value)
-            return
-
-        if self.mode == UIMode.MANUAL.value:
-            if key[pg.K_1]:
-                self.setMode(UIMode.RANDOM.value)
-            elif key[pg.K_w] or key[pg.K_UP]:
-                self.model.playAction(Direction.UP.value)
-            elif key[pg.K_s] or key[pg.K_DOWN]:
-                self.model.playAction(Direction.DOWN.value)
-            elif key[pg.K_a] or key[pg.K_LEFT]:
-                self.model.playAction(Direction.LEFT.value)
-            elif key[pg.K_d] or key[pg.K_RIGHT]:
-                self.model.playAction(Direction.RIGHT.value)
-        elif self.mode == UIMode.RANDOM.value:
-            if key[pg.K_0]:
-                self.setMode(UIMode.MANUAL.value)
-            else:
-                self.model.playAction(r.randint(1, 4))
+        This draws a buttons on the screen.
+        
+        :param button_rect_index: The index in the buttons list that holds the rectangle position
+        :type button_rect: int
+        :param button_text: The text the button will show
+        :type button_text: str
+        """
+        rect = self.buttons[button_rect_index]
+        pg.draw.rect(self.screen, self.COLOR_BUTTON_BACKGROUND, rect)
+        button_text = self.info_font.render(button_display_text, True, self.COLOR_BUTTON_TEXT)
+        button_text_rect = button_text.get_rect(center=rect.center)
+        self.screen.blit(button_text, button_text_rect)
 
     def getTileColor(self, tile: int) -> str:
         """
@@ -185,6 +179,33 @@ class UI2048:
             case 16384: return "#1D72C1"
             case 32768: return "#7050d2"
             case _: return "#000000"
+
+    def handleMovementInput(self):
+        """
+        This calls the model to shift the tiles and add a new tile on the board.
+        """
+        key = pg.key.get_pressed()
+
+        if key[pg.K_r]: # Reset
+            self.setMode(UIMode.MANUAL.value)
+            return
+
+        if self.mode == UIMode.MANUAL.value:
+            if key[pg.K_1]:
+                self.setMode(UIMode.RANDOM.value)
+            elif key[pg.K_w] or key[pg.K_UP]:
+                self.model.playAction(Direction.UP.value)
+            elif key[pg.K_s] or key[pg.K_DOWN]:
+                self.model.playAction(Direction.DOWN.value)
+            elif key[pg.K_a] or key[pg.K_LEFT]:
+                self.model.playAction(Direction.LEFT.value)
+            elif key[pg.K_d] or key[pg.K_RIGHT]:
+                self.model.playAction(Direction.RIGHT.value)
+        elif self.mode == UIMode.RANDOM.value:
+            if key[pg.K_0]:
+                self.setMode(UIMode.MANUAL.value)
+            else:
+                self.model.playAction(r.randint(1, 4))
     
     def setMode(self, mode: int):
         """
