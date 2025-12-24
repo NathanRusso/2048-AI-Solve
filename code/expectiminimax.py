@@ -12,9 +12,15 @@ class Expectiminimax2048():
     TILE_4_CHANCE = 0.1
     SNAKE_HEURISTIC = [
         [2**15, 2**14, 2**13, 2**12],
-        [2**11, 2**10, 2**9, 2**8],
+        [2**8, 2**9, 2**10, 2**11],
         [2**7, 2**6, 2**5, 2**4],
-        [2**3, 2**2, 2**1, 2**0]
+        [2**0, 2**1, 2**2, 2**3]
+    ]
+    SPIRAL_HEURISTIC = [
+        [2**12, 2**13, 2**14, 2**15],
+        [2**11, 2**2, 2**3, 2**4],
+        [2**10, 2**1, 2**0, 2**5],
+        [2**9, 2**8, 2**7, 2**6]
     ]
 
     def __init__(self, depth):
@@ -27,6 +33,17 @@ class Expectiminimax2048():
 
     def getHeuristicScore(self, board: list) -> int:
         """
+        This gets the board's heuristic score.
+        
+        :param board: The given 4x4 2048 board.
+        :type board: list
+        :return: The heuristic score.
+        :rtype: int
+        """
+        return self.__getHeuristicSnakeScore(board)
+
+    def __getHeuristicSnakeScore(self, board: list) -> int:
+        """
         This gets the board snake heuristic score.
         
         :param board: The given 4x4 2048 board.
@@ -38,6 +55,36 @@ class Expectiminimax2048():
         for y in range(self.MAX_BOARD_DIMENSION):
             for x in range(self.MAX_BOARD_DIMENSION):
                 heuristic_score += board[y][x] * self.SNAKE_HEURISTIC[y][x]
+        return heuristic_score
+
+    def __getHeuristicSpiralScore(self, board: list) -> int: # BAD
+        """
+        This gets the board spiral heuristic score.
+        
+        :param board: The given 4x4 2048 board.
+        :type board: list
+        :return: The heuristic score.
+        :rtype: int
+        """
+        heuristic_score = 0
+        for y in range(self.MAX_BOARD_DIMENSION):
+            for x in range(self.MAX_BOARD_DIMENSION):
+                heuristic_score += board[y][x] * self.SPIRAL_HEURISTIC[y][x]
+        return heuristic_score
+
+    def __getHeuristicSumScore(self, board: list) -> int: # TERRIBLE
+        """
+        This gets the board sum heuristic score.
+        
+        :param board: The given 4x4 2048 board.
+        :type board: list
+        :return: The heuristic score.
+        :rtype: int
+        """
+        heuristic_score = 0
+        for y in range(self.MAX_BOARD_DIMENSION):
+            for x in range(self.MAX_BOARD_DIMENSION):
+                heuristic_score += board[y][x]
         return heuristic_score
 
     def getNextDirection(self, board: list) -> int:

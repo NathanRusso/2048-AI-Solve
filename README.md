@@ -5,4 +5,11 @@ I am going to recreate and improve a class project that uses AI search algorithm
 1. pip install pygame
 
 ## Resources
+### Expectiminimax
+- https://www.geeksforgeeks.org/dsa/expectimax-algorithm-in-game-theory/
+- https://youtu.be/0fOLkZJ-Q6I?si=IS6iU51pobOUEFQW
+- https://github.com/mschrandt/2048
+- https://cs229.stanford.edu/proj2016/report/NieHouAn-AIPlays2048-report.pdf
+- https://www.baeldung.com/cs/2048-algorithm
 
+### Misc
