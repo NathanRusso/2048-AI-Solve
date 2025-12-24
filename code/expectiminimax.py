@@ -16,11 +16,11 @@ class Expectiminimax2048():
         [2**7, 2**6, 2**5, 2**4],
         [2**0, 2**1, 2**2, 2**3]
     ]
-    SPIRAL_HEURISTIC = [
-        [2**12, 2**13, 2**14, 2**15],
-        [2**11, 2**2, 2**3, 2**4],
-        [2**10, 2**1, 2**0, 2**5],
-        [2**9, 2**8, 2**7, 2**6]
+    SNAKE_HEURISTIC_2 = [
+        [2**30, 2**28, 2**26, 2**24],
+        [2**16, 2**18, 2**20, 2**22],
+        [2**14, 2**12, 2**10, 2**8],
+        [2**0, 2**2, 2**4, 2**6]
     ]
 
     def __init__(self, depth):
@@ -29,7 +29,7 @@ class Expectiminimax2048():
         
         :param depth: The search depth of the AI solver/search.
         """
-        self.depth = depth  # How deep are algorithm will search, MUST BE ODD
+        self.depth = depth  # How deep are algorithm will search
 
     def getHeuristicScore(self, board: list) -> int:
         """
@@ -40,9 +40,9 @@ class Expectiminimax2048():
         :return: The heuristic score.
         :rtype: int
         """
-        return self.__getHeuristicSnakeScore(board)
+        return self.__getHeuristicSnake2Score(board)
 
-    def __getHeuristicSnakeScore(self, board: list) -> int:
+    def __getHeuristicSnakeScore(self, board: list) -> int: # BEST
         """
         This gets the board snake heuristic score.
         
@@ -56,10 +56,10 @@ class Expectiminimax2048():
             for x in range(self.MAX_BOARD_DIMENSION):
                 heuristic_score += board[y][x] * self.SNAKE_HEURISTIC[y][x]
         return heuristic_score
-
-    def __getHeuristicSpiralScore(self, board: list) -> int: # BAD
+    
+    def __getHeuristicSnake2Score(self, board: list) -> int: # BEST
         """
-        This gets the board spiral heuristic score.
+        This gets the board snake 2 heuristic score.
         
         :param board: The given 4x4 2048 board.
         :type board: list
@@ -69,22 +69,7 @@ class Expectiminimax2048():
         heuristic_score = 0
         for y in range(self.MAX_BOARD_DIMENSION):
             for x in range(self.MAX_BOARD_DIMENSION):
-                heuristic_score += board[y][x] * self.SPIRAL_HEURISTIC[y][x]
-        return heuristic_score
-
-    def __getHeuristicSumScore(self, board: list) -> int: # TERRIBLE
-        """
-        This gets the board sum heuristic score.
-        
-        :param board: The given 4x4 2048 board.
-        :type board: list
-        :return: The heuristic score.
-        :rtype: int
-        """
-        heuristic_score = 0
-        for y in range(self.MAX_BOARD_DIMENSION):
-            for x in range(self.MAX_BOARD_DIMENSION):
-                heuristic_score += board[y][x]
+                heuristic_score += board[y][x] * self.SNAKE_HEURISTIC_2[y][x]
         return heuristic_score
 
     def getNextDirection(self, board: list) -> int:
@@ -103,13 +88,13 @@ class Expectiminimax2048():
             board_copy = [row[:] for row in board]
             board_changed = self.__shift(board_copy, original_board, direction.value)
             if board_changed:
-                heuristic = self.__getBestScore(board_copy, self.depth - 1)
+                heuristic = self.__getBestScore(board_copy, self.depth - 1, False)
                 if heuristic > highest_heuristic:
                     highest_heuristic = heuristic
                     best_direction = direction
         return best_direction.value
 
-    def __getBestScore(self, board: list, current_depth: int) -> int:
+    def __getBestScore(self, board: list, current_depth: int, players_turn: bool) -> int:
         """
         Returns the best heuristic score for the given board and depth.
         
@@ -117,6 +102,8 @@ class Expectiminimax2048():
         :type board: list
         :param current_depth: The current search depth.
         :type current_depth: int
+        :param players_turn: If it is the player's turn, shifting tiles.
+        :type players_turn: bool
         :return: The average heuristic score of the board overall.
         :rtype: int
         """
@@ -125,18 +112,19 @@ class Expectiminimax2048():
         open_cells = self.__getAllOpenCells(board)
         if len(open_cells) == 0 and not self.__potentialMerges(board): return self.getHeuristicScore(board)
 
-        if current_depth % 2 != 0: # Odd: Player move, tiles shift
+        #if current_depth % 2 != 0: # Odd: Player move, tiles shift
+        if players_turn: # Odd: Player move, tiles shift
             highest_heuristic = 0
             original_board = [row[:] for row in board]
             for direction in Direction:
                 board_copy = [row[:] for row in board]
                 board_changed = self.__shift(board_copy, original_board, direction.value)
                 if board_changed:
-                    heuristic = self.__getBestScore(board_copy, current_depth - 1)
+                    heuristic = self.__getBestScore(board_copy, current_depth - 1, False)
                     if heuristic > highest_heuristic: highest_heuristic = heuristic
             return highest_heuristic
         else: # Even: Game move, random tile spawn
-            #open_cells = self.__getAllOpenCells(board) ###########################################3
+            #open_cells = self.__getAllOpenCells(board)
             if len(open_cells) != 0:
                 sum_heuristic_2 = 0
                 sum_heuristic_4 = 0
@@ -146,15 +134,15 @@ class Expectiminimax2048():
                     y, x = cell
                     board_copy_2[y][x] = 2
                     board_copy_4[y][x] = 4
-                    sum_heuristic_2 += self.__getBestScore(board_copy_2, current_depth - 1)
-                    sum_heuristic_4 += self.__getBestScore(board_copy_4, current_depth - 1)
+                    sum_heuristic_2 += self.__getBestScore(board_copy_2, current_depth - 1, True)
+                    sum_heuristic_4 += self.__getBestScore(board_copy_4, current_depth - 1, True)
 
                 avg_heuristic_2 = sum_heuristic_2 / len(open_cells)
                 avg_heuristic_4 = sum_heuristic_4 / len(open_cells)
                 return m.floor(avg_heuristic_2 * self.TILE_2_CHANCE + avg_heuristic_4 * self.TILE_4_CHANCE)
             else:
                 board_copy = [row[:] for row in board]
-                return self.__getBestScore(board_copy, current_depth - 1)
+                return self.__getBestScore(board_copy, current_depth - 1, True)
 
     def __getAllOpenCells(self, board: list) -> list:
         """
