@@ -10,7 +10,7 @@ class Expectiminimax2048():
     BLANK_TILE = 0
     TILE_2_CHANCE = 0.9
     TILE_4_CHANCE = 0.1
-    SNAKE_HEURISTIC = [
+    SNAKE_HEURISTIC_1 = [
         [2**15, 2**14, 2**13, 2**12],
         [2**8, 2**9, 2**10, 2**11],
         [2**7, 2**6, 2**5, 2**4],
@@ -23,13 +23,14 @@ class Expectiminimax2048():
         [2**0, 2**2, 2**4, 2**6]
     ]
 
-    def __init__(self, depth):
+    def __init__(self, depth, snake_1):
         """
         This sets up the variables needed for Expectiminimax to function.
         
         :param depth: The search depth of the AI solver/search.
         """
-        self.depth = depth  # How deep are algorithm will search
+        self.depth = depth      # How deep are algorithm will search
+        self.snake_1 = snake_1  # If the heuristic will be the snake 1
 
     def getHeuristicScore(self, board: list) -> int:
         """
@@ -40,9 +41,12 @@ class Expectiminimax2048():
         :return: The heuristic score.
         :rtype: int
         """
-        return self.__getHeuristicSnake2Score(board)
+        if self.snake_1:
+            self.__getHeuristicSnake1Score(board)
+        else:
+            self.__getHeuristicSnake2Score(board)
 
-    def __getHeuristicSnakeScore(self, board: list) -> int: # BEST
+    def __getHeuristicSnake1Score(self, board: list) -> int: # BEST
         """
         This gets the board snake heuristic score.
         
@@ -54,7 +58,7 @@ class Expectiminimax2048():
         heuristic_score = 0
         for y in range(self.MAX_BOARD_DIMENSION):
             for x in range(self.MAX_BOARD_DIMENSION):
-                heuristic_score += board[y][x] * self.SNAKE_HEURISTIC[y][x]
+                heuristic_score += board[y][x] * self.SNAKE_HEURISTIC_1[y][x]
         return heuristic_score
     
     def __getHeuristicSnake2Score(self, board: list) -> int: # BEST
@@ -257,7 +261,7 @@ class Expectiminimax2048():
 
 def main():
     model = Model2048()
-    expectiminimax = Expectiminimax2048(5) # Search depth of 5 is a good balance
+    expectiminimax = Expectiminimax2048(5, False) # Search depth of 5 is a good balance
     while not model.gameOver():
         direction = expectiminimax.getNextDirection(model.getBoard())
         board_changed = model.shift(direction)
