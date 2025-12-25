@@ -254,7 +254,7 @@ class UI2048:
 
 def main():
     model = Model2048()
-    expectiminimax = Expectiminimax2048(5, False) # Search depth of 5 is the max before the time increase becomes too much!
+    expectiminimax = Expectiminimax2048(5, 4) # Search depth of 5 is the max before the time increase becomes too much!
     game = UI2048(model, expectiminimax)
     game.run()
 

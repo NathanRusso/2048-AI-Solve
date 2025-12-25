@@ -17,20 +17,36 @@ class Expectiminimax2048():
         [2**0, 2**1, 2**2, 2**3]
     ]
     SNAKE_HEURISTIC_2 = [
-        [2**30, 2**28, 2**26, 2**24],
-        [2**16, 2**18, 2**20, 2**22],
-        [2**14, 2**12, 2**10, 2**8],
-        [2**0, 2**2, 2**4, 2**6]
+        [4**15, 4**14, 4**13, 4**12],
+        [4**8, 4**9, 4**10, 4**11],
+        [4**7, 4**6, 4**5, 4**4],
+        [4**0, 4**1, 4**2, 4**3]
+    ]
+    SNAKE_HEURISTIC_3 = [
+        [2**12, 2**11, 2**10, 2**9],
+        [2**6, 2**7, 2**8, 2**9],
+        [2**6, 2**5, 2**4, 2**3],
+        [2**0, 2**1, 2**2, 2**3]
+    ]
+    SNAKE_HEURISTIC_4 = [
+        [4**12, 4**11, 4**10, 4**9],
+        [4**6, 4**7, 4**8, 4**9],
+        [4**6, 4**5, 4**4, 4**3],
+        [4**0, 4**1, 4**2, 4**3]
     ]
 
-    def __init__(self, depth, snake_1):
+    def __init__(self, depth: int , snake: int):
         """
         This sets up the variables needed for Expectiminimax to function.
         
         :param depth: The search depth of the AI solver/search.
+        :type depth: int
+        :param snake: Which snake heuristic to use.
+        :type snake: int
+        
         """
         self.depth = depth      # How deep are algorithm will search
-        self.snake_1 = snake_1  # If the heuristic will be the snake 1
+        self.snake = snake  # If the heuristic will be the snake 1
 
     def getHeuristicScore(self, board: list) -> int:
         """
@@ -41,39 +57,33 @@ class Expectiminimax2048():
         :return: The heuristic score.
         :rtype: int
         """
-        if self.snake_1:
-            self.__getHeuristicSnake1Score(board)
-        else:
-            self.__getHeuristicSnake2Score(board)
+        match self.snake:
+            case 1:
+                return self.__getHeuristicSnakeScore(board, self.SNAKE_HEURISTIC_1)
+            case 2:
+                return self.__getHeuristicSnakeScore(board, self.SNAKE_HEURISTIC_2)
+            case 3:
+                return self.__getHeuristicSnakeScore(board, self.SNAKE_HEURISTIC_3)
+            case 4:
+                return self.__getHeuristicSnakeScore(board, self.SNAKE_HEURISTIC_4)
+            case _:
+                return self.__getHeuristicSnakeScore(board, self.SNAKE_HEURISTIC_2)
 
-    def __getHeuristicSnake1Score(self, board: list) -> int: # BEST
+    def __getHeuristicSnakeScore(self, board: list, snake_heuristic: list) -> int:
         """
         This gets the board snake heuristic score.
-        
+                
         :param board: The given 4x4 2048 board.
         :type board: list
-        :return: The heuristic score.
+        :param snake_heuristic: The snake heuristic to be used when getting the board's score.
+        :type snake_heuristic: list
+        :return: he heuristic score.
         :rtype: int
         """
         heuristic_score = 0
         for y in range(self.MAX_BOARD_DIMENSION):
             for x in range(self.MAX_BOARD_DIMENSION):
-                heuristic_score += board[y][x] * self.SNAKE_HEURISTIC_1[y][x]
-        return heuristic_score
-    
-    def __getHeuristicSnake2Score(self, board: list) -> int: # BEST
-        """
-        This gets the board snake 2 heuristic score.
-        
-        :param board: The given 4x4 2048 board.
-        :type board: list
-        :return: The heuristic score.
-        :rtype: int
-        """
-        heuristic_score = 0
-        for y in range(self.MAX_BOARD_DIMENSION):
-            for x in range(self.MAX_BOARD_DIMENSION):
-                heuristic_score += board[y][x] * self.SNAKE_HEURISTIC_2[y][x]
+                heuristic_score += board[y][x] * snake_heuristic[y][x]
         return heuristic_score
 
     def getNextDirection(self, board: list) -> int:
