@@ -35,7 +35,7 @@ class Expectiminimax2048():
         [4**0, 4**1, 4**2, 4**3]
     ]
 
-    def __init__(self, depth: int , snake: int):
+    def __init__(self, depth: int, snake: int):
         """
         This sets up the variables needed for Expectiminimax to function.
         
