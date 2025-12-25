@@ -73,18 +73,21 @@ class Expectiminimax2048():
         """
         This gets the board snake heuristic score.
                 
-        :param board: The given 4x4 2048 board.
-        :type board: list
-        :param snake_heuristic: The snake heuristic to be used when getting the board's score.
-        :type snake_heuristic: list
-        :return: he heuristic score.
+        :param b: The given 4x4 2048 board.
+        :type b: list
+        :param h: The snake heuristic to be used when getting the board's score.
+        :type h: list
+        :return: The heuristic score.
         :rtype: int
         """
-        heuristic_score = 0
-        for y in range(self.MAX_BOARD_DIMENSION):
-            for x in range(self.MAX_BOARD_DIMENSION):
-                heuristic_score += board[y][x] * snake_heuristic[y][x]
-        return heuristic_score
+        br0, br1, br2, br3 = board              # Board rows
+        hr0, hr1, hr2, hr3 = snake_heuristic    # Snake heuristic rows
+        return (
+            br0[0]*hr0[0] + br0[1]*hr0[1] + br0[2]*hr0[2] + br0[3]*hr0[3] +
+            br1[0]*hr1[0] + br1[1]*hr1[1] + br1[2]*hr1[2] + br1[3]*hr1[3] +
+            br2[0]*hr2[0] + br2[1]*hr2[1] + br2[2]*hr2[2] + br2[3]*hr2[3] +
+            br3[0]*hr3[0] + br3[1]*hr3[1] + br3[2]*hr3[2] + br3[3]*hr3[3]
+        )
 
     def getNextDirection(self, board: list) -> int:
         """
