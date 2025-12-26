@@ -129,8 +129,7 @@ class Expectiminimax2048():
         open_cells = self.__getAllOpenCells(board)
         if len(open_cells) == 0 and not self.__potentialMerges(board): return self.getHeuristicScore(board)
 
-        #if current_depth % 2 != 0: # Odd: Player move, tiles shift
-        if players_turn: # Odd: Player move, tiles shift
+        if players_turn: # Player's Turn: Tiles shift
             highest_heuristic = 0
             original_board = [row[:] for row in board]
             for direction in Direction:
@@ -140,8 +139,7 @@ class Expectiminimax2048():
                     heuristic = self.__getBestScore(board_copy, current_depth - 1, False)
                     if heuristic > highest_heuristic: highest_heuristic = heuristic
             return highest_heuristic
-        else: # Even: Game move, random tile spawn
-            #open_cells = self.__getAllOpenCells(board)
+        else: # Game's Turn: Random tile spawn
             if len(open_cells) != 0:
                 sum_heuristic_2 = 0
                 sum_heuristic_4 = 0

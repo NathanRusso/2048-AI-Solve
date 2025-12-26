@@ -22,8 +22,8 @@ def main():
             e_scores.append(model.getScore())
             e_highest_tiles.append(model.getHighestTile())
             model.restart()
-    e_scores_all.append(e_scores)
-    e_highest_tiles_all.append(e_highest_tiles)
+        e_scores_all.append(e_scores)
+        e_highest_tiles_all.append(e_highest_tiles)
 
     with open("data/output.txt", "w") as f:
         for i in range(1, 5):
