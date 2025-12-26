@@ -12,4 +12,5 @@ I am going to recreate and improve a class project that uses AI search algorithm
 - https://cs229.stanford.edu/proj2016/report/NieHouAn-AIPlays2048-report.pdf
 - https://www.baeldung.com/cs/2048-algorithm
 
-### Misc
+### Monte Carlo Tree Search
+- https://www.geeksforgeeks.org/machine-learning/monte-carlo-tree-search-mcts-in-machine-learning/
