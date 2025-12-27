@@ -36,13 +36,13 @@ class UI2048:
         
         :param model: A game model for 2048.
         :param expectiminimax: A Expectiminimax solver to chose the next direction.
-        :param expectiminimax: A Monte Carlo Tree Search solver to chose the next direction.
+        :param mcts: A Monte Carlo Tree Search solver to chose the next direction.
         """
         pg.init() # Starts pygame
         pg.font.init()
         self.model = model
         self.expectiminimax = expectiminimax
-        self.mcts
+        self.mcts = mcts
         self.screen = None
         self.clock = pg.time.Clock()
         self.board = pg.Rect((10, 110, 530, 530))

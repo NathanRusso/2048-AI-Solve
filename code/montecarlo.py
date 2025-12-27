@@ -19,7 +19,7 @@ class MCTSNode:
         [4**0, 4**1, 4**2, 4**3]
     ]
 
-    def __init__(self, board: list, parent: MCTSNode, direction: int, player_turn_next: bool):
+    def __init__(self, board: list, parent: "MCTSNode", direction: int, player_turn_next: bool):
         self.board = board
         self.parent = parent
         self.direction == direction
@@ -47,7 +47,7 @@ class MCTSNode:
             for j in range(self.MAX_BOARD_DIMENSION - 1):
                 if (board[i][j] == board[i][j+1] or board[j][i] == board[j+1][i]): self.game_over == False
 
-    def selectBestChild(self) -> MCTSNode:
+    def selectBestChild(self) -> "MCTSNode":
         best_child = None
         best_child_ucb1 = float("-inf")
         for child in self.children:
@@ -57,7 +57,7 @@ class MCTSNode:
                 best_child = child
         return best_child
 
-    def expandNode(self) -> MCTSNode:
+    def expandNode(self) -> "MCTSNode":
         action = self.available_actions.pop()
         board_copy = [row[:] for row in self.board]
         child = None
