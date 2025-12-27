@@ -22,7 +22,7 @@ class MCTSNode:
     def __init__(self, board: list, parent: "MCTSNode", direction: int, player_turn_next: bool):
         self.board = board
         self.parent = parent
-        self.direction == direction
+        self.direction = direction
         self.player_turn_next = player_turn_next
         self.children = []
         self.all_actions = []
@@ -40,16 +40,23 @@ class MCTSNode:
             self.all_actions = [Direction.DOWN.value, Direction.RIGHT.value, Direction.LEFT.value, Direction.UP.value]
         else:
             self.all_actions = open_cells
+
         self.available_actions = self.all_actions
 
-        if len(open_cells) > 0: self.game_over == False
-        for i in range(self.MAX_BOARD_DIMENSION):
-            for j in range(self.MAX_BOARD_DIMENSION - 1):
-                if (board[i][j] == board[i][j+1] or board[j][i] == board[j+1][i]): self.game_over == False
+        print("On Creation")
+        print(vars(self))
+
+        if len(open_cells) > 0: self.game_over = False
+        if player_turn_next:
+            for i in range(self.MAX_BOARD_DIMENSION):
+                for j in range(self.MAX_BOARD_DIMENSION - 1):
+                    if (board[i][j] == board[i][j+1] or board[j][i] == board[j+1][i]): self.game_over = False
+        print(vars(self))
 
     def selectBestChild(self) -> "MCTSNode":
         best_child = None
         best_child_ucb1 = float("-inf")
+        print(f"Children: {self.children}")
         for child in self.children:
             child_ucb1 = self.__UCB1(child.reward, self.visits, child.visits)
             if child_ucb1 > best_child_ucb1:
@@ -62,7 +69,7 @@ class MCTSNode:
         board_copy = [row[:] for row in self.board]
         child = None
         if self.player_turn_next:
-            self.__shift(board_copy, board_copy, action)
+            board_changed = self.__shift(board_copy, self.board, action)
             child = MCTSNode(board_copy, self, action, not self.player_turn_next)
         else:
             y, x  = action
@@ -81,24 +88,26 @@ class MCTSNode:
         i = 0
         players_turn = self.player_turn_next
         while i < expansion_depth and not game_over:
+            open_cells = []
+            for y in range(self.MAX_BOARD_DIMENSION):
+                for x in range(self.MAX_BOARD_DIMENSION):
+                    if simulation_board[y][x] == self.BLANK_TILE: open_cells.append((y, x))
+
             if players_turn:
                 self.__shift(simulation_board, simulation_board, r.randint(1, 4))
+                self.game_over = len(open_cells) == 0 and not self.__potentialMerges(simulation_board)
             else:
-                open_cells = []
-                for y in range(self.MAX_BOARD_DIMENSION):
-                    for x in range(self.MAX_BOARD_DIMENSION):
-                        if simulation_board[y][x] == self.BLANK_TILE: open_cells.append((y, x))
-                y, x  = r.choice(open_cells)
-                tile_probability_num = r.random()
-                if tile_probability_num < self.TILE_2_CHANCE:
-                    simulation_board[y][x] = 2
-                else:
-                    simulation_board[y][x] = 4
-
+                if len(open_cells) > 0:
+                    y, x  = r.choice(open_cells)
+                    tile_probability_num = r.random()
+                    if tile_probability_num < self.TILE_2_CHANCE:
+                        simulation_board[y][x] = 2
+                    else:
+                        simulation_board[y][x] = 4
+                self.game_over = len(open_cells) <= 1 and not self.__potentialMerges(simulation_board)
             players_turn = not players_turn
-            if len(open_cells) <= 1:
-                self.game_over = not self.__potentialMerges(simulation_board)
-        
+            i += 1
+
         return self.__getHeuristicSnake2Score(simulation_board)
     
     def backPropagation(self, heuristic: int):
@@ -109,7 +118,7 @@ class MCTSNode:
         else:
             self.reward = heuristic
 
-        if self.parent: self.parent.backPropagation()
+        if self.parent: self.parent.backPropagation(heuristic)
 
     def __potentialMerges(self, board: list) -> bool:
         """
@@ -245,17 +254,25 @@ class MonteCarlo2048:
     def getNextDirection(self, original_board: list) -> int:
         root = MCTSNode(original_board, None, None, True)
         
-        for _ in range(self.selection_iterations):
+        for i in range(self.selection_iterations):
+            print(i)
             node = root
 
+            print("Sele")
             while not node.game_over and len(node.available_actions) == 0:
-                node = node.selectBestChild()   # Selection
-            
+                node = node.selectBestChild()                       # Selection
+                print(node)
+                print(vars(node))
+
+            print("Expa")
             if not node.game_over and len(node.available_actions) > 0:
-                node = node.expandNode()        # Expansion
-            
-            heuristic = node.simulateNode()     # Simulation
-            node.backPropagation(heuristic)     # Backpropagation
+                node = node.expandNode()                            # Expansion
+
+            print("Simu")
+            heuristic = node.simulateNode(self.expansion_depth)     # Simulation
+
+            print("Back")
+            node.backPropagation(heuristic)                         # Backpropagation
 
         best_direction = None
         best_visits = 0
