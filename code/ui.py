@@ -3,6 +3,7 @@ import random as r
 import pygame as pg
 from model import Model2048, Direction
 from expectiminimax import Expectiminimax2048
+from montecarlo import MonteCarlo2048
 
 
 class UIMode(Enum):
@@ -12,7 +13,7 @@ class UIMode(Enum):
     MANUAL = 0
     RANDOM = 1
     EXPECTIMINIMAX = 2
-    NEXT2 = 3
+    MCTS = 3
 
 
 class UI2048:
@@ -29,17 +30,19 @@ class UI2048:
     COLOR_BUTTON_BACKGROUND = COLOR_BOARD
     RUN = True
 
-    def __init__(self, model, expectiminimax):
+    def __init__(self, model, expectiminimax, mcts):
         """
         This sets up the variables need for the UI to function.
         
         :param model: A game model for 2048.
-        :param expectiminimax: A expectiminimax solver to chose the next direction.
+        :param expectiminimax: A Expectiminimax solver to chose the next direction.
+        :param expectiminimax: A Monte Carlo Tree Search solver to chose the next direction.
         """
         pg.init() # Starts pygame
         pg.font.init()
         self.model = model
         self.expectiminimax = expectiminimax
+        self.mcts
         self.screen = None
         self.clock = pg.time.Clock()
         self.board = pg.Rect((10, 110, 530, 530))
@@ -118,7 +121,7 @@ class UI2048:
         self.drawButton(UIMode.MANUAL.value, "Manual Play!")
         self.drawButton(UIMode.RANDOM.value, "Random Play!")
         self.drawButton(UIMode.EXPECTIMINIMAX.value, "Expectiminimax!")
-        self.drawButton(UIMode.NEXT2.value, "- - - Next? - - -")
+        self.drawButton(UIMode.MCTS.value, "Monte Carlo!")
 
         current_board = self.model.getBoard()
         for row in range(self.MAX_BOARD_DIMENSION):
@@ -205,7 +208,7 @@ class UI2048:
                 elif key[pg.K_2]:
                     self.setMode(UIMode.EXPECTIMINIMAX.value)
                 elif key[pg.K_3]:
-                    self.setMode(UIMode.NEXT2.value)
+                    self.setMode(UIMode.MCTS.value)
                 elif key[pg.K_w] or key[pg.K_UP]:
                     self.model.playAction(Direction.UP.value)
                 elif key[pg.K_s] or key[pg.K_DOWN]:
@@ -220,7 +223,7 @@ class UI2048:
                 elif key[pg.K_2]:
                     self.setMode(UIMode.EXPECTIMINIMAX.value)
                 elif key[pg.K_3]:
-                    self.setMode(UIMode.NEXT2.value)
+                    self.setMode(UIMode.MCTS.value)
                 else:
                     self.model.playAction(r.randint(1, 4))
             case UIMode.EXPECTIMINIMAX.value:
@@ -229,10 +232,10 @@ class UI2048:
                 elif key[pg.K_1]:
                     self.setMode(UIMode.RANDOM.value)
                 elif key[pg.K_3]:
-                    self.setMode(UIMode.NEXT2.value)
+                    self.setMode(UIMode.MCTS.value)
                 else:
                     self.model.playAction(self.expectiminimax.getNextDirection(self.model.getBoard()))
-            case UIMode.NEXT2.value:
+            case UIMode.MCTS.value:
                 if key[pg.K_0]:
                     self.setMode(UIMode.MANUAL.value)
                 elif key[pg.K_1]:
@@ -240,7 +243,7 @@ class UI2048:
                 elif key[pg.K_2]:
                     self.setMode(UIMode.EXPECTIMINIMAX.value)
                 else:
-                    pass
+                    self.model.playAction(self.mcts.getNextDirection(self.model.getBoard()))
     
     def setMode(self, mode: int):
         """
@@ -255,7 +258,8 @@ class UI2048:
 def main():
     model = Model2048()
     expectiminimax = Expectiminimax2048(5, 2) # Search depth of 5 is the max before the time increase becomes too much!
-    game = UI2048(model, expectiminimax)
+    montecarlo = MonteCarlo2048(20, 50)
+    game = UI2048(model, expectiminimax, montecarlo)
     game.run()
 
 if __name__ == '__main__':
