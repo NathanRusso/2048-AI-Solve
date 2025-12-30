@@ -35,28 +35,35 @@ class MCTSNode:
         for y in range(self.MAX_BOARD_DIMENSION):
             for x in range(self.MAX_BOARD_DIMENSION):
                 if board[y][x] == self.BLANK_TILE: open_cells.append((y, x))
-        
-        if player_turn_next:
-            self.all_actions = [Direction.DOWN.value, Direction.RIGHT.value, Direction.LEFT.value, Direction.UP.value]
-        else:
-            self.all_actions = open_cells
 
-        self.available_actions = self.all_actions
-
-        print("On Creation")
-        print(vars(self))
-
-        if len(open_cells) > 0: self.game_over = False
-        if player_turn_next:
+        if len(open_cells) > 0:
+            self.game_over = False
+            if player_turn_next:
+                self.all_actions = [Direction.DOWN.value, Direction.RIGHT.value, Direction.LEFT.value, Direction.UP.value]
+            else:
+                self.all_actions = open_cells
+        elif player_turn_next:
+            check1 = False
+            check2 = False
             for i in range(self.MAX_BOARD_DIMENSION):
                 for j in range(self.MAX_BOARD_DIMENSION - 1):
-                    if (board[i][j] == board[i][j+1] or board[j][i] == board[j+1][i]): self.game_over = False
-        print(vars(self))
+                    if board[i][j] == board[i][j+1] and not check1:
+                        self.all_actions.append(Direction.RIGHT.value)
+                        self.all_actions.append(Direction.LEFT.value)
+                        self.game_over = False
+                        check1 = True
+                    
+                    if board[j][i] == board[j+1][i] and not check2:
+                        self.all_actions.append(Direction.DOWN.value)
+                        self.all_actions.append(Direction.UP.value)
+                        self.game_over = False
+                        check2 = True
+
+        self.available_actions = self.all_actions
 
     def selectBestChild(self) -> "MCTSNode":
         best_child = None
         best_child_ucb1 = float("-inf")
-        print(f"Children: {self.children}")
         for child in self.children:
             child_ucb1 = self.__UCB1(child.reward, self.visits, child.visits)
             if child_ucb1 > best_child_ucb1:
@@ -255,23 +262,16 @@ class MonteCarlo2048:
         root = MCTSNode(original_board, None, None, True)
         
         for i in range(self.selection_iterations):
-            print(i)
             node = root
 
-            print("Sele")
             while not node.game_over and len(node.available_actions) == 0:
                 node = node.selectBestChild()                       # Selection
-                print(node)
-                print(vars(node))
 
-            print("Expa")
             if not node.game_over and len(node.available_actions) > 0:
                 node = node.expandNode()                            # Expansion
 
-            print("Simu")
             heuristic = node.simulateNode(self.expansion_depth)     # Simulation
 
-            print("Back")
             node.backPropagation(heuristic)                         # Backpropagation
 
         best_direction = None

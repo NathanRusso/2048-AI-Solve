@@ -74,13 +74,13 @@ class Model2048:
         """
         for y in range(self.MAX_BOARD_DIMENSION):
             for x in range(self.MAX_BOARD_DIMENSION):
-                if (self.board[y][x] == self.BLANK_TILE):
+                if self.board[y][x] == self.BLANK_TILE:
                     self.game_over = False
                     return
 
         for i in range(self.MAX_BOARD_DIMENSION):
             for j in range(self.MAX_BOARD_DIMENSION - 1):
-                if (self.board[i][j] == self.board[i][j+1] or self.board[j][i] == self.board[j+1][i]):
+                if self.board[i][j] == self.board[i][j+1] or self.board[j][i] == self.board[j+1][i]:
                     self.game_over = False
                     return
 
