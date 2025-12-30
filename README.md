@@ -14,3 +14,4 @@ I am going to recreate and improve a class project that uses AI search algorithm
 
 ### Monte Carlo Tree Search
 - https://www.geeksforgeeks.org/machine-learning/monte-carlo-tree-search-mcts-in-machine-learning/
+- https://github.com/poomstas/2048_MCTS

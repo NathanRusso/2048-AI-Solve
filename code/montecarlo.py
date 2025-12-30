@@ -19,11 +19,23 @@ class MCTSNode:
         [4**0, 4**1, 4**2, 4**3]
     ]
 
-    def __init__(self, board: list, parent: "MCTSNode", direction: int, player_turn_next: bool):
+    def __init__(self, board: list, parent: "MCTSNode", direction: int, players_turn: bool):
+        """
+        Docstring for __init__
+        
+        :param board: Description
+        :type board: list
+        :param parent: Description
+        :type parent: "MCTSNode"
+        :param direction: Description
+        :type direction: int
+        :param players_turn: Description
+        :type players_turn: bool
+        """
         self.board = board
         self.parent = parent
         self.direction = direction
-        self.player_turn_next = player_turn_next
+        self.players_turn = players_turn
         self.children = []
         self.all_actions = []
         self.available_actions = []
@@ -38,11 +50,11 @@ class MCTSNode:
 
         if len(open_cells) > 0:
             self.game_over = False
-            if player_turn_next:
+            if players_turn:
                 self.all_actions = [Direction.DOWN.value, Direction.RIGHT.value, Direction.LEFT.value, Direction.UP.value]
             else:
                 self.all_actions = open_cells
-        elif player_turn_next:
+        elif players_turn:
             check1 = False
             check2 = False
             for i in range(self.MAX_BOARD_DIMENSION):
@@ -75,9 +87,9 @@ class MCTSNode:
         action = self.available_actions.pop()
         board_copy = [row[:] for row in self.board]
         child = None
-        if self.player_turn_next:
+        if self.players_turn:
             board_changed = self.__shift(board_copy, self.board, action)
-            child = MCTSNode(board_copy, self, action, not self.player_turn_next)
+            child = MCTSNode(board_copy, self, action, not self.players_turn)
         else:
             y, x  = action
             tile_probability_num = r.random()
@@ -85,7 +97,7 @@ class MCTSNode:
                 board_copy[y][x] = 2
             else:
                 board_copy[y][x] = 4
-            child = MCTSNode(board_copy, self, None, not self.player_turn_next)
+            child = MCTSNode(board_copy, self, None, not self.players_turn)
         self.children.append(child)
         return child
 
@@ -93,17 +105,23 @@ class MCTSNode:
         simulation_board = [row[:] for row in self.board]
         game_over = False
         i = 0
-        players_turn = self.player_turn_next
+        players_turn = self.players_turn
         while i < expansion_depth and not game_over:
-            open_cells = []
-            for y in range(self.MAX_BOARD_DIMENSION):
-                for x in range(self.MAX_BOARD_DIMENSION):
-                    if simulation_board[y][x] == self.BLANK_TILE: open_cells.append((y, x))
-
             if players_turn:
-                self.__shift(simulation_board, simulation_board, r.randint(1, 4))
-                self.game_over = len(open_cells) == 0 and not self.__potentialMerges(simulation_board)
+                directions = [Direction.DOWN.value, Direction.RIGHT.value, Direction.LEFT.value, Direction.UP.value]
+                board_changed = False
+                while not board_changed and not game_over:
+                    if len(directions) == 0:
+                        game_over = True
+                        continue
+                    direction = directions.pop(r.randrange(len(directions)))
+                    board_changed = self.__shift(simulation_board, simulation_board, direction)
             else:
+                open_cells = []
+                for y in range(self.MAX_BOARD_DIMENSION):
+                    for x in range(self.MAX_BOARD_DIMENSION):
+                        if simulation_board[y][x] == self.BLANK_TILE: open_cells.append((y, x))
+
                 if len(open_cells) > 0:
                     y, x  = r.choice(open_cells)
                     tile_probability_num = r.random()
@@ -111,7 +129,6 @@ class MCTSNode:
                         simulation_board[y][x] = 2
                     else:
                         simulation_board[y][x] = 4
-                self.game_over = len(open_cells) <= 1 and not self.__potentialMerges(simulation_board)
             players_turn = not players_turn
             i += 1
 
@@ -120,26 +137,19 @@ class MCTSNode:
     def backPropagation(self, heuristic: int):
         self.visits += 1
 
-        if self.player_turn_next:
+        num_of_children = len(self.children)
+        if num_of_children == 0:
+            self.reward = heuristic
+        else:
+            self.reward += ((self.reward * num_of_children - 1) + heuristic) / num_of_children
+        """
+        if self.players_turn:
             self.reward = heuristic
         else:
             self.reward = heuristic
+        """
 
         if self.parent: self.parent.backPropagation(heuristic)
-
-    def __potentialMerges(self, board: list) -> bool:
-        """
-        This checks if any cells can be merged together.
-
-        :param board: The current 4x4 2048 board to check.
-        :type board: list
-        :return: True if the board can merge cells, False otherwise.
-        :rtype: bool
-        """
-        for i in range(self.MAX_BOARD_DIMENSION):
-            for j in range(self.MAX_BOARD_DIMENSION - 1):
-                if (board[i][j] == board[i][j+1] or board[j][i] == board[j+1][i]): return True
-        return False
     
     def __getHeuristicSnake2Score(self, board: list) -> int:
         """
@@ -259,9 +269,17 @@ class MonteCarlo2048:
         self.expansion_depth = expansion_depth
 
     def getNextDirection(self, original_board: list) -> int:
+        """
+        Docstring for getNextDirection
+        
+        :param original_board: Description
+        :type original_board: list
+        :return: Description
+        :rtype: int
+        """
         root = MCTSNode(original_board, None, None, True)
         
-        for i in range(self.selection_iterations):
+        for _ in range(self.selection_iterations):
             node = root
 
             while not node.game_over and len(node.available_actions) == 0:
