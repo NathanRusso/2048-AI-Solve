@@ -1,7 +1,6 @@
-from model import Model2048, Direction
+from model import Direction
 import math as m
 import random as r
-from copy import deepcopy as d
 
 class MCTSNode:
     """
@@ -136,21 +135,24 @@ class MCTSNode:
     
     def backPropagation(self, heuristic: int):
         self.visits += 1
-
-        num_of_children = len(self.children)
-        if num_of_children == 0:
-            self.reward = heuristic
-        else:
-            self.reward += ((self.reward * num_of_children - 1) + heuristic) / num_of_children
-        """
-        if self.players_turn:
-            self.reward = heuristic
-        else:
-            self.reward = heuristic
-        """
-
+        self.reward += heuristic
         if self.parent: self.parent.backPropagation(heuristic)
     
+    def __UCB1(self, average_reward: float, parent_visits: int, node_visits: int) -> float:
+        """
+        Docstring for UCB1 Upper Confidence Bound 1 for Trees
+        
+        :param average_reward: Description
+        :type average_reward: float
+        :param parent_visits: Description
+        :type parent_visits: int
+        :param node_visits: Description
+        :type node_visits: int
+        :return: Description
+        :rtype: float
+        """
+        return average_reward + m.sqrt( 2 * m.log(parent_visits) / node_visits )    
+
     def __getHeuristicSnake2Score(self, board: list) -> int:
         """
         This gets the board snake heuristic score.
@@ -234,21 +236,6 @@ class MCTSNode:
         while len(final_values) < self.MAX_BOARD_DIMENSION:
             final_values.append(0)
         return final_values[::-1]
-
-    def __UCB1(self, average_reward: float, parent_visits: int, node_visits: int) -> float:
-        """
-        Docstring for UCB1 Upper Confidence Bound 1 for Trees
-        
-        :param average_reward: Description
-        :type average_reward: float
-        :param parent_visits: Description
-        :type parent_visits: int
-        :param node_visits: Description
-        :type node_visits: int
-        :return: Description
-        :rtype: float
-        """
-        return average_reward + m.sqrt( 2 * m.log(parent_visits) / node_visits )    
                 
 
 class MonteCarlo2048:
@@ -279,7 +266,7 @@ class MonteCarlo2048:
         """
         root = MCTSNode(original_board, None, None, True)
         
-        for _ in range(self.selection_iterations):
+        for i in range(self.selection_iterations):
             node = root
 
             while not node.game_over and len(node.available_actions) == 0:
@@ -289,16 +276,19 @@ class MonteCarlo2048:
                 node = node.expandNode()                            # Expansion
 
             heuristic = node.simulateNode(self.expansion_depth)     # Simulation
+            adjusted_score = m.log(heuristic)
 
-            node.backPropagation(heuristic)                         # Backpropagation
+            node.backPropagation(adjusted_score)                    # Backpropagation
 
         best_direction = None
         best_visits = 0
         for child in root.children:
+            print(child.reward)
             if best_direction is None:
                 best_direction = child.direction
                 best_visits = child.visits
             elif child.visits > best_visits:
                 best_visits = child.visits
                 best_direction = child.direction
+        print(best_direction)
         return best_direction

@@ -258,7 +258,7 @@ class UI2048:
 def main():
     model = Model2048()
     expectiminimax = Expectiminimax2048(5, 2) # Search depth of 5 is the max before the time increase becomes too much!
-    montecarlo = MonteCarlo2048(500, 1000)
+    montecarlo = MonteCarlo2048(1000, 200)
     game = UI2048(model, expectiminimax, montecarlo)
     game.run()
 
