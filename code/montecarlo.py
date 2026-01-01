@@ -4,7 +4,7 @@ import random as r
 
 class MCTSNode:
     """
-    Docstring for MCTSNode
+    This class represents the games nodes used by MonteCarlo2048 to simulate a state of 2048.
     """
 
     MAX_BOARD_DIMENSION = 4
@@ -20,15 +20,16 @@ class MCTSNode:
 
     def __init__(self, board: list, parent: "MCTSNode", direction: int, players_turn: bool):
         """
-        Docstring for __init__
+        This creates the MCTS 2048 Node with all of the relevant information. 
+        All and available action are set and the state is checked if the game is over.  
         
-        :param board: Description
+        :param board: The given current 4x4 2048 board.
         :type board: list
-        :param parent: Description
+        :param parent: The parent node of the current MCTS2048Node.
         :type parent: "MCTSNode"
-        :param direction: Description
+        :param direction: The shift direction made to reach this state: 1: UP, 2: DOWN, 3: LEFT, 4: RIGHT, None: Random tile.
         :type direction: int
-        :param players_turn: Description
+        :param players_turn: This dictates if it is the player turn to shift tiles in the current node state.
         :type players_turn: bool
         """
         self.board = board
@@ -73,6 +74,12 @@ class MCTSNode:
         self.available_actions = self.all_actions
 
     def selectBestChild(self) -> "MCTSNode":
+        """
+        Given the current node, the child with the best UCB1 score is returned.
+        
+        :return: The node child with the best UCB1 score.
+        :rtype: MCTSNode
+        """
         best_child = None
         best_child_ucb1 = float("-inf")
         for child in self.children:
@@ -83,6 +90,12 @@ class MCTSNode:
         return best_child
 
     def expandNode(self) -> "MCTSNode":
+        """
+        Given the current node, this adds/creates a new child for it.
+        
+        :return: A new child node for the given parent node based on the parent's available moves.
+        :rtype: MCTSNode
+        """
         action = self.available_actions.pop()
         board_copy = [row[:] for row in self.board]
         child = None
@@ -101,6 +114,14 @@ class MCTSNode:
         return child
 
     def simulateNode(self, expansion_depth: int) -> int:
+        """
+        Given the current node, this simulates a game with a max number of turns and return the final board score.
+        
+        :param expansion_depth: How many turns to simulate in the 2048 game.
+        :type expansion_depth: int
+        :return: The heuristic score of the final board.
+        :rtype: int
+        """
         simulation_board = [row[:] for row in self.board]
         game_over = False
         i = 0
@@ -134,28 +155,34 @@ class MCTSNode:
         return self.__getHeuristicSnake2Score(simulation_board)
     
     def backPropagation(self, heuristic: int):
+        """
+        Given the current node, this update the score and visits of itself, its parent, its parent's parent, and so on.
+        
+        :param heuristic: The heuristic score to add the a nodes reward.
+        :type heuristic: int
+        """
         self.visits += 1
         self.reward += heuristic
         if self.parent: self.parent.backPropagation(heuristic)
     
-    def __UCB1(self, average_reward: float, parent_visits: int, node_visits: int) -> float:
+    def __UCB1(self, reward: float, parent_visits: int, node_visits: int) -> float:
         """
-        Docstring for UCB1 Upper Confidence Bound 1 for Trees
+        Given a current node, this returns its Upper Confidence Bound 1 score for trees.
         
-        :param average_reward: Description
-        :type average_reward: float
-        :param parent_visits: Description
+        :param reward: The current total heurisitic score of the node state.
+        :type reward: float
+        :param parent_visits: Then number of times the node's parent has been visited.
         :type parent_visits: int
-        :param node_visits: Description
+        :param node_visits: The number of times the node has been visited
         :type node_visits: int
-        :return: Description
+        :return: The UCB1 score of the node.
         :rtype: float
         """
-        return average_reward + m.sqrt( 2 * m.log(parent_visits) / node_visits )    
+        return reward + m.sqrt( 2 * m.log(parent_visits) / node_visits )    
 
     def __getHeuristicSnake2Score(self, board: list) -> int:
         """
-        This gets the board snake heuristic score.
+        Given the current node, this gets its board snake heuristic score.
                 
         :param b: The given 4x4 2048 board.
         :type b: list
