@@ -51,7 +51,30 @@ class MCTSNode:
         if len(open_cells) > 0:
             self.game_over = False
             if players_turn:
-                self.all_actions = [Direction.DOWN.value, Direction.RIGHT.value, Direction.LEFT.value, Direction.UP.value]
+                for direction in Direction:
+                    board_copy = [row[:] for row in board]
+                    board_changed = self.__shift(board_copy, board, direction.value)
+                    if board_changed: self.all_actions.append(direction.value)
+                """
+                br0, br1, br2, br3 = board # Board rows
+                if self.BLANK_TILE in (br1[1], br1[2], br2[1], br2[2]):
+                    self.all_actions = [Direction.DOWN.value, Direction.RIGHT.value, Direction.LEFT.value, Direction.UP.value]
+                else:
+                    if br0[0] == self.BLANK_TILE:
+                        self.all_actions.append(Direction.UP.value)
+                        self.all_actions.append(Direction.LEFT.value)
+                    if br0[3] == self.BLANK_TILE:
+                        self.all_actions.append(Direction.UP.value)
+                        self.all_actions.append(Direction.RIGHT.value)
+                    if br3[0] == self.BLANK_TILE:
+                        self.all_actions.append(Direction.DOWN.value)
+                        self.all_actions.append(Direction.LEFT.value)
+                    if br3[0] == self.BLANK_TILE:
+                        self.all_actions.append(Direction.DOWN.value)
+                        self.all_actions.append(Direction.RIGHT.value)
+
+                self.all_actions = list(set(self.all_actions))
+                """
             else:
                 self.all_actions = open_cells
         elif players_turn:
@@ -152,22 +175,13 @@ class MCTSNode:
             players_turn = not players_turn
             i += 1
 
-        return self.__getHeuristicSnake2Score(simulation_board)
-    
-    def getAdjustedScore(self, heuristic: int):
-        """
-        Docstring for getAdjustedScore
-        
-        :param heuristic: The heuristic score of the node board after the current node was expanded. 
-        :type heuristic: int
-        """
-        return m.log(heuristic)
-    
+        return self.getHeuristicSnake2Score(simulation_board)
+
     def backPropagation(self, reward: int):
         """
         Given the current node, this update the score and visits of itself, its parent, its parent's parent, and so on.
         
-        :param reward: The adjusted heuristic score to add the a nodes reward.
+        :param reward: The heuristic score to add the a nodes reward.
         :type reward: int
         """
         node = self
@@ -179,6 +193,8 @@ class MCTSNode:
     def __UCB1(self, reward: float, parent_visits: int, node_visits: int) -> float:
         """
         Given a current node, this returns its Upper Confidence Bound 1 score for trees.
+        For the exploit, since the heuristic scores go from 0 to infinity, a simple average of reward / visits cannot be used.  
+        An alternative is adjusting the score using functions to be the score between 0 and 1. 
         
         :param reward: The current total heurisitic score of the node state.
         :type reward: float
@@ -189,10 +205,13 @@ class MCTSNode:
         :return: The UCB1 score of the node.
         :rtype: float
         """
-        exploit = reward
-        return exploit + m.sqrt( 1 * m.log(parent_visits) / node_visits )    
+        C = 4                                 # The exploration constant used to adjust weighting
+        adjusted_score = m.log(reward)          # The logarithmic heavily reduces large number down
+        exploit = m.tanh(adjusted_score / 50)   # The tanh function bounds the exploit to [0, 1]
+        explore = C * m.sqrt( m.log(parent_visits) / node_visits )
+        return exploit + explore                # UCB1 typical
 
-    def __getHeuristicSnake2Score(self, board: list) -> int:
+    def getHeuristicSnake2Score(self, board: list) -> int:
         """
         Given the current node, this gets its board snake heuristic score.
                 
@@ -304,6 +323,7 @@ class MonteCarlo2048:
         :rtype: int
         """
         root = MCTSNode(original_board, None, None, True)
+        original_heuristic = root.getHeuristicSnake2Score(original_board)
         
         for i in range(self.selection_iterations):
             node = root
@@ -315,17 +335,18 @@ class MonteCarlo2048:
                 node = node.expandNode()                            # Expansion
 
             heuristic = node.simulateNode(self.expansion_depth)     # Simulation
-            adjusted_score = node.getAdjustedScore(heuristic)
 
-            node.backPropagation(adjusted_score)                    # Backpropagation
+            node.backPropagation(heuristic)                    # Backpropagation
 
         best_direction = None
         best_visits = 0
         for child in root.children:
+            print(child.reward)
             if best_direction is None:
                 best_direction = child.direction
                 best_visits = child.visits
             elif child.visits > best_visits:
                 best_visits = child.visits
                 best_direction = child.direction
+        print(best_direction)
         return best_direction
