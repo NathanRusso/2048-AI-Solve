@@ -154,16 +154,27 @@ class MCTSNode:
 
         return self.__getHeuristicSnake2Score(simulation_board)
     
-    def backPropagation(self, heuristic: int):
+    def getAdjustedScore(self, heuristic: int):
+        """
+        Docstring for getAdjustedScore
+        
+        :param heuristic: The heuristic score of the node board after the current node was expanded. 
+        :type heuristic: int
+        """
+        return m.log(heuristic)
+    
+    def backPropagation(self, reward: int):
         """
         Given the current node, this update the score and visits of itself, its parent, its parent's parent, and so on.
         
-        :param heuristic: The heuristic score to add the a nodes reward.
-        :type heuristic: int
+        :param reward: The adjusted heuristic score to add the a nodes reward.
+        :type reward: int
         """
-        self.visits += 1
-        self.reward += heuristic
-        if self.parent: self.parent.backPropagation(heuristic)
+        node = self
+        while node:
+            node.visits += 1
+            node.reward += reward
+            node = node.parent
     
     def __UCB1(self, reward: float, parent_visits: int, node_visits: int) -> float:
         """
@@ -178,7 +189,8 @@ class MCTSNode:
         :return: The UCB1 score of the node.
         :rtype: float
         """
-        return reward + m.sqrt( 2 * m.log(parent_visits) / node_visits )    
+        exploit = reward
+        return exploit + m.sqrt( 1 * m.log(parent_visits) / node_visits )    
 
     def __getHeuristicSnake2Score(self, board: list) -> int:
         """
@@ -303,19 +315,17 @@ class MonteCarlo2048:
                 node = node.expandNode()                            # Expansion
 
             heuristic = node.simulateNode(self.expansion_depth)     # Simulation
-            adjusted_score = m.log(heuristic)
+            adjusted_score = node.getAdjustedScore(heuristic)
 
             node.backPropagation(adjusted_score)                    # Backpropagation
 
         best_direction = None
         best_visits = 0
         for child in root.children:
-            print(child.reward)
             if best_direction is None:
                 best_direction = child.direction
                 best_visits = child.visits
             elif child.visits > best_visits:
                 best_visits = child.visits
                 best_direction = child.direction
-        print(best_direction)
         return best_direction
