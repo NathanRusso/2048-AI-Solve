@@ -25,12 +25,18 @@ def main():
         e_scores_all.append(e_scores)
         e_highest_tiles_all.append(e_highest_tiles)
 
-    with open("data/output.txt", "w") as f:
+    with open("data/output_1.txt", "w") as f:
+        for i in range(1, 5): 
+            f.write(f"E{i} Scores: {e_scores_all[i-1]}" + "\n", end='\n' if i == 5 else '')
+
         for i in range(1, 5):
-            f.write(f"E{i} Scores: {e_scores_all[i-1]}" + "\n")
-            f.write(f"E{i} Highest Tiles: {e_highest_tiles_all[i-1]}" + "\n")
-            f.write(f"E{i} Score Sum: {sum(e_scores_all[i-1])}, Avg: {sum(e_scores_all[i-1]) / 20}" + "\n")
-            f.write(f"E{i} Highest Tile Sum: {sum(e_highest_tiles_all[i-1])}, Avg: {sum(e_highest_tiles_all[i-1]) / 20}" + "\n")
+            f.write(f"E{i} Highest Tiles: {e_highest_tiles_all[i-1]}" + "\n", end='\n' if i == 5 else '')
+
+        for i in range(1, 5):
+            f.write(f"E{i} Score Sum: {sum(e_scores_all[i-1])}, Avg: {sum(e_scores_all[i-1]) / 20}" + "\n", end='\n' if i == 5 else '')
+
+        for i in range(1, 5):
+            f.write(f"E{i} Highest Tile Sum: {sum(e_highest_tiles_all[i-1])}, Avg: {sum(e_highest_tiles_all[i-1]) / 20}" + "\n", end='\n' if i == 5 else '')
 
 if __name__ == '__main__':
     main()
