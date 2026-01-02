@@ -55,26 +55,6 @@ class MCTSNode:
                     board_copy = [row[:] for row in board]
                     board_changed = self.__shift(board_copy, board, direction.value)
                     if board_changed: self.all_actions.append(direction.value)
-                """
-                br0, br1, br2, br3 = board # Board rows
-                if self.BLANK_TILE in (br1[1], br1[2], br2[1], br2[2]):
-                    self.all_actions = [Direction.DOWN.value, Direction.RIGHT.value, Direction.LEFT.value, Direction.UP.value]
-                else:
-                    if br0[0] == self.BLANK_TILE:
-                        self.all_actions.append(Direction.UP.value)
-                        self.all_actions.append(Direction.LEFT.value)
-                    if br0[3] == self.BLANK_TILE:
-                        self.all_actions.append(Direction.UP.value)
-                        self.all_actions.append(Direction.RIGHT.value)
-                    if br3[0] == self.BLANK_TILE:
-                        self.all_actions.append(Direction.DOWN.value)
-                        self.all_actions.append(Direction.LEFT.value)
-                    if br3[0] == self.BLANK_TILE:
-                        self.all_actions.append(Direction.DOWN.value)
-                        self.all_actions.append(Direction.RIGHT.value)
-
-                self.all_actions = list(set(self.all_actions))
-                """
             else:
                 self.all_actions = open_cells
         elif players_turn:
@@ -205,7 +185,7 @@ class MCTSNode:
         :return: The UCB1 score of the node.
         :rtype: float
         """
-        C = 4                                 # The exploration constant used to adjust weighting
+        C = 1.4                                 # The exploration constant used to adjust weighting
         adjusted_score = m.log(reward)          # The logarithmic heavily reduces large number down
         exploit = m.tanh(adjusted_score / 50)   # The tanh function bounds the exploit to [0, 1]
         explore = C * m.sqrt( m.log(parent_visits) / node_visits )
