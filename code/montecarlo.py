@@ -316,7 +316,7 @@ class MonteCarlo2048:
 
             heuristic = node.simulateNode(self.expansion_depth)     # Simulation
 
-            node.backPropagation(heuristic)                    # Backpropagation
+            node.backPropagation(heuristic)                         # Backpropagation
 
         best_direction = None
         best_visits = 0
