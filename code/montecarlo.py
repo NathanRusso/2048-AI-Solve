@@ -76,7 +76,7 @@ class MCTSNode:
 
         self.available_actions = self.all_actions
 
-    def selectBestChild(self) -> "MCTSNode":
+    def selectBestChild(self, C: int) -> "MCTSNode":
         """
         Given the current node, the child with the best UCB1 score is returned.
         
@@ -86,7 +86,7 @@ class MCTSNode:
         best_child = None
         best_child_ucb1 = float("-inf")
         for child in self.children:
-            child_ucb1 = self.__UCB1(child.reward, self.visits, child.visits)
+            child_ucb1 = self.__UCB1(child.reward, self.visits, child.visits, C)
             if child_ucb1 > best_child_ucb1:
                 best_child_ucb1 = child_ucb1
                 best_child = child
@@ -170,7 +170,7 @@ class MCTSNode:
             node.reward += reward
             node = node.parent
     
-    def __UCB1(self, reward: float, parent_visits: int, node_visits: int) -> float:
+    def __UCB1(self, reward: float, parent_visits: int, node_visits: int, C: int) -> float:
         """
         Given a current node, this returns its Upper Confidence Bound 1 score for trees.
         For the exploit, since the heuristic scores go from 0 to infinity, a simple average of reward / visits cannot be used.  
@@ -185,7 +185,7 @@ class MCTSNode:
         :return: The UCB1 score of the node.
         :rtype: float
         """
-        C = 1.4                                 # The exploration constant used to adjust weighting
+        #C = 1.4                                 # The exploration constant used to adjust weighting
         adjusted_score = m.log(reward)          # The logarithmic heavily reduces large number down
         exploit = m.tanh(adjusted_score / 50)   # The tanh function bounds the exploit to [0, 1]
         explore = C * m.sqrt( m.log(parent_visits) / node_visits )
@@ -281,7 +281,7 @@ class MonteCarlo2048:
     This classes uses the Monte Carlo Tree Search algorithm to determine the "best" next move in 2048.
     """
 
-    def __init__(self, selection_iterations: int, expansion_depth: int):
+    def __init__(self, selection_iterations: int, expansion_depth: int, C: int):
         """
         This sets up the variables needed for MCTS to function.
         
@@ -292,6 +292,7 @@ class MonteCarlo2048:
         """
         self.selection_iterations = selection_iterations
         self.expansion_depth = expansion_depth
+        self.C = C
 
     def getNextDirection(self, original_board: list) -> int:
         """
@@ -303,13 +304,13 @@ class MonteCarlo2048:
         :rtype: int
         """
         root = MCTSNode(original_board, None, None, True)
-        original_heuristic = root.getHeuristicSnake2Score(original_board)
+        #original_heuristic = root.getHeuristicSnake2Score(original_board)
         
         for i in range(self.selection_iterations):
             node = root
 
             while not node.game_over and len(node.available_actions) == 0:
-                node = node.selectBestChild()                       # Selection
+                node = node.selectBestChild(self.C)                       # Selection
 
             if not node.game_over and len(node.available_actions) > 0:
                 node = node.expandNode()                            # Expansion
@@ -321,12 +322,12 @@ class MonteCarlo2048:
         best_direction = None
         best_visits = 0
         for child in root.children:
-            print(child.reward)
+            #print(child.reward)
             if best_direction is None:
                 best_direction = child.direction
                 best_visits = child.visits
             elif child.visits > best_visits:
                 best_visits = child.visits
                 best_direction = child.direction
-        print(best_direction)
+        #print(best_direction)
         return best_direction

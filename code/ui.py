@@ -103,7 +103,7 @@ class UI2048:
             
             pg.display.update() # Updates the screen to show changes
             if self.mode != UIMode.MANUAL.value:
-                self.clock.tick(10) # Update runs at 10 frames/second
+                self.clock.tick(100) # Update runs at 10 frames/second
             
         pg.quit() # Ends pygame
 
@@ -258,7 +258,7 @@ class UI2048:
 def main():
     model = Model2048()
     expectiminimax = Expectiminimax2048(5, 2) # Search depth of 5 is the max before the time increase becomes too much!
-    montecarlo = MonteCarlo2048(1000, 5)
+    montecarlo = MonteCarlo2048(1000, 5, 1.4)
     game = UI2048(model, expectiminimax, montecarlo)
     game.run()
 
