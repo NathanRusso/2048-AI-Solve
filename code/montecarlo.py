@@ -310,7 +310,7 @@ class MonteCarlo2048:
             node = root
 
             while not node.game_over and len(node.available_actions) == 0:
-                node = node.selectBestChild(self.C)                       # Selection
+                node = node.selectBestChild(self.C)                 # Selection
 
             if not node.game_over and len(node.available_actions) > 0:
                 node = node.expandNode()                            # Expansion
