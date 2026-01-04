@@ -45,8 +45,8 @@ class UI2048:
         self.mcts = mcts
         self.screen = None
         self.clock = pg.time.Clock()
-        self.board = pg.Rect((10, 110, 530, 530))
-        self.tiles = [
+        self.board_rect = pg.Rect((10, 110, 530, 530))
+        self.tile_rects = [
             pg.Rect((20, 120, 120, 120)),
             pg.Rect((150, 120, 120, 120)),
             pg.Rect((280, 120, 120, 120)),
@@ -64,12 +64,13 @@ class UI2048:
             pg.Rect((280, 510, 120, 120)),
             pg.Rect((410, 510, 120, 120))
         ]
-        self.buttons = [
+        self.button_rects = [
             pg.Rect((565, 10, 200, 30)),
             pg.Rect((565, 50, 200, 30)),
             pg.Rect((565, 90, 200, 30)),
             pg.Rect((565, 130, 200, 30))
         ]
+        self.title_font = pg.font.SysFont("Clear Sans Bold", 128)
         self.tile_font = pg.font.SysFont("Clear Sans Bold", 64)
         self.info_font = pg.font.SysFont("Clear Sans Bold", 32)
         self.mode = UIMode.MANUAL.value
@@ -91,7 +92,7 @@ class UI2048:
 
                 if event.type == pg.MOUSEBUTTONDOWN:
                     mouse_x, mouse_y = mouse
-                    for index, button in enumerate(self.buttons):
+                    for index, button in enumerate(self.button_rects):
                         button_min_x, button_min_y = button.topleft
                         button_max_x, button_max_y = button.bottomright
                         if (button_min_x <= mouse_x <= button_max_x) and (button_min_y <= mouse_y <= button_max_y):
@@ -103,7 +104,7 @@ class UI2048:
             
             pg.display.update() # Updates the screen to show changes
             if self.mode != UIMode.MANUAL.value:
-                self.clock.tick(100) # Update runs at 10 frames/second
+                self.clock.tick(10) # Update runs at 10 frames/second
             
         pg.quit() # Ends pygame
 
@@ -112,11 +113,13 @@ class UI2048:
         This draws the current game state.
         """
         self.screen.fill(self.COLOR_SCREEN) # Fills (Resets) the screen to not leave trails
-        pg.draw.rect(self.screen, self.COLOR_BOARD, self.board)
+        pg.draw.rect(self.screen, self.COLOR_BOARD, self.board_rect) # Draws the board background
 
         self.drawLabel(f"Best Score: {self.model.getBestScore()}", (10, 10))
         self.drawLabel(f"Current Score: {self.model.getScore()}", (10, 40))
         if self.model.gameOver(): self.drawLabel("GAME OVER!", (10, 70))
+
+        self.drawTitle()
 
         self.drawButton(UIMode.MANUAL.value, "Manual Play!")
         self.drawButton(UIMode.RANDOM.value, "Random Play!")
@@ -128,12 +131,20 @@ class UI2048:
             for col in range(self.MAX_BOARD_DIMENSION):
                 tile = current_board[row][col]
                 rect_index = row * self.MAX_BOARD_DIMENSION + col
-                rect = self.tiles[rect_index]
+                rect = self.tile_rects[rect_index]
                 pg.draw.rect(self.screen, self.getTileColor(tile), rect)
                 if tile > 0:
                     tile_text = self.tile_font.render(str(tile), True, "#FFFFFF" if tile >= 8 else "#736452")
                     tile_text_rect = tile_text.get_rect(center=rect.center)
                     self.screen.blit(tile_text, tile_text_rect)
+
+    def drawTitle(self):
+        """
+        This draws the title "2048" on the screen.
+        """
+        text = self.title_font.render("2048", True, self.COLOR_LABEL_TEXT)
+        text_rect = text.get_rect(centerx=self.SCREEN_WIDTH // 2, top=0)
+        self.screen.blit(text, text_rect)
 
     def drawLabel(self, label_display_text: str, label_top_left: tuple):
         """
@@ -146,7 +157,7 @@ class UI2048:
         """
         text = self.info_font.render(label_display_text, True, self.COLOR_LABEL_TEXT)
         text_rect = text.get_rect(topleft=label_top_left)
-        self.screen.blit(text, text_rect)        
+        self.screen.blit(text, text_rect)
 
     def drawButton(self, button_rect_index: int, button_display_text: str):
         """
@@ -157,7 +168,7 @@ class UI2048:
         :param button_text: The text the button will show
         :type button_text: str
         """
-        rect = self.buttons[button_rect_index]
+        rect = self.button_rects[button_rect_index]
         pg.draw.rect(self.screen, self.COLOR_BUTTON_BACKGROUND, rect)
         button_text = self.info_font.render(button_display_text, True, self.COLOR_BUTTON_TEXT)
         button_text_rect = button_text.get_rect(center=rect.center)
@@ -258,7 +269,7 @@ class UI2048:
 def main():
     model = Model2048()
     expectiminimax = Expectiminimax2048(5, 2) # Search depth of 5 is the max before the time increase becomes too much!
-    montecarlo = MonteCarlo2048(1000, 5, 1.25)
+    montecarlo = MonteCarlo2048(1500, 30, 1.25)
     game = UI2048(model, expectiminimax, montecarlo)
     game.run()
 
