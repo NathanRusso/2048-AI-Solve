@@ -103,8 +103,8 @@ class UI2048:
             if self.mode != UIMode.MANUAL.value: self.handleMovementInput()
             
             pg.display.update() # Updates the screen to show changes
-            if self.mode != UIMode.MANUAL.value:
-                self.clock.tick(10) # Update runs at 10 frames/second
+            #if self.mode != UIMode.MANUAL.value:
+                #self.clock.tick(10) # Update runs at 10 frames/second
             
         pg.quit() # Ends pygame
 

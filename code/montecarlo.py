@@ -1,6 +1,7 @@
 from model import Direction
 import math as m
 import random as r
+from expectiminimax import Expectiminimax2048
 
 class MCTSNode:
     """
@@ -122,6 +123,7 @@ class MCTSNode:
         self.children.append(child)
         return child
 
+    #def simulateNode(self, expansion_depth: int, expectiminimax) -> int:
     def simulateNode(self, expansion_depth: int) -> int:
         """
         Given the current node, this simulates a game with a max number of turns and return the final board score.
@@ -145,6 +147,11 @@ class MCTSNode:
                         continue
                     direction = directions.pop(r.randrange(len(directions)))
                     board_changed = self.__shift(simulation_board, simulation_board, direction)
+                """
+                direction = expectiminimax.getNextDirection(simulation_board)
+                board_changed = self.__shift(simulation_board, simulation_board, direction)
+                if direction == Direction.UP.value and not board_changed: game_over = True
+                """
             else:
                 open_cells = []
                 for y in range(self.MAX_BOARD_DIMENSION):
@@ -299,6 +306,7 @@ class MonteCarlo2048:
         self.selection_iterations = selection_iterations
         self.expansion_depth = expansion_depth
         self.C = C
+        #self.expectiminimax = Expectiminimax2048(5, 2)
 
     def getNextDirection(self, original_board: list) -> int:
         """
@@ -322,6 +330,7 @@ class MonteCarlo2048:
                 node = node.expandNode()                            # Expansion
 
             heuristic = node.simulateNode(self.expansion_depth)     # Simulation
+            #heuristic = node.simulateNode(self.expansion_depth, self.expectiminimax)     # Simulation
 
             node.backPropagation(heuristic)                         # Backpropagation
 
@@ -333,7 +342,7 @@ class MonteCarlo2048:
                 best_direction = child.direction
                 best_visits = child.visits
             elif child.visits > best_visits:
-                best_visits = child.visits
                 best_direction = child.direction
+                best_visits = child.visits
         #print(best_direction)
         return best_direction
