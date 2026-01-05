@@ -14,6 +14,7 @@ class UIMode(Enum):
     RANDOM = 1
     EXPECTIMINIMAX = 2
     MCTS = 3
+    MCTS_EMM = 4
 
 
 class UI2048:
@@ -30,7 +31,7 @@ class UI2048:
     COLOR_BUTTON_BACKGROUND = COLOR_BOARD
     RUN = True
 
-    def __init__(self, model, expectiminimax, mcts):
+    def __init__(self, model, expectiminimax, mcts, mcts_emm):
         """
         This sets up the variables need for the UI to function.
         
@@ -43,6 +44,7 @@ class UI2048:
         self.model = model
         self.expectiminimax = expectiminimax
         self.mcts = mcts
+        self.mcts_emm = mcts_emm
         self.screen = None
         self.clock = pg.time.Clock()
         self.board_rect = pg.Rect((10, 110, 530, 530))
@@ -68,7 +70,8 @@ class UI2048:
             pg.Rect((565, 10, 200, 30)),
             pg.Rect((565, 50, 200, 30)),
             pg.Rect((565, 90, 200, 30)),
-            pg.Rect((565, 130, 200, 30))
+            pg.Rect((565, 130, 200, 30)),
+            pg.Rect((565, 170, 200, 30))
         ]
         self.title_font = pg.font.SysFont("Clear Sans Bold", 128)
         self.tile_font = pg.font.SysFont("Clear Sans Bold", 64)
@@ -103,8 +106,8 @@ class UI2048:
             if self.mode != UIMode.MANUAL.value: self.handleMovementInput()
             
             pg.display.update() # Updates the screen to show changes
-            #if self.mode != UIMode.MANUAL.value:
-                #self.clock.tick(10) # Update runs at 10 frames/second
+            if self.mode != UIMode.MANUAL.value:
+                self.clock.tick(10) # Update runs at 10 frames/second
             
         pg.quit() # Ends pygame
 
@@ -124,7 +127,8 @@ class UI2048:
         self.drawButton(UIMode.MANUAL.value, "Manual Play!")
         self.drawButton(UIMode.RANDOM.value, "Random Play!")
         self.drawButton(UIMode.EXPECTIMINIMAX.value, "Expectiminimax!")
-        self.drawButton(UIMode.MCTS.value, "Monte Carlo!")
+        self.drawButton(UIMode.MCTS.value, "Monte Carlo TS!")
+        self.drawButton(UIMode.MCTS_EMM.value, "MCTS x EMM!")
 
         current_board = self.model.getBoard()
         for row in range(self.MAX_BOARD_DIMENSION):
@@ -220,6 +224,8 @@ class UI2048:
                     self.setMode(UIMode.EXPECTIMINIMAX.value)
                 elif key[pg.K_3]:
                     self.setMode(UIMode.MCTS.value)
+                elif key[pg.K_4]:
+                    self.setMode(UIMode.MCTS_EMM.value)
                 elif key[pg.K_w] or key[pg.K_UP]:
                     self.model.playAction(Direction.UP.value)
                 elif key[pg.K_s] or key[pg.K_DOWN]:
@@ -235,6 +241,8 @@ class UI2048:
                     self.setMode(UIMode.EXPECTIMINIMAX.value)
                 elif key[pg.K_3]:
                     self.setMode(UIMode.MCTS.value)
+                elif key[pg.K_4]:
+                    self.setMode(UIMode.MCTS_EMM.value)
                 else:
                     self.model.playAction(r.randint(1, 4))
             case UIMode.EXPECTIMINIMAX.value:
@@ -244,6 +252,8 @@ class UI2048:
                     self.setMode(UIMode.RANDOM.value)
                 elif key[pg.K_3]:
                     self.setMode(UIMode.MCTS.value)
+                elif key[pg.K_4]:
+                    self.setMode(UIMode.MCTS_EMM.value)
                 else:
                     self.model.playAction(self.expectiminimax.getNextDirection(self.model.getBoard()))
             case UIMode.MCTS.value:
@@ -253,8 +263,21 @@ class UI2048:
                     self.setMode(UIMode.RANDOM.value)
                 elif key[pg.K_2]:
                     self.setMode(UIMode.EXPECTIMINIMAX.value)
+                elif key[pg.K_4]:
+                    self.setMode(UIMode.MCTS_EMM.value)
                 else:
                     self.model.playAction(self.mcts.getNextDirection(self.model.getBoard()))
+            case UIMode.MCTS_EMM.value:
+                if key[pg.K_0]:
+                    self.setMode(UIMode.MANUAL.value)
+                elif key[pg.K_1]:
+                    self.setMode(UIMode.RANDOM.value)
+                elif key[pg.K_2]:
+                    self.setMode(UIMode.EXPECTIMINIMAX.value)
+                elif key[pg.K_3]:
+                    self.setMode(UIMode.MCTS.value)
+                else:
+                    self.model.playAction(self.mcts_emm.getNextDirection(self.model.getBoard()))                
     
     def setMode(self, mode: int):
         """
@@ -269,8 +292,10 @@ class UI2048:
 def main():
     model = Model2048()
     expectiminimax = Expectiminimax2048(5, 2) # Search depth of 5 is the max before the time increase becomes too much!
-    montecarlo = MonteCarlo2048(1500, 30, 1.25)
-    game = UI2048(model, expectiminimax, montecarlo)
+    expectiminimax_weak = Expectiminimax2048(3, 2)
+    montecarlo = MonteCarlo2048(1500, 30, 1.25, None)
+    mcts_emm = MonteCarlo2048(50, 30, 1.25, expectiminimax_weak)
+    game = UI2048(model, expectiminimax, montecarlo, mcts_emm)
     game.run()
 
 if __name__ == '__main__':

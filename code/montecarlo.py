@@ -123,13 +123,13 @@ class MCTSNode:
         self.children.append(child)
         return child
 
-    #def simulateNode(self, expansion_depth: int, expectiminimax) -> int:
-    def simulateNode(self, expansion_depth: int) -> int:
+    def simulateNode(self, expansion_depth: int, expectiminimax) -> int:
         """
         Given the current node, this simulates a game with a max number of turns and return the final board score.
         
         :param expansion_depth: How many turns to simulate in the 2048 game.
         :type expansion_depth: int
+        :param expectiminimax: The model for Expectiminimax which may be None.
         :return: The heuristic score of the final board.
         :rtype: int
         """
@@ -139,19 +139,19 @@ class MCTSNode:
         players_turn = self.players_turn
         while i < expansion_depth and not game_over:
             if players_turn:
-                directions = [Direction.DOWN.value, Direction.RIGHT.value, Direction.LEFT.value, Direction.UP.value]
-                board_changed = False
-                while not board_changed and not game_over:
-                    if len(directions) == 0:
-                        game_over = True
-                        continue
-                    direction = directions.pop(r.randrange(len(directions)))
+                if expectiminimax:
+                    direction = expectiminimax.getNextDirection(simulation_board)
                     board_changed = self.__shift(simulation_board, simulation_board, direction)
-                """
-                direction = expectiminimax.getNextDirection(simulation_board)
-                board_changed = self.__shift(simulation_board, simulation_board, direction)
-                if direction == Direction.UP.value and not board_changed: game_over = True
-                """
+                    if not board_changed and direction == Direction.UP.value: game_over = True
+                else:
+                    directions = [Direction.DOWN.value, Direction.RIGHT.value, Direction.LEFT.value, Direction.UP.value]
+                    board_changed = False
+                    while not board_changed and not game_over:
+                        if len(directions) == 0:
+                            game_over = True
+                            continue
+                        direction = directions.pop(r.randrange(len(directions)))
+                        board_changed = self.__shift(simulation_board, simulation_board, direction)
             else:
                 open_cells = []
                 for y in range(self.MAX_BOARD_DIMENSION):
@@ -294,7 +294,7 @@ class MonteCarlo2048:
     This classes uses the Monte Carlo Tree Search algorithm to determine the "best" next move in 2048.
     """
 
-    def __init__(self, selection_iterations: int, expansion_depth: int, C: int):
+    def __init__(self, selection_iterations: int, expansion_depth: int, C: int, expectiminimax):
         """
         This sets up the variables needed for MCTS to function.
         
@@ -302,11 +302,12 @@ class MonteCarlo2048:
         :type selection_iterations: int
         :param expansion_depth: The max number of moves simulated on a node.
         :type expansion_depth: int
+        :param expectiminimax: The model for Expectiminimax which may be None.
         """
         self.selection_iterations = selection_iterations
         self.expansion_depth = expansion_depth
         self.C = C
-        #self.expectiminimax = Expectiminimax2048(5, 2)
+        self.emm = expectiminimax
 
     def getNextDirection(self, original_board: list) -> int:
         """
@@ -324,15 +325,14 @@ class MonteCarlo2048:
             node = root
 
             while not node.game_over and len(node.available_actions) == 0:
-                node = node.selectBestChild(self.C)                 # Selection
+                node = node.selectBestChild(self.C)                         # Selection
 
             if not node.game_over and len(node.available_actions) > 0:
-                node = node.expandNode()                            # Expansion
+                node = node.expandNode()                                    # Expansion
 
-            heuristic = node.simulateNode(self.expansion_depth)     # Simulation
-            #heuristic = node.simulateNode(self.expansion_depth, self.expectiminimax)     # Simulation
+            heuristic = node.simulateNode(self.expansion_depth, self.emm)   # Simulation
 
-            node.backPropagation(heuristic)                         # Backpropagation
+            node.backPropagation(heuristic)                                 # Backpropagation
 
         best_direction = None
         best_visits = 0
