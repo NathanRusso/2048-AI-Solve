@@ -95,7 +95,7 @@ class MCTSNode:
 
         self.available_actions = self.all_actions
 
-    def selectBestChild(self, C: int) -> "MCTSNode":
+    def selectBestChild(self, C: float) -> "MCTSNode":
         """
         Given the current node, the child with the best UCB1 score is returned.
         
@@ -180,7 +180,7 @@ class MCTSNode:
             players_turn = not players_turn
             i += 1
 
-        return self.getHeuristicSnake2Score(simulation_board)
+        return self.getHeuristicSnakeScore(simulation_board)
 
     def backPropagation(self, reward: int):
         """
@@ -195,7 +195,7 @@ class MCTSNode:
             node.reward += reward
             node = node.parent
     
-    def __UCB1(self, reward: float, parent_visits: int, node_visits: int, C: int) -> float:
+    def __UCB1(self, reward: float, parent_visits: int, node_visits: int, C: float) -> float:
         """
         Given a current node, this returns its Upper Confidence Bound 1 score for trees.
         For the exploit, since the heuristic scores go from 0 to infinity, a simple average of reward / visits cannot be used.  
@@ -208,16 +208,21 @@ class MCTSNode:
         :param node_visits: The number of times the node has been visited
         :type node_visits: int
         :param C: The exploration constant used to adjust weighting
-        :type C: int
+        :type C: float
         :return: The UCB1 score of the node.
         :rtype: float
         """
-        adjusted_score = m.log(reward)          # The logarithmic heavily reduces large number down
-        exploit = m.tanh(adjusted_score / 50)   # The tanh function bounds the exploit to [0, 1]
+        #adjusted_score = m.log(reward)          # The logarithmic heavily reduces large number down
+        #exploit = m.tanh(adjusted_score / 70)   # The tanh function bounds the exploit to [0, 1]
+        exploit = m.log(reward / node_visits)
+        #print(exploit) 
         explore = C * m.sqrt( m.log(parent_visits) / node_visits )
+        #print(explore)
+        #print("----")
+        #print(f"Exploit: {exploit}, Explore: {explore}")
         return exploit + explore                # UCB1 typical
 
-    def getHeuristicSnake2Score(self, board: list) -> int:
+    def getHeuristicSnakeScore(self, board: list) -> int:
         """
         Given the current node, this gets its board snake heuristic score.
                 
@@ -227,7 +232,7 @@ class MCTSNode:
         :rtype: int
         """
         br0, br1, br2, br3 = board                      # Board rows
-        hr0, hr1, hr2, hr3 = self.SNAKE_HEURISTIC_2     # Snake heuristic rows
+        hr0, hr1, hr2, hr3 = self.SNAKE_HEURISTIC_3     # Snake heuristic rows
         return (
             br0[0]*hr0[0] + br0[1]*hr0[1] + br0[2]*hr0[2] + br0[3]*hr0[3] +
             br1[0]*hr1[0] + br1[1]*hr1[1] + br1[2]*hr1[2] + br1[3]*hr1[3] +
@@ -307,7 +312,7 @@ class MonteCarlo2048:
     This classes uses the Monte Carlo Tree Search algorithm to determine the "best" next move in 2048.
     """
 
-    def __init__(self, selection_iterations: int, expansion_depth: int, C: int, expectiminimax):
+    def __init__(self, selection_iterations: int, expansion_depth: int, C: float, expectiminimax):
         """
         This sets up the variables needed for MCTS to function.
         
@@ -316,7 +321,7 @@ class MonteCarlo2048:
         :param expansion_depth: The max number of moves simulated on a node.
         :type expansion_depth: int
         :param C: The exploration constant used to adjust weighting in UCB1.
-        :type C: int
+        :type C: float
         :param expectiminimax: The model for Expectiminimax which may be None.
         """
         self.selection_iterations = selection_iterations
@@ -334,7 +339,7 @@ class MonteCarlo2048:
         :rtype: int
         """
         root = MCTSNode(original_board, None, None, True)
-        #original_heuristic = root.getHeuristicSnake2Score(original_board)
+        #original_heuristic = root.getHeuristicSnakeScore(original_board)
         
         for i in range(self.selection_iterations):
             node = root

@@ -284,9 +284,9 @@ class UI2048:
 
 def main():
     model = Model2048()
-    expectiminimax = Expectiminimax2048(5, 2) # Search depth of 5 is the max before the time increase becomes too much!
-    expectiminimax_weak = Expectiminimax2048(3, 2)
-    montecarlo = MonteCarlo2048(1500, 30, 1.25, None)
+    expectiminimax = Expectiminimax2048(5, 3) # Search depth of 5 is the max before the time increase becomes too much!
+    expectiminimax_weak = Expectiminimax2048(3, 3)
+    montecarlo = MonteCarlo2048(1500, 30, 5, None)
     mcts_emm = MonteCarlo2048(50, 30, 1.25, expectiminimax_weak)
     game = UI2048(model, expectiminimax, montecarlo, mcts_emm)
     game.run()
