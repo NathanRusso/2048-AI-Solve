@@ -75,6 +75,7 @@ class UI2048:
             pg.Rect((565, 200, 200, 30)),
             pg.Rect((615, 280, 100, 30)),
             pg.Rect((615, 320, 100, 30)),
+            pg.Rect((615, 360, 100, 30)),
         ]
         self.title_font = pg.font.SysFont("Clear Sans Bold", 128)
         self.tile_font = pg.font.SysFont("Clear Sans Bold", 64)
@@ -106,6 +107,8 @@ class UI2048:
                                 self.pause = not self.pause         # Pause or continues the game
                             elif index == 6:
                                 self.setMode(UIMode.MANUAL.value)   # Resets the game
+                            elif index == 7:
+                                pg.quit()                           # Quit the program
                             else:
                                 self.setMode(index)                 # Changes game modes based on a button click
 
@@ -141,6 +144,7 @@ class UI2048:
         self.drawButton(UIMode.MCTS_EMM.value, "MCTS x EMM!")
         self.drawButton(5, "Go" if self.pause else "Pause")
         self.drawButton(6, "Reset")
+        self.drawButton(7, "Quit")
 
         current_board = self.model.getBoard()
         for row in range(self.MAX_BOARD_DIMENSION):
