@@ -103,17 +103,15 @@ class UI2048:
                         button_max_x, button_max_y = button.bottomright
                         if (button_min_x <= mouse_x <= button_max_x) and (button_min_y <= mouse_y <= button_max_y):
                             if index == 5:
-                                self.pause = not self.pause
+                                self.pause = not self.pause         # Pause or continues the game
                             elif index == 6:
-                                self.setMode(UIMode.MANUAL.value)
+                                self.setMode(UIMode.MANUAL.value)   # Resets the game
                             else:
-                                self.setMode(index)
+                                self.setMode(index)                 # Changes game modes based on a button click
 
-                if self.mode == UIMode.MANUAL.value and not self.pause:
-                    self.handleMovementInput() # Handle per event if manual
+                if self.mode == UIMode.MANUAL.value: self.handleMovementInput() # Handle per event if manual
 
-            if self.mode != UIMode.MANUAL.value and not self.pause:
-                self.handleMovementInput()
+            if self.mode != UIMode.MANUAL.value: self.handleMovementInput()
             
             pg.display.update() # Updates the screen to show changes
             if self.mode != UIMode.MANUAL.value:
@@ -222,25 +220,16 @@ class UI2048:
 
     def handleMovementInput(self):
         """
-        This calls the model to shift the tiles and add a new tile on the board.
+        This checks and handles if the game mode has been altered. 
+        It then handles a play action either with manual key presses or AI modes.
         """
         key = pg.key.get_pressed()
+        mode_changed = self.checkSetMode(key) # Changes game modes based on keyboard input
+        if mode_changed or self.pause: return
 
-        if key[pg.K_r]: # Reset
-            self.setMode(UIMode.MANUAL.value)
-            return
-        
         match self.mode:
             case UIMode.MANUAL.value:
-                if key[pg.K_1]:
-                    self.setMode(UIMode.RANDOM.value)
-                elif key[pg.K_2]:
-                    self.setMode(UIMode.EXPECTIMINIMAX.value)
-                elif key[pg.K_3]:
-                    self.setMode(UIMode.MCTS.value)
-                elif key[pg.K_4]:
-                    self.setMode(UIMode.MCTS_EMM.value)
-                elif key[pg.K_w] or key[pg.K_UP]:
+                if key[pg.K_w] or key[pg.K_UP]:
                     self.model.playAction(Direction.UP.value)
                 elif key[pg.K_s] or key[pg.K_DOWN]:
                     self.model.playAction(Direction.DOWN.value)
@@ -249,50 +238,40 @@ class UI2048:
                 elif key[pg.K_d] or key[pg.K_RIGHT]:
                     self.model.playAction(Direction.RIGHT.value)
             case UIMode.RANDOM.value:
-                if key[pg.K_0]:
-                    self.setMode(UIMode.MANUAL.value)
-                elif key[pg.K_2]:
-                    self.setMode(UIMode.EXPECTIMINIMAX.value)
-                elif key[pg.K_3]:
-                    self.setMode(UIMode.MCTS.value)
-                elif key[pg.K_4]:
-                    self.setMode(UIMode.MCTS_EMM.value)
-                else:
-                    self.model.playAction(r.randint(1, 4))
+                self.model.playAction(r.randint(1, 4))
             case UIMode.EXPECTIMINIMAX.value:
-                if key[pg.K_0]:
-                    self.setMode(UIMode.MANUAL.value)
-                elif key[pg.K_1]:
-                    self.setMode(UIMode.RANDOM.value)
-                elif key[pg.K_3]:
-                    self.setMode(UIMode.MCTS.value)
-                elif key[pg.K_4]:
-                    self.setMode(UIMode.MCTS_EMM.value)
-                else:
-                    self.model.playAction(self.expectiminimax.getNextDirection(self.model.getBoard()))
+                self.model.playAction(self.expectiminimax.getNextDirection(self.model.getBoard()))
             case UIMode.MCTS.value:
-                if key[pg.K_0]:
-                    self.setMode(UIMode.MANUAL.value)
-                elif key[pg.K_1]:
-                    self.setMode(UIMode.RANDOM.value)
-                elif key[pg.K_2]:
-                    self.setMode(UIMode.EXPECTIMINIMAX.value)
-                elif key[pg.K_4]:
-                    self.setMode(UIMode.MCTS_EMM.value)
-                else:
-                    self.model.playAction(self.mcts.getNextDirection(self.model.getBoard()))
+                self.model.playAction(self.mcts.getNextDirection(self.model.getBoard()))
             case UIMode.MCTS_EMM.value:
-                if key[pg.K_0]:
-                    self.setMode(UIMode.MANUAL.value)
-                elif key[pg.K_1]:
-                    self.setMode(UIMode.RANDOM.value)
-                elif key[pg.K_2]:
-                    self.setMode(UIMode.EXPECTIMINIMAX.value)
-                elif key[pg.K_3]:
-                    self.setMode(UIMode.MCTS.value)
-                else:
-                    self.model.playAction(self.mcts_emm.getNextDirection(self.model.getBoard()))                
-    
+                self.model.playAction(self.mcts_emm.getNextDirection(self.model.getBoard()))                
+
+    def checkSetMode(self, key) -> bool:
+        """
+        This changes the game mode if requested and returns if the mode changed.
+        
+        :param key: The key holding booleans for each key if it was pressed or not.
+        :return: True if the game mode has changed, False otherwise.
+        :rtype: bool
+        """
+        mode_changed = True
+        if key[pg.K_p]:
+            self.pause = not self.pause # Pause or continues the game
+            print("Key Pause")
+        elif key[pg.K_r] or key[pg.K_0]:
+            self.setMode(UIMode.MANUAL.value) # Accounts for Reset
+        elif key[pg.K_1]:
+            self.setMode(UIMode.RANDOM.value)
+        elif key[pg.K_2]:
+            self.setMode(UIMode.EXPECTIMINIMAX.value)
+        elif key[pg.K_3]:
+            self.setMode(UIMode.MCTS.value)
+        elif key[pg.K_4]:
+            self.setMode(UIMode.MCTS_EMM.value)
+        else:
+            mode_changed = False
+        return mode_changed
+
     def setMode(self, mode: int):
         """
         This resets the board and switches modes.
