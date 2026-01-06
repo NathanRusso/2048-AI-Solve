@@ -259,6 +259,8 @@ class UI2048:
         :rtype: bool
         """
         mode_changed = True
+        if key[pg.K_q]:
+            pg.quit()
         if key[pg.K_p]:
             self.pause = not self.pause # Pause or continues the game
             print("Key Pause")
