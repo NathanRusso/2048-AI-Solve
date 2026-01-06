@@ -45,6 +45,7 @@ class UI2048:
         self.expectiminimax = expectiminimax
         self.mcts = mcts
         self.mcts_emm = mcts_emm
+        self.pause = False
         self.screen = None
         self.clock = pg.time.Clock()
         self.board_rect = pg.Rect((10, 110, 530, 530))
@@ -67,11 +68,13 @@ class UI2048:
             pg.Rect((410, 510, 120, 120))
         ]
         self.button_rects = [
-            pg.Rect((565, 10, 200, 30)),
-            pg.Rect((565, 50, 200, 30)),
-            pg.Rect((565, 90, 200, 30)),
-            pg.Rect((565, 130, 200, 30)),
-            pg.Rect((565, 170, 200, 30))
+            pg.Rect((565, 40, 200, 30)),
+            pg.Rect((565, 80, 200, 30)),
+            pg.Rect((565, 120, 200, 30)),
+            pg.Rect((565, 160, 200, 30)),
+            pg.Rect((565, 200, 200, 30)),
+            pg.Rect((615, 280, 100, 30)),
+            pg.Rect((615, 320, 100, 30)),
         ]
         self.title_font = pg.font.SysFont("Clear Sans Bold", 128)
         self.tile_font = pg.font.SysFont("Clear Sans Bold", 64)
@@ -99,11 +102,18 @@ class UI2048:
                         button_min_x, button_min_y = button.topleft
                         button_max_x, button_max_y = button.bottomright
                         if (button_min_x <= mouse_x <= button_max_x) and (button_min_y <= mouse_y <= button_max_y):
-                            self.setMode(index)
+                            if index == 5:
+                                self.pause = not self.pause
+                            elif index == 6:
+                                self.setMode(UIMode.MANUAL.value)
+                            else:
+                                self.setMode(index)
 
-                if self.mode == UIMode.MANUAL.value: self.handleMovementInput() # Handle per event if manual
+                if self.mode == UIMode.MANUAL.value and not self.pause:
+                    self.handleMovementInput() # Handle per event if manual
 
-            if self.mode != UIMode.MANUAL.value: self.handleMovementInput()
+            if self.mode != UIMode.MANUAL.value and not self.pause:
+                self.handleMovementInput()
             
             pg.display.update() # Updates the screen to show changes
             if self.mode != UIMode.MANUAL.value:
@@ -121,6 +131,8 @@ class UI2048:
         self.drawLabel(f"Best Score: {self.model.getBestScore()}", (10, 10))
         self.drawLabel(f"Current Score: {self.model.getScore()}", (10, 40))
         if self.model.gameOver(): self.drawLabel("GAME OVER!", (10, 70))
+        self.drawLabel("GAME MODES:", (580, 10))
+        self.drawLabel("CONTROLS:", (595, 250))
 
         self.drawTitle()
 
@@ -129,6 +141,8 @@ class UI2048:
         self.drawButton(UIMode.EXPECTIMINIMAX.value, "Expectiminimax!")
         self.drawButton(UIMode.MCTS.value, "Monte Carlo TS!")
         self.drawButton(UIMode.MCTS_EMM.value, "MCTS x EMM!")
+        self.drawButton(5, "Go" if self.pause else "Pause")
+        self.drawButton(6, "Reset")
 
         current_board = self.model.getBoard()
         for row in range(self.MAX_BOARD_DIMENSION):
