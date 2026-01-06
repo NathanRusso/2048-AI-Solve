@@ -45,8 +45,8 @@ class Expectiminimax2048():
         :type snake: int
         
         """
-        self.depth = depth      # How deep are algorithm will search
-        self.snake = snake  # If the heuristic will be the snake 1
+        self.depth = depth # How deep are algorithm will search
+        self.snake = snake # If the heuristic will be the snake 1
 
     def getHeuristicScore(self, board: list) -> int:
         """

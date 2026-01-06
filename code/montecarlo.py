@@ -24,6 +24,18 @@ class MCTSNode:
         [4**7, 4**6, 4**5, 4**4],
         [4**0, 4**1, 4**2, 4**3]
     ]
+    SNAKE_HEURISTIC_3 = [
+        [2**12, 2**11, 2**10, 2**9],
+        [2**6, 2**7, 2**8, 2**9],
+        [2**6, 2**5, 2**4, 2**3],
+        [2**0, 2**1, 2**2, 2**3]
+    ]
+    SNAKE_HEURISTIC_4 = [
+        [4**12, 4**11, 4**10, 4**9],
+        [4**6, 4**7, 4**8, 4**9],
+        [4**6, 4**5, 4**4, 4**3],
+        [4**0, 4**1, 4**2, 4**3]
+    ]
 
     def __init__(self, board: list, parent: "MCTSNode", direction: int, players_turn: bool):
         """
@@ -195,10 +207,11 @@ class MCTSNode:
         :type parent_visits: int
         :param node_visits: The number of times the node has been visited
         :type node_visits: int
+        :param C: The exploration constant used to adjust weighting
+        :type C: int
         :return: The UCB1 score of the node.
         :rtype: float
         """
-        #C = 1.4                                 # The exploration constant used to adjust weighting
         adjusted_score = m.log(reward)          # The logarithmic heavily reduces large number down
         exploit = m.tanh(adjusted_score / 50)   # The tanh function bounds the exploit to [0, 1]
         explore = C * m.sqrt( m.log(parent_visits) / node_visits )
@@ -302,6 +315,8 @@ class MonteCarlo2048:
         :type selection_iterations: int
         :param expansion_depth: The max number of moves simulated on a node.
         :type expansion_depth: int
+        :param C: The exploration constant used to adjust weighting in UCB1.
+        :type C: int
         :param expectiminimax: The model for Expectiminimax which may be None.
         """
         self.selection_iterations = selection_iterations
@@ -334,14 +349,11 @@ class MonteCarlo2048:
 
             node.backPropagation(heuristic)                                 # Backpropagation
 
-        best_direction = None
+        best_direction = Direction.UP.value
         best_visits = 0
         for child in root.children:
             #print(child.reward)
-            if best_direction is None:
-                best_direction = child.direction
-                best_visits = child.visits
-            elif child.visits > best_visits:
+            if child.visits > best_visits:
                 best_direction = child.direction
                 best_visits = child.visits
         #print(best_direction)
