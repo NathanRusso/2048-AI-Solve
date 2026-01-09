@@ -80,7 +80,10 @@ class UI2048:
             pg.Rect((615, 400, 100, 30))
         ]
         self.title_font = pg.font.SysFont("Clear Sans Bold", 128)
-        self.tile_font = pg.font.SysFont("Clear Sans Bold", 64)
+        self.tile_font_1 = pg.font.SysFont("Clear Sans Bold", 64)
+        self.tile_font_2 = pg.font.SysFont("Clear Sans Bold", 56)
+        self.tile_font_3 = pg.font.SysFont("Clear Sans Bold", 48)
+        self.tile_font_4 = pg.font.SysFont("Clear Sans Bold", 40)
         self.info_font = pg.font.SysFont("Clear Sans Bold", 32)
         self.mode = UIMode.MANUAL.value
 
@@ -131,7 +134,6 @@ class UI2048:
         This draws the current game state.
         """
         self.screen.fill(self.COLOR_SCREEN) # Fills (Resets) the screen to not leave trails
-        pg.draw.rect(self.screen, self.COLOR_BOARD, self.board_rect) # Draws the board background
 
         self.drawLabel(f"Best Score: {self.model.getBestScore()}", (10, 10))
         self.drawLabel(f"Current Score: {self.model.getScore()}", (10, 40))
@@ -151,17 +153,7 @@ class UI2048:
         self.drawButton(7, "Reset")
         self.drawButton(8, "Quit")
 
-        current_board = self.model.getBoard()
-        for row in range(self.MAX_BOARD_DIMENSION):
-            for col in range(self.MAX_BOARD_DIMENSION):
-                tile = current_board[row][col]
-                rect_index = row * self.MAX_BOARD_DIMENSION + col
-                rect = self.tile_rects[rect_index]
-                pg.draw.rect(self.screen, self.getTileColor(tile), rect)
-                if tile > 0:
-                    tile_text = self.tile_font.render(str(tile), True, "#FFFFFF" if tile >= 8 else "#736452")
-                    tile_text_rect = tile_text.get_rect(center=rect.center)
-                    self.screen.blit(tile_text, tile_text_rect)
+        self.drawBoard()
 
     def drawTitle(self):
         """
@@ -199,6 +191,31 @@ class UI2048:
         button_text_rect = button_text.get_rect(center=rect.center)
         self.screen.blit(button_text, button_text_rect)
 
+    def drawBoard(self):
+        """
+        This draws the board background and all of its tiles.
+        """
+        pg.draw.rect(self.screen, self.COLOR_BOARD, self.board_rect) # Draws the board background
+        current_board = self.model.getBoard()
+        for row in range(self.MAX_BOARD_DIMENSION):
+            for col in range(self.MAX_BOARD_DIMENSION):
+                tile = current_board[row][col]
+                rect_index = row * self.MAX_BOARD_DIMENSION + col
+                rect = self.tile_rects[rect_index]
+                pg.draw.rect(self.screen, self.getTileColor(tile), rect)
+                if tile > 0:
+                    tile_color = "#FFFFFF" if tile >= 8 else "#736452"
+                    if tile <= 8192:
+                        tile_text = self.tile_font_1.render(str(tile), True, tile_color)
+                    elif tile <= 65536:
+                        tile_text = self.tile_font_2.render(str(tile), True, tile_color)
+                    elif tile <= 524288:
+                        tile_text = self.tile_font_3.render(str(tile), True, tile_color)
+                    else:
+                        tile_text = self.tile_font_4.render(str(tile), True, tile_color)
+                    tile_text_rect = tile_text.get_rect(center=rect.center)
+                    self.screen.blit(tile_text, tile_text_rect)
+
     def getTileColor(self, tile: int) -> str:
         """
         This gets the color of the given tile.
@@ -225,6 +242,10 @@ class UI2048:
             case 8192: return "#24C8B5"
             case 16384: return "#1D72C1"
             case 32768: return "#7050d2"
+            case 65536: return "#b850d2"
+            case 131072: return "#f838be"
+            case 262144: return "#e32f2f"
+            case 524288: return "#991313"
             case _: return "#000000"
 
     def handleMovementInput(self):
