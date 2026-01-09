@@ -199,22 +199,21 @@ class UI2048:
         current_board = self.model.getBoard()
         for row in range(self.MAX_BOARD_DIMENSION):
             for col in range(self.MAX_BOARD_DIMENSION):
-                tile = current_board[row][col]
-                rect_index = row * self.MAX_BOARD_DIMENSION + col
-                rect = self.tile_rects[rect_index]
-                pg.draw.rect(self.screen, self.getTileColor(tile), rect)
-                if tile > 0:
-                    tile_color = "#FFFFFF" if tile >= 8 else "#736452"
-                    if tile <= 8192:
-                        tile_text = self.tile_font_1.render(str(tile), True, tile_color)
-                    elif tile <= 65536:
-                        tile_text = self.tile_font_2.render(str(tile), True, tile_color)
-                    elif tile <= 524288:
-                        tile_text = self.tile_font_3.render(str(tile), True, tile_color)
+                tile_num = current_board[row][col]
+                tile_rect = self.tile_rects[row * self.MAX_BOARD_DIMENSION + col]
+                pg.draw.rect(self.screen, self.getTileColor(tile_num), tile_rect)   # Draws tile background
+                if tile_num > 0:
+                    tile_num_color = "#FFFFFF" if tile_num >= 8 else "#736452"
+                    if tile_num <= 8192:
+                        tile_num_text = self.tile_font_1.render(str(tile_num), True, tile_num_color)
+                    elif tile_num <= 65536:
+                        tile_num_text = self.tile_font_2.render(str(tile_num), True, tile_num_color)
+                    elif tile_num <= 524288:
+                        tile_num_text = self.tile_font_3.render(str(tile_num), True, tile_num_color)
                     else:
-                        tile_text = self.tile_font_4.render(str(tile), True, tile_color)
-                    tile_text_rect = tile_text.get_rect(center=rect.center)
-                    self.screen.blit(tile_text, tile_text_rect)
+                        tile_num_text = self.tile_font_4.render(str(tile_num), True, tile_num_color)
+                    tile_num_text_rect = tile_num_text.get_rect(center=tile_rect.center)
+                    self.screen.blit(tile_num_text, tile_num_text_rect)             # Draws tile text
 
     def getTileColor(self, tile: int) -> str:
         """
