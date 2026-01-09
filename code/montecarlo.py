@@ -212,15 +212,13 @@ class MCTSNode:
         :return: The UCB1 score of the node.
         :rtype: float
         """
-        #adjusted_score = m.log(reward)          # The logarithmic heavily reduces large number down
-        #exploit = m.tanh(adjusted_score / 70)   # The tanh function bounds the exploit to [0, 1]
-        exploit = m.log(reward / node_visits)
-        #print(exploit) 
+        adjusted_score = m.log(reward / node_visits)    # The logarithmic heavily reduces large number down
+        exploit = m.tanh(adjusted_score / 70)           # The tanh function bounds the exploit to [0, 1]
         explore = C * m.sqrt( m.log(parent_visits) / node_visits )
-        #print(explore)
-        #print("----")
+        #exploit = m.log(reward / node_visits)
+        #explore = (exploit * 1) * m.sqrt( m.log(parent_visits) / node_visits )
         #print(f"Exploit: {exploit}, Explore: {explore}")
-        return exploit + explore                # UCB1 typical
+        return exploit + explore                        # UCB1 typical
 
     def getHeuristicSnakeScore(self, board: list) -> int:
         """

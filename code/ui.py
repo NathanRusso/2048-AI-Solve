@@ -46,6 +46,7 @@ class UI2048:
         self.mcts = mcts
         self.mcts_emm = mcts_emm
         self.pause = False
+        self.speed_limiter = True
         self.screen = None
         self.clock = pg.time.Clock()
         self.board_rect = pg.Rect((10, 110, 530, 530))
@@ -73,9 +74,10 @@ class UI2048:
             pg.Rect((565, 120, 200, 30)),
             pg.Rect((565, 160, 200, 30)),
             pg.Rect((565, 200, 200, 30)),
-            pg.Rect((615, 280, 100, 30)),
+            pg.Rect((585, 280, 160, 30)),
             pg.Rect((615, 320, 100, 30)),
             pg.Rect((615, 360, 100, 30)),
+            pg.Rect((615, 400, 100, 30))
         ]
         self.title_font = pg.font.SysFont("Clear Sans Bold", 128)
         self.tile_font = pg.font.SysFont("Clear Sans Bold", 64)
@@ -104,20 +106,22 @@ class UI2048:
                         button_max_x, button_max_y = button.bottomright
                         if (button_min_x <= mouse_x <= button_max_x) and (button_min_y <= mouse_y <= button_max_y):
                             if index == 5:
-                                self.pause = not self.pause         # Pause or continues the game
+                                self.speed_limiter = not self.speed_limiter # Removes tile shift limit
                             elif index == 6:
-                                self.setMode(UIMode.MANUAL.value)   # Resets the game
+                                self.pause = not self.pause                 # Pause or continues the game
                             elif index == 7:
-                                pg.quit()                           # Quit the program
+                                self.setMode(UIMode.MANUAL.value)           # Resets the game
+                            elif index == 8:
+                                pg.quit()                                   # Quit the program
                             else:
-                                self.setMode(index)                 # Changes game modes based on a button click
+                                self.setMode(index)                         # Changes game modes based on a button click
 
                 if self.mode == UIMode.MANUAL.value: self.handleMovementInput() # Handle per event if manual
 
             if self.mode != UIMode.MANUAL.value: self.handleMovementInput()
             
             pg.display.update() # Updates the screen to show changes
-            if self.mode != UIMode.MANUAL.value:
+            if self.mode != UIMode.MANUAL.value and self.speed_limiter:
                 self.clock.tick(10) # Update runs at 10 frames/second
             
         pg.quit() # Ends pygame
@@ -142,9 +146,10 @@ class UI2048:
         self.drawButton(UIMode.EXPECTIMINIMAX.value, "Expectiminimax!")
         self.drawButton(UIMode.MCTS.value, "Monte Carlo TS!")
         self.drawButton(UIMode.MCTS_EMM.value, "MCTS x EMM!")
-        self.drawButton(5, "Go" if self.pause else "Pause")
-        self.drawButton(6, "Reset")
-        self.drawButton(7, "Quit")
+        self.drawButton(5, "Unlimit Speed" if self.speed_limiter else "Limit Speed")
+        self.drawButton(6, "Go" if self.pause else "Pause")
+        self.drawButton(7, "Reset")
+        self.drawButton(8, "Quit")
 
         current_board = self.model.getBoard()
         for row in range(self.MAX_BOARD_DIMENSION):
@@ -261,9 +266,10 @@ class UI2048:
         mode_changed = True
         if key[pg.K_q]:
             pg.quit()
-        if key[pg.K_p]:
+        elif key[pg.K_p]:
             self.pause = not self.pause # Pause or continues the game
-            print("Key Pause")
+        elif key[pg.K_l]:
+            self.speed_limiter = not self.speed_limiter # Limit tile shift speed
         elif key[pg.K_r] or key[pg.K_0]:
             self.setMode(UIMode.MANUAL.value) # Accounts for Reset
         elif key[pg.K_1]:
@@ -292,7 +298,7 @@ def main():
     model = Model2048()
     expectiminimax = Expectiminimax2048(5, 3) # Search depth of 5 is the max before the time increase becomes too much!
     expectiminimax_weak = Expectiminimax2048(3, 3)
-    montecarlo = MonteCarlo2048(1500, 30, 5, None)
+    montecarlo = MonteCarlo2048(1500, 30, 1, None)
     mcts_emm = MonteCarlo2048(50, 30, 1.25, expectiminimax_weak)
     game = UI2048(model, expectiminimax, montecarlo, mcts_emm)
     game.run()
