@@ -22,3 +22,9 @@ I am going to recreate and improve a class project that uses AI search algorithm
 
 ### Both
 - https://www.researchgate.net/publication/327912401_Comparison_of_Expectimax_and_Monte_Carlo_algorithms_in_Solving_the_online_2048_game/fulltext/5bacdd4092851ca9ed2a29ce/Comparison-of-Expectimax-and-Monte-Carlo-algorithms-in-Solving-the-online-2048-game.pdf?__cf_chl_tk=f1HpxtWwhXsYdST7Gesk_kO1wUsKYZGxYo3_KazfrT4-1767725944-1.0.1.1-ajWTr_ys5XUhCiI32mzLZx7HUzXJ4IavJg3qRU8u0kI
+
+### Other (Not yet implemented or taken inspiration from)
+- https://event.cwi.nl/uai2010/papers/UAI2010_0219.pdf
+- https://www.cs.unh.edu/~sjw1000/2024-socs-extreme_value_mcts-ea.pdf   # References 3?
+- https://arxiv.org/html/2405.18248v1#S3                                # References 2?
+- https://arxiv.org/html/2512.09727v1
