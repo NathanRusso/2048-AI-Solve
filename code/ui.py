@@ -83,7 +83,6 @@ class UI2048:
         self.tile_font_1 = pg.font.SysFont("Clear Sans Bold", 64)
         self.tile_font_2 = pg.font.SysFont("Clear Sans Bold", 56)
         self.tile_font_3 = pg.font.SysFont("Clear Sans Bold", 48)
-        self.tile_font_4 = pg.font.SysFont("Clear Sans Bold", 40)
         self.info_font = pg.font.SysFont("Clear Sans Bold", 32)
         self.mode = UIMode.MANUAL.value
 
@@ -208,10 +207,8 @@ class UI2048:
                         tile_num_text = self.tile_font_1.render(str(tile_num), True, tile_num_color)
                     elif tile_num <= 65536:
                         tile_num_text = self.tile_font_2.render(str(tile_num), True, tile_num_color)
-                    elif tile_num <= 524288:
+                    else: # Max is 131072
                         tile_num_text = self.tile_font_3.render(str(tile_num), True, tile_num_color)
-                    else:
-                        tile_num_text = self.tile_font_4.render(str(tile_num), True, tile_num_color)
                     tile_num_text_rect = tile_num_text.get_rect(center=tile_rect.center)
                     self.screen.blit(tile_num_text, tile_num_text_rect)             # Draws tile text
 
@@ -241,11 +238,9 @@ class UI2048:
             case 8192: return "#24C8B5"
             case 16384: return "#1D72C1"
             case 32768: return "#7050d2"
-            case 65536: return "#b850d2"
-            case 131072: return "#f838be"
-            case 262144: return "#e32f2f"
-            case 524288: return "#991313"
-            case _: return "#000000"
+            case 65536: return "#e00b0b"
+            case 131072: return "#000000"   # The max tile is 131072
+            case _: return "#000000"        # Default case in case there is a bug
 
     def handleMovementInput(self):
         """
