@@ -187,7 +187,7 @@ class Expectiminimax2048():
         """
         for i in range(self.MAX_BOARD_DIMENSION):
             for j in range(self.MAX_BOARD_DIMENSION - 1):
-                if (board[i][j] == board[i][j+1] or board[j][i] == board[j+1][i]): return True
+                if board[i][j] == board[i][j+1] or board[j][i] == board[j+1][i]: return True
         return False
 
     def __gameOver(self, board: list) -> bool:
@@ -201,7 +201,7 @@ class Expectiminimax2048():
         """
         for y in range(self.MAX_BOARD_DIMENSION):
             for x in range(self.MAX_BOARD_DIMENSION):
-                if (board[y][x] == self.BLANK_TILE): return False
+                if board[y][x] == self.BLANK_TILE: return False
 
         return not self.__potentialMerges(board)
 
