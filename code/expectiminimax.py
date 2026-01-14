@@ -127,7 +127,8 @@ class Expectiminimax2048():
         if current_depth == 0: return self.getHeuristicScore(board)
  
         open_cells = self.__getAllOpenCells(board)
-        if len(open_cells) == 0 and not self.__potentialMerges(board): return self.getHeuristicScore(board)
+        num_open_cells = len(open_cells)
+        if num_open_cells == 0 and not self.__potentialMerges(board): return self.getHeuristicScore(board)
 
         if players_turn: # Player's Turn: Tiles shift
             highest_heuristic = 0
@@ -140,7 +141,7 @@ class Expectiminimax2048():
                     if heuristic > highest_heuristic: highest_heuristic = heuristic
             return highest_heuristic
         else: # Game's Turn: Random tile spawn
-            if len(open_cells) != 0:
+            if num_open_cells != 0:
                 sum_heuristic_2 = 0
                 sum_heuristic_4 = 0
                 for cell in open_cells:
@@ -152,8 +153,8 @@ class Expectiminimax2048():
                     sum_heuristic_2 += self.__getBestScore(board_copy_2, current_depth - 1, True)
                     sum_heuristic_4 += self.__getBestScore(board_copy_4, current_depth - 1, True)
 
-                avg_heuristic_2 = sum_heuristic_2 / len(open_cells)
-                avg_heuristic_4 = sum_heuristic_4 / len(open_cells)
+                avg_heuristic_2 = sum_heuristic_2 / num_open_cells
+                avg_heuristic_4 = sum_heuristic_4 / num_open_cells
                 return m.floor(avg_heuristic_2 * self.TILE_2_CHANCE + avg_heuristic_4 * self.TILE_4_CHANCE)
             else:
                 board_copy = [row[:] for row in board]
