@@ -238,7 +238,7 @@ class MCTSNode:
             br3[0]*hr3[0] + br3[1]*hr3[1] + br3[2]*hr3[2] + br3[3]*hr3[3]
         )
 
-    def __shift(self, board: list, original_board: list, direction: int) -> list:
+    def __shift(self, board: list, original_board: list, direction: int) -> bool:
         """
         This shifts the tiles of the given board in one of the 4 cardinal directions.
         
@@ -249,7 +249,7 @@ class MCTSNode:
         :param direction: The direction to shift the board tiles. 
         :type direction: int
         :return: True if the tiles on the board have changed positions, False otherwise.
-        :rtype: list
+        :rtype: bool
         """
         if direction == Direction.UP.value:
             for col in range(self.MAX_BOARD_DIMENSION):
