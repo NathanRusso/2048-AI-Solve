@@ -15,11 +15,11 @@
 #define TILE_4_CHANCE 0.1
 
 typedef enum {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT
-} Direction; // NOTE: STARTS AT 0, NOT 1!!!!!!!!!!!!!
+    UP, // 0 -> 1
+    DOWN, // 1 -> 2
+    LEFT, // 2 -> 3
+    RIGHT // 3 -> 4
+} Direction;
 
 const int SNAKE_HEURISTIC_3[4][4] = {
     {4096, 2048, 1024, 512},
@@ -47,20 +47,20 @@ long long get_heuristic_score(int board[4][4]) {
     return board_heuristic;
 }
 
-int **merge() {}
+int *merge(int list[4]) {}
 
-bool shift() {}
+bool shift(int board[4][4], int original_board[4][4], int direction) {}
 
-bool potential_merges() {}
+bool potential_merges(int board[4][4]) {}
 
-int **get_open_cells() {}
+int **get_open_cells(int board[4][4]) {}
 
-long long get_best_score() {}
+long long get_best_score(int board[4][4], int current_depth, bool players_turn) {}
 
 /**
  * This returns the "best" direction to shift the tiles in the given board.
  * 
- * @param depth The search depth of the AI solver/search.
+ * @param depth The search depth of the AI Expectiminimax solver/search.
  * @param board The given 4x4 2048 board.
  * 
  * @return The best direction to move: 1: UP, 2: DOWN, 3: LEFT, 4: RIGHT
