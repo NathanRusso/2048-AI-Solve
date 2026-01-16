@@ -47,15 +47,118 @@ long long get_heuristic_score(int board[4][4]) {
     return board_heuristic;
 }
 
-int *merge(int list[4]) {}
+int *merge(int list[4]) {
+/*
+    list_values = [tile for tile in list_values if tile != self.BLANK_TILE]
+    final_values = []
+    i = len(list_values) - 1
+    while i >= 0:
+        if i - 1 >= 0 and list_values[i] == list_values[i-1]:
+            new_tile = list_values[i] * 2
+            final_values.append(new_tile)
+            i -= 2
+        else:
+            final_values.append(list_values[i])
+            i -= 1
 
-bool shift(int board[4][4], int original_board[4][4], int direction) {}
+    while len(final_values) < self.MAX_BOARD_DIMENSION:
+        final_values.append(0)
+    return final_values[::-1]
+*/
+}
 
-bool potential_merges(int board[4][4]) {}
+bool shift(int board[4][4], int original_board[4][4], int direction) {
+/*
+    if direction == Direction.UP.value:
+        for col in range(self.MAX_BOARD_DIMENSION):
+            original_col_values = [row[col] for row in board][::-1] # Column in reverse order (going up)
+            final_col_values = self.__merge(original_col_values)[::-1]
+            for row in range(self.MAX_BOARD_DIMENSION):
+                board[row][col] = final_col_values[row]
+    elif direction == Direction.DOWN.value:
+        for col in range(self.MAX_BOARD_DIMENSION):
+            original_col_values = [row[col] for row in board] # Column in normal order (going down)
+            final_col_values = self.__merge(original_col_values)
+            for row in range(self.MAX_BOARD_DIMENSION):
+                board[row][col] = final_col_values[row]
+    elif direction == Direction.LEFT.value:
+        for row in range(self.MAX_BOARD_DIMENSION):
+            original_row_values = board[row][::-1] # Row in reverse order
+            final_row_values = self.__merge(original_row_values)[::-1]
+            board[row] = final_row_values
+    elif direction == Direction.RIGHT.value:
+        for row in range(self.MAX_BOARD_DIMENSION):
+            original_row_values = board[row] # Row in normal order
+            final_row_values = self.__merge(original_row_values)
+            board[row] = final_row_values
+    else:
+        return False # Invalid direction
 
-int **get_open_cells(int board[4][4]) {}
+    return original_board != board
+*/   
+}
 
-long long get_best_score(int board[4][4], int current_depth, bool players_turn) {}
+bool potential_merges(int board[4][4]) {
+/*
+    for i in range(self.MAX_BOARD_DIMENSION):
+        for j in range(self.MAX_BOARD_DIMENSION - 1):
+            if board[i][j] == board[i][j+1] or board[j][i] == board[j+1][i]: return True
+    return False
+*/
+}
+
+int **get_open_cells(int board[4][4]) {
+/*
+    open_cells = []
+    for y in range(self.MAX_BOARD_DIMENSION):
+        for x in range(self.MAX_BOARD_DIMENSION):
+            if board[y][x] == self.BLANK_TILE:
+                open_cells.append((y, x))
+    return open_cells
+*/
+
+}
+
+long long get_best_score(int board[4][4], int current_depth, bool players_turn) {
+/*
+    if current_depth == 0: return self.getHeuristicScore(board)
+
+    open_cells = self.__getAllOpenCells(board)
+    num_open_cells = len(open_cells)
+    if num_open_cells == 0 and not self.__potentialMerges(board): return self.getHeuristicScore(board)
+
+    if players_turn: # Player's Turn: Tiles shift
+        highest_heuristic = 0
+        original_board = [row[:] for row in board]
+        for direction in Direction:
+            board_copy = [row[:] for row in board]
+            board_changed = self.__shift(board_copy, original_board, direction.value)
+            if board_changed:
+                heuristic = self.__getBestScore(board_copy, current_depth - 1, False)
+                if heuristic > highest_heuristic: highest_heuristic = heuristic
+        return highest_heuristic
+    else: # Game's Turn: Random tile spawn
+        if num_open_cells != 0:
+            sum_heuristic_2 = 0
+            sum_heuristic_4 = 0
+            for cell in open_cells:
+                board_copy_2 = [row[:] for row in board]
+                board_copy_4 = [row[:] for row in board]
+                y, x = cell
+                board_copy_2[y][x] = 2
+                board_copy_4[y][x] = 4
+                sum_heuristic_2 += self.__getBestScore(board_copy_2, current_depth - 1, True)
+                sum_heuristic_4 += self.__getBestScore(board_copy_4, current_depth - 1, True)
+
+            avg_heuristic_2 = sum_heuristic_2 / num_open_cells
+            avg_heuristic_4 = sum_heuristic_4 / num_open_cells
+            return m.floor(avg_heuristic_2 * self.TILE_2_CHANCE + avg_heuristic_4 * self.TILE_4_CHANCE)
+        else:
+            board_copy = [row[:] for row in board]
+            return self.__getBestScore(board_copy, current_depth - 1, True)
+*/
+
+}
 
 /**
  * This returns the "best" direction to shift the tiles in the given board.
@@ -68,5 +171,19 @@ long long get_best_score(int board[4][4], int current_depth, bool players_turn) 
 int get_next_direction(int depth, int board[4][4]) {
     DEPTH = depth;
     Direction best_direction = UP;
+/*
+    best_direction = Direction.UP
+    highest_heuristic = 0
+    original_board = [row[:] for row in board]
+    for direction in Direction:
+        board_copy = [row[:] for row in board]
+        board_changed = self.__shift(board_copy, original_board, direction.value)
+        if board_changed:
+            heuristic = self.__getBestScore(board_copy, self.depth - 1, False)
+            if heuristic > highest_heuristic:
+                highest_heuristic = heuristic
+                best_direction = direction
+    return best_direction.value
+*/
     return best_direction + 1;
 }
