@@ -47,6 +47,13 @@ long long get_heuristic_score(int board[4][4]) {
     return board_heuristic;
 }
 
+/**
+ * ???
+ * 
+ * @param list ???
+ * 
+ * @return ???
+ */
 int *merge(int list[4]) {
 /*
     list_values = [tile for tile in list_values if tile != self.BLANK_TILE]
@@ -150,6 +157,13 @@ bool potential_merges(int board[4][4]) {
     return false;
 }
 
+/**
+ * ???
+ * 
+ * @param board ???
+ * 
+ * @return ???
+ */
 int **get_open_cells(int board[4][4]) {
 /*
     open_cells = []
@@ -159,9 +173,17 @@ int **get_open_cells(int board[4][4]) {
                 open_cells.append((y, x))
     return open_cells
 */
-
 }
 
+/**
+ * This 
+ * 
+ * @param board 
+ * @param current_depth 
+ * @param players_turn 
+ * 
+ * @return
+ */
 long long get_best_score(int board[4][4], int current_depth, bool players_turn) {
 /*
     if current_depth == 0: return self.getHeuristicScore(board)
