@@ -61,7 +61,7 @@ int *merge(int list[4]) {
             final_values.append(list_values[i])
             i -= 1
 
-    while len(final_values) < self.MAX_BOARD_DIMENSION:
+    while len(final_values) < MAX_BOARD_DIMENSION:
         final_values.append(0)
     return final_values[::-1]
 */
@@ -70,24 +70,24 @@ int *merge(int list[4]) {
 bool shift(int board[4][4], int original_board[4][4], int direction) {
 /*
     if direction == Direction.UP.value:
-        for col in range(self.MAX_BOARD_DIMENSION):
+        for col in range(MAX_BOARD_DIMENSION):
             original_col_values = [row[col] for row in board][::-1] # Column in reverse order (going up)
             final_col_values = self.__merge(original_col_values)[::-1]
-            for row in range(self.MAX_BOARD_DIMENSION):
+            for row in range(MAX_BOARD_DIMENSION):
                 board[row][col] = final_col_values[row]
     elif direction == Direction.DOWN.value:
-        for col in range(self.MAX_BOARD_DIMENSION):
+        for col in range(MAX_BOARD_DIMENSION):
             original_col_values = [row[col] for row in board] # Column in normal order (going down)
             final_col_values = self.__merge(original_col_values)
-            for row in range(self.MAX_BOARD_DIMENSION):
+            for row in range(MAX_BOARD_DIMENSION):
                 board[row][col] = final_col_values[row]
     elif direction == Direction.LEFT.value:
-        for row in range(self.MAX_BOARD_DIMENSION):
+        for row in range(MAX_BOARD_DIMENSION):
             original_row_values = board[row][::-1] # Row in reverse order
             final_row_values = self.__merge(original_row_values)[::-1]
             board[row] = final_row_values
     elif direction == Direction.RIGHT.value:
-        for row in range(self.MAX_BOARD_DIMENSION):
+        for row in range(MAX_BOARD_DIMENSION):
             original_row_values = board[row] # Row in normal order
             final_row_values = self.__merge(original_row_values)
             board[row] = final_row_values
@@ -98,20 +98,29 @@ bool shift(int board[4][4], int original_board[4][4], int direction) {
 */   
 }
 
+/**
+ * This checks if any cells can be merged together.
+ * 
+ * @param The current 4x4 2048 board to check.
+ * 
+ * @return True if the board can merge cells, False otherwise.
+ */
 bool potential_merges(int board[4][4]) {
-/*
-    for i in range(self.MAX_BOARD_DIMENSION):
-        for j in range(self.MAX_BOARD_DIMENSION - 1):
-            if board[i][j] == board[i][j+1] or board[j][i] == board[j+1][i]: return True
-    return False
-*/
+    for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
+        for (int col = 0; col < MAX_BOARD_DIMENSION - 1; col++) {
+            if (board[row][col] == board[row][col+1] || board[col][row] == board[col+1][row]) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 int **get_open_cells(int board[4][4]) {
 /*
     open_cells = []
-    for y in range(self.MAX_BOARD_DIMENSION):
-        for x in range(self.MAX_BOARD_DIMENSION):
+    for y in range(MAX_BOARD_DIMENSION):
+        for x in range(MAX_BOARD_DIMENSION):
             if board[y][x] == self.BLANK_TILE:
                 open_cells.append((y, x))
     return open_cells
