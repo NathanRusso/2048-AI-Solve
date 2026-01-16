@@ -213,7 +213,7 @@ class Expectiminimax2048():
         :type board: list
         :param original_board: The original 4x4 2048 board before the shift.
         :type original_board: list
-        :param direction: The direction to shift the board tiles. 
+        :param direction: The direction to shift the board tiles.
         :type direction: int
         :return: True if the tiles on the board have changed positions, False otherwise.
         :rtype: bool
