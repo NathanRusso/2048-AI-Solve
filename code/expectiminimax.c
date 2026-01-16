@@ -7,6 +7,8 @@
 #include <math.h>
 #include <stdbool.h>
 
+#include "expectiminimax.h"
+
 #define MAX_BOARD_DIMENSION 4
 #define BLANK_TILE 0
 #define TILE_2_CHANCE 0.9
@@ -32,10 +34,11 @@ int DEPTH = 5; // The defalt depth for Expectiminimax
  * This returns the "best" direction to shift the tiles in the given board.
  * 
  * @param depth The search depth of the AI solver/search.
+ * @param board The given 4x4 2048 board.
  * 
  * @return The best direction to move: 1: UP, 2: DOWN, 3: LEFT, 4: RIGHT
  */
-int getNextDirection(int depth) {
+int getNextDirection(int depth, int board[4][4]) {
     DEPTH = depth;
     Direction best_direction = UP;
     return best_direction + 1;
