@@ -30,7 +30,22 @@ const int SNAKE_HEURISTIC_3[4][4] = {
 
 int DEPTH = 5; // The defalt depth for Expectiminimax
 
-long long getHeuristicScore() {}
+/**
+ * This gets the board heuristic score.
+ * 
+ * @param board The given 4x4 2048 board.
+ * 
+ * @return The board's snake heuristic score.
+ */
+long long get_heuristic_score(int board[4][4]) {
+    long long board_heuristic = 0;
+    for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
+        for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
+            board_heuristic += board[row][col] * SNAKE_HEURISTIC_3[row][col];
+        }
+    }
+    return board_heuristic;
+}
 
 int **merge() {}
 
