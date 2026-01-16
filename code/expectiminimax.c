@@ -30,6 +30,18 @@ const int SNAKE_HEURISTIC_3[4][4] = {
 
 int DEPTH = 5; // The defalt depth for Expectiminimax
 
+long long getHeuristicScore() {}
+
+int **merge() {}
+
+bool shift() {}
+
+bool potential_merges() {}
+
+int **get_open_cells() {}
+
+long long get_best_score() {}
+
 /**
  * This returns the "best" direction to shift the tiles in the given board.
  * 
@@ -38,7 +50,7 @@ int DEPTH = 5; // The defalt depth for Expectiminimax
  * 
  * @return The best direction to move: 1: UP, 2: DOWN, 3: LEFT, 4: RIGHT
  */
-int getNextDirection(int depth, int board[4][4]) {
+int get_next_direction(int depth, int board[4][4]) {
     DEPTH = depth;
     Direction best_direction = UP;
     return best_direction + 1;
