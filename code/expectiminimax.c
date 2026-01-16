@@ -48,11 +48,13 @@ long long get_heuristic_score(int board[4][4]) {
 }
 
 /**
- * ???
+ * This merges and combines numbers from right to right for a single row/column.
+ * \n
+ * It start are the right and merges values in the right direction.\n
  * 
- * @param list ???
+ * @param list The row/column list of values to combine.
  * 
- * @return ???
+ * @return The updated row/column list of values after the being merged.
  */
 int *merge(int list[4]) {
 /*
@@ -158,11 +160,11 @@ bool potential_merges(int board[4][4]) {
 }
 
 /**
- * ???
+ * This finds all cells that are empty in the given board.
  * 
- * @param board ???
+ * @param board The given 4x4 2048 board.
  * 
- * @return ???
+ * @return A list of all open cells.
  */
 int **get_open_cells(int board[4][4]) {
 /*
@@ -176,15 +178,16 @@ int **get_open_cells(int board[4][4]) {
 }
 
 /**
- * This 
+ * Returns the best heuristic score for the given board and depth.
  * 
- * @param board 
- * @param current_depth 
- * @param players_turn 
+ * @param board The current 4x4 2048 board to check.
+ * @param current_depth The current search depth.
+ * @param players_turn If it is the player's turn, shifting tiles.
  * 
- * @return
+ * @return The average/best heuristic score of the board overall.
  */
 long long get_best_score(int board[4][4], int current_depth, bool players_turn) {
+    if (current_depth == 0) { return get_heuristic_score(board); }
 /*
     if current_depth == 0: return self.getHeuristicScore(board)
 

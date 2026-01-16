@@ -115,13 +115,13 @@ class Expectiminimax2048():
         """
         Returns the best heuristic score for the given board and depth.
         
-        :param board: The current board.
+        :param board: The current 4x4 2048 board.
         :type board: list
         :param current_depth: The current search depth.
         :type current_depth: int
         :param players_turn: If it is the player's turn, shifting tiles.
         :type players_turn: bool
-        :return: The average heuristic score of the board overall.
+        :return: The average/best heuristic score of the board overall.
         :rtype: int
         """
         if current_depth == 0: return self.getHeuristicScore(board)
