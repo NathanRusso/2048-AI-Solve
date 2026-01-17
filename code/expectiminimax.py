@@ -100,10 +100,9 @@ class Expectiminimax2048():
         """
         best_direction = Direction.UP
         highest_heuristic = 0
-        original_board = [row[:] for row in board]
         for direction in Direction:
             copy_board = [row[:] for row in board]
-            board_changed = self.__shift(copy_board, original_board, direction.value)
+            board_changed = self.__shift(copy_board, board, direction.value)
             if board_changed:
                 heuristic = self.__getBestScore(copy_board, self.depth - 1, False)
                 if heuristic > highest_heuristic:
@@ -128,14 +127,14 @@ class Expectiminimax2048():
  
         open_cells = self.__getAllOpenCells(board)
         num_open_cells = len(open_cells)
-        if num_open_cells == 0 and not self.__potentialMerges(board): return self.getHeuristicScore(board)
+        if num_open_cells == 0 and not self.__potentialMerges(board):
+            return self.getHeuristicScore(board) # Game over for the board
 
         if players_turn: # Player's Turn: Tiles shift
             highest_heuristic = 0
-            original_board = [row[:] for row in board]
             for direction in Direction:
                 copy_board = [row[:] for row in board]
-                board_changed = self.__shift(copy_board, original_board, direction.value)
+                board_changed = self.__shift(copy_board, board, direction.value)
                 if board_changed:
                     heuristic = self.__getBestScore(copy_board, current_depth - 1, False)
                     if heuristic > highest_heuristic: highest_heuristic = heuristic
@@ -155,9 +154,9 @@ class Expectiminimax2048():
             avg_heuristic_2 = sum_heuristic_2 / num_open_cells
             avg_heuristic_4 = sum_heuristic_4 / num_open_cells
             return m.floor(avg_heuristic_2 * self.TILE_2_CHANCE + avg_heuristic_4 * self.TILE_4_CHANCE)
-        else: # Game's Turn: Random tile spawn, no tile are open
+        else: # Game's Turn: Random tile spawn, no tile are open ~ SHOULD NOT HAPPEN
             copy_board = [row[:] for row in board]
-            return self.__getBestScore(copy_board, current_depth - 1, True)
+            return self.__getBestScore(board, current_depth - 1, True)
 
     def __getAllOpenCells(self, board: list) -> list:
         """

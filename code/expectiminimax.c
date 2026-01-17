@@ -224,16 +224,16 @@ long long get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], in
     if (current_depth == 0) return get_heuristic_score(board);
     int num_open_cells = 0;
     int **open_cells = get_open_cells(board, &num_open_cells);
-    if (num_open_cells == 0 && !potential_merges(board)) return get_heuristic_score(board);
+    if (num_open_cells == 0 && !potential_merges(board)) {
+        return get_heuristic_score(board); // Game over for the board
+    }
 
     long long final_heuristic = 0;
     if (players_turn) { // Player's Turn: Tiles shift
-        int original_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
-        memcpy(original_board, board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
         for (int direction = UP; direction <= RIGHT; direction++) {
             int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
-            memcpy(copy_board, original_board, sizeof(original_board));
-            bool board_changed = shift(copy_board, original_board, direction);
+            memcpy(copy_board, board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
+            bool board_changed = shift(copy_board, board, direction);
             if (board_changed) {
                 long long heuristic = get_best_score(copy_board, current_depth - 1, false);
                 if (heuristic > final_heuristic) final_heuristic = heuristic;
@@ -255,7 +255,7 @@ long long get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], in
             avg_heuristic_4 += get_best_score(copy_board_4, current_depth - 1, true) / num_open_cells;
         }
         final_heuristic = floor(avg_heuristic_2 * TILE_2_CHANCE + avg_heuristic_4 * TILE_4_CHANCE);
-    } else { // Game's Turn: Random tile spawn, no tile are open
+    } else { // Game's Turn: Random tile spawn, no tile are open ~ SHOULD NOT HAPPEN
         int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
         memcpy(copy_board, board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
         final_heuristic = get_best_score(copy_board, current_depth - 1, false);

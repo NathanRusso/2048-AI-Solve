@@ -267,6 +267,8 @@ class UI2048:
                 self.model.playAction(r.randint(1, 4))
             case UIMode.EXPECTIMINIMAX.value:
                 #self.model.playAction(self.expectiminimax.getNextDirection(self.model.getBoard()))
+                #return
+                #"""
                 current_board = self.model.getBoard()
                 current_board_flat = [tile for row in current_board for tile in row]
                 CBoardType = ctypes.c_int * (self.MAX_BOARD_DIMENSION * self.MAX_BOARD_DIMENSION)
@@ -276,6 +278,7 @@ class UI2048:
                 direction = c_expectiminimax.get_next_direction(5, c_board)
                 print(direction)
                 self.model.playAction(direction)
+                #"""
             case UIMode.MCTS.value:
                 self.model.playAction(self.mcts.getNextDirection(self.model.getBoard()))
             case UIMode.MCTS_EMM.value:
