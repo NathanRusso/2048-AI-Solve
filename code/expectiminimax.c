@@ -200,44 +200,48 @@ int **get_open_cells(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int *n
  */
 long long get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int current_depth, bool players_turn) {
     if (current_depth == 0) return get_heuristic_score(board);
-/*
-    if current_depth == 0: return self.getHeuristicScore(board)
+    int num_open_cells = 0;
+    int **open_cells = get_open_cells(board, &num_open_cells);
+    if (num_open_cells == 0 && !potential_merges(board)) return get_heuristic_score(board);
 
-    open_cells = self.__getAllOpenCells(board)
-    num_open_cells = len(open_cells)
-    if num_open_cells == 0 and not self.__potentialMerges(board): return self.getHeuristicScore(board)
+    long long final_heuristic = 0;
+    if (players_turn) { // Player's Turn: Tiles shift
+        int original_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
+        memcpy(board, original_board, sizeof(board));
+        for (int direction = UP; direction <= RIGHT; direction++) {
+            int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
+            memcpy(original_board, copy_board, sizeof(original_board));
+            bool board_changed = shift(copy_board, original_board, direction);
+            if (board_changed) {
+                long long heuristic = get_best_score(copy_board, current_depth - 1, false);
+                if (heuristic > final_heuristic) final_heuristic = heuristic;
+            }
+        }
+    } else if (num_open_cells != 0) { // Game's Turn: Random tile spawn, tiles are open
+        long long avg_heuristic_2 = 0;
+        long long avg_heuristic_4 = 0;
+        for (int i = 0; i < num_open_cells; i++) {
+            int copy_board_2[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
+            int copy_board_4[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
+            memcpy(board, copy_board_2, sizeof(board));
+            memcpy(board, copy_board_4, sizeof(board));
+            int row = open_cells[i][0];
+            int col = open_cells[i][1];
+            copy_board_2[row][col] = 2;
+            copy_board_4[row][col] = 4;
+            avg_heuristic_2 += get_best_score(copy_board_2, current_depth - 1, true) / num_open_cells;
+            avg_heuristic_4 += get_best_score(copy_board_4, current_depth - 1, true) / num_open_cells;
+        }
+        final_heuristic = floor(avg_heuristic_2 * TILE_2_CHANCE + avg_heuristic_4 * TILE_4_CHANCE);
+    } else { // Game's Turn: Random tile spawn, no tile are open
+        int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
+        memcpy(board, copy_board, sizeof(board));
+        final_heuristic = get_best_score(copy_board, current_depth - 1, false);
+    }
 
-    if players_turn: # Player's Turn: Tiles shift
-        highest_heuristic = 0
-        original_board = [row[:] for row in board]
-        for direction in Direction:
-            copy_board = [row[:] for row in board]
-            board_changed = self.__shift(copy_board, original_board, direction.value)
-            if board_changed:
-                heuristic = self.__getBestScore(copy_board, current_depth - 1, False)
-                if heuristic > highest_heuristic: highest_heuristic = heuristic
-        return highest_heuristic
-    else: # Game's Turn: Random tile spawn
-        if num_open_cells != 0:
-            sum_heuristic_2 = 0
-            sum_heuristic_4 = 0
-            for cell in open_cells:
-                copy_board_2 = [row[:] for row in board]
-                copy_board_4 = [row[:] for row in board]
-                y, x = cell
-                copy_board_2[y][x] = 2
-                copy_board_4[y][x] = 4
-                sum_heuristic_2 += self.__getBestScore(copy_board_2, current_depth - 1, True)
-                sum_heuristic_4 += self.__getBestScore(copy_board_4, current_depth - 1, True)
-
-            avg_heuristic_2 = sum_heuristic_2 / num_open_cells
-            avg_heuristic_4 = sum_heuristic_4 / num_open_cells
-            return m.floor(avg_heuristic_2 * self.TILE_2_CHANCE + avg_heuristic_4 * self.TILE_4_CHANCE)
-        else:
-            copy_board = [row[:] for row in board]
-            return self.__getBestScore(copy_board, current_depth - 1, True)
-*/
-
+    for (int i = 0; i < num_open_cells; i++) free(open_cells[i]);
+    free(open_cells);
+    return final_heuristic;
 }
 
 /**
@@ -254,7 +258,6 @@ int get_next_direction(int depth, int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMEN
     long long highest_heuristic = 0;
     int original_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
     memcpy(board, original_board, sizeof(board));
-
     for (int direction = UP; direction <= RIGHT; direction++) {
         int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
         memcpy(board, original_board, sizeof(board));
