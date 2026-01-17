@@ -53,14 +53,24 @@ long long get_heuristic_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION
  * 
  * @return The updated row/column list of values after the being merged.
  */
-int *merge(int original_list[MAX_BOARD_DIMENSION], int new_list[MAX_BOARD_DIMENSION]) {
+void merge(int original_list[MAX_BOARD_DIMENSION], int new_list[MAX_BOARD_DIMENSION]) {
+    if (original_list[0] == BLANK_TILE && original_list[1] == BLANK_TILE && 
+        original_list[2] == BLANK_TILE && original_list[3] == BLANK_TILE) {
+        for (int i = 0; i < MAX_BOARD_DIMENSION; i++) new_list[i] = BLANK_TILE;
+        return;
+    }
+
     int original_list_values_length = MAX_BOARD_DIMENSION;
     for (int i = 0; i < MAX_BOARD_DIMENSION; i++) {
         if (original_list[i] == BLANK_TILE) original_list_values_length--;
     }
     int original_list_values[original_list_values_length];
+    int j = 0;
     for (int i = 0; i < MAX_BOARD_DIMENSION; i++) {
-        if (original_list[i] != BLANK_TILE) original_list_values[i] = original_list[i];
+        if (original_list[i] != BLANK_TILE) {
+            original_list_values[j] = original_list[i];
+            j++;
+        }
     }
     int final_list_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
     int index = 3;
@@ -122,7 +132,7 @@ bool shift(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int original_boa
                 }
                 int final_row_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
                 merge(original_row_values, final_row_values);
-                for (int col = 0; row < MAX_BOARD_DIMENSION; col++) {
+                for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
                     board[row][col] = final_row_values[3 - col];
                 }
             }
@@ -135,7 +145,7 @@ bool shift(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int original_boa
                 }
                 int final_row_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
                 merge(original_row_values, final_row_values);
-                for (int col = 0; row < MAX_BOARD_DIMENSION; col++) {
+                for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
                     board[row][col] = final_row_values[col];
                 }
             }
@@ -193,7 +203,7 @@ int **get_open_cells(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int *n
                 assert(open_cells[*num_open_cells]);
                 open_cells[*num_open_cells][0] = row;
                 open_cells[*num_open_cells][1] = col;
-                *num_open_cells++;
+                (*num_open_cells)++;
             }
         }
     }
