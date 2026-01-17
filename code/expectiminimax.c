@@ -283,3 +283,5 @@ int get_next_direction(int depth, int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMEN
     }
     return best_direction + 1;
 }
+
+int main() {}
