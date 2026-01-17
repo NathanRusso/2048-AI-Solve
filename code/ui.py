@@ -6,7 +6,7 @@ import os
 from model import Model2048, Direction
 from expectiminimax import Expectiminimax2048
 from montecarlo import MonteCarlo2048
-c_expectiminimax = ctypes.CDLL(os.path.abspath("expectiminimax.dll"))
+c_expectiminimax = ctypes.CDLL(os.path.abspath("code/expectiminimax.dll"))
 
 class UIMode(Enum):
     """
