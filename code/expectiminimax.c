@@ -9,6 +9,7 @@
 
 #include "expectiminimax.h"
 
+#define MAX_NUM_TILES 16
 #define MAX_BOARD_DIMENSION 4
 #define BLANK_TILE 0
 #define TILE_2_CHANCE 0.9
@@ -161,20 +162,30 @@ bool potential_merges(int board[4][4]) {
 
 /**
  * This finds all cells that are empty in the given board.
+ * \n
+ * The cells and board must be freed later.
  * 
  * @param board The given 4x4 2048 board.
+ * @param num_open_cells A pointer to a variable holding the number of open cells.
  * 
  * @return A list of all open cells.
  */
-int **get_open_cells(int board[4][4]) {
-/*
-    open_cells = []
-    for y in range(MAX_BOARD_DIMENSION):
-        for x in range(MAX_BOARD_DIMENSION):
-            if board[y][x] == self.BLANK_TILE:
-                open_cells.append((y, x))
-    return open_cells
-*/
+int **get_open_cells(int board[4][4], int *num_open_cells) {
+    int **open_cells = (int **) malloc(sizeof(int*) * MAX_NUM_TILES);
+    assert(open_cells);
+    *num_open_cells = 0;
+    for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
+        for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
+            if (board[row][col] == BLANK_TILE) {
+                open_cells[*num_open_cells] = (int *) malloc(sizeof(int) * 2);
+                assert(open_cells[*num_open_cells]);
+                open_cells[*num_open_cells][0] = row;
+                open_cells[*num_open_cells][1] = col;
+                *num_open_cells++;
+            }
+        }
+    }
+    return open_cells;
 }
 
 /**
@@ -187,7 +198,7 @@ int **get_open_cells(int board[4][4]) {
  * @return The average/best heuristic score of the board overall.
  */
 long long get_best_score(int board[4][4], int current_depth, bool players_turn) {
-    if (current_depth == 0) { return get_heuristic_score(board); }
+    if (current_depth == 0) return get_heuristic_score(board);
 /*
     if current_depth == 0: return self.getHeuristicScore(board)
 
@@ -239,6 +250,7 @@ long long get_best_score(int board[4][4], int current_depth, bool players_turn) 
 int get_next_direction(int depth, int board[4][4]) {
     DEPTH = depth;
     Direction best_direction = UP;
+    long long highest_heuristic = 0;
 /*
     best_direction = Direction.UP
     highest_heuristic = 0
