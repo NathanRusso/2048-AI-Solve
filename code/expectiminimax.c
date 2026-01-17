@@ -10,11 +10,11 @@
 
 #include "expectiminimax.h"
 
-#define MAX_NUM_TILES 16
+/*#define MAX_NUM_TILES 16
 #define MAX_BOARD_DIMENSION 4
 #define BLANK_TILE 0
 #define TILE_2_CHANCE 0.9
-#define TILE_4_CHANCE 0.1
+#define TILE_4_CHANCE 0.1*/
 
 typedef enum {
     UP, // 0 -> 1
