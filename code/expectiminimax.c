@@ -38,7 +38,8 @@ long long get_heuristic_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION
     long long board_heuristic = 0;
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
-            board_heuristic += board[row][col] * SNAKE_HEURISTIC_3[row][col];
+            //printf("Heuristic: %d and %d\n", board[row][col], SNAKE_HEURISTIC_3[row][col]);
+            board_heuristic += (long long)board[row][col] * SNAKE_HEURISTIC_3[row][col];
         }
     }
     return board_heuristic;
@@ -283,12 +284,18 @@ int get_next_direction(int depth, int *flat_board) {
             original_board[row][col] = flat_board[row * MAX_BOARD_DIMENSION + col];
         }
     }
+    for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
+        for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
+            //printf("Start: %d\n", original_board[row][col]);
+        }
+    }
     for (int direction = UP; direction <= RIGHT; direction++) {
         int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
         memcpy(copy_board, original_board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
         bool board_changed = shift(copy_board, original_board, direction);
         if (board_changed) {
             long long heuristic = get_best_score(copy_board, DEPTH - 1, false);
+            //printf("%d", heuristic);
             if (heuristic > highest_heuristic) {
                 highest_heuristic = heuristic;
                 best_direction = direction;

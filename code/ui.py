@@ -274,6 +274,7 @@ class UI2048:
                 c_expectiminimax.get_next_direction.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
                 c_expectiminimax.get_next_direction.restype = ctypes.c_int
                 direction = c_expectiminimax.get_next_direction(5, c_board)
+                print(direction)
                 self.model.playAction(direction)
             case UIMode.MCTS.value:
                 self.model.playAction(self.mcts.getNextDirection(self.model.getBoard()))
@@ -321,7 +322,7 @@ class UI2048:
 
 def main():
     model = Model2048()
-    expectiminimax = Expectiminimax2048(5, 3) # Search depth of 5 is the max before the time increase becomes too much!
+    expectiminimax = Expectiminimax2048(6, 3) # Search depth of 5 is the max before the time increase becomes too much!
     expectiminimax_weak = Expectiminimax2048(3, 3)
     montecarlo = MonteCarlo2048(1500, 30, 1.4, None)
     mcts_emm = MonteCarlo2048(50, 30, 1.25, expectiminimax_weak)
