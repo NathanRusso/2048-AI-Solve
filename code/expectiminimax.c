@@ -58,24 +58,28 @@ long long get_heuristic_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION
  * 
  * @return The updated row/column list of values after the being merged.
  */
-int *merge(int list[4]) {
-/*
-    list_values = [tile for tile in list_values if tile != self.BLANK_TILE]
-    final_values = []
-    i = len(list_values) - 1
-    while i >= 0:
-        if i - 1 >= 0 and list_values[i] == list_values[i-1]:
-            new_tile = list_values[i] * 2
-            final_values.append(new_tile)
-            i -= 2
-        else:
-            final_values.append(list_values[i])
-            i -= 1
-
-    while len(final_values) < MAX_BOARD_DIMENSION:
-        final_values.append(0)
-    return final_values[::-1]
-*/
+int *merge(int original_list[MAX_BOARD_DIMENSION], int new_list[MAX_BOARD_DIMENSION]) {
+    int original_list_values_length = MAX_BOARD_DIMENSION;
+    for (int i = 0; i < MAX_BOARD_DIMENSION; i++) {
+        if (original_list[i] == BLANK_TILE) original_list_values_length--;
+    }
+    int original_list_values[original_list_values_length];
+    for (int i = 0; i < MAX_BOARD_DIMENSION; i++) {
+        if (original_list[i] != BLANK_TILE) original_list_values[i] = original_list[i];
+    }
+    int final_list_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
+    int index = 3;
+    int i = original_list_values_length - 1;
+    while (i >= 0) {
+        if (i - 1 >= 0 && original_list_values[i] == original_list_values[i-1]) {
+            final_list_values[index] = original_list_values[i] * 2;
+            i -= 2;
+        } else {
+            final_list_values[index] = original_list_values[i];
+            i--;
+        }
+        index--;
+    }
 }
 
 /**
@@ -91,43 +95,55 @@ bool shift(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int original_boa
     switch (direction) {
         case UP:
             for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
-                //original_col_values = [row[col] for row in board][::-1] # Column in reverse order (going up)
-                //final_col_values = self.__merge(original_col_values)[::-1]
-                //for row in range(MAX_BOARD_DIMENSION):
-                    //board[row][col] = final_col_values[row]
+                int original_col_values[MAX_BOARD_DIMENSION];
                 for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
-                    //board[row][col] = final_col_values[row]
+                    original_col_values[row] = board[3 - row][col]; // Column in reverse order (going up)
+                }
+                int final_col_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
+                merge(original_col_values, final_col_values);
+                for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
+                    board[row][col] = final_col_values[3 - row];
                 }
             }
-            return true;
             break;
         case DOWN:
             for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
-                //original_col_values = [row[col] for row in board] # Column in normal order (going down)
-                //final_col_values = self.__merge(original_col_values)
-                //for row in range(MAX_BOARD_DIMENSION):
-                    //board[row][col] = final_col_values[row]   
+                int original_col_values[MAX_BOARD_DIMENSION];
                 for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
-                    //board[row][col] = final_col_values[row]
+                    original_col_values[row] = board[row][col]; // Column in normal order (going down)
+                }
+                int final_col_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
+                merge(original_col_values, final_col_values);
+                for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
+                    board[row][col] = final_col_values[row];
                 }
             }
-            return true;
             break;
         case LEFT:
             for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
-                //original_row_values = board[row][::-1] # Row in reverse order
-                //final_row_values = self.__merge(original_row_values)[::-1]
-                //board[row] = final_row_values
+                int original_row_values[MAX_BOARD_DIMENSION];
+                for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
+                    original_row_values[col] = board[row][3 - col]; // Row in reverse order
+                }
+                int final_row_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
+                merge(original_row_values, final_row_values);
+                for (int col = 0; row < MAX_BOARD_DIMENSION; col++) {
+                    board[row][col] = final_row_values[3 - col];
+                }
             }
-            return true;
             break;
         case RIGHT:
             for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
-                //original_row_values = board[row] # Row in normal order
-                //final_row_values = self.__merge(original_row_values)
-                //board[row] = final_row_values
+                int original_row_values[MAX_BOARD_DIMENSION];
+                for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
+                    original_row_values[col] = board[row][col]; // Row in normal order
+                }
+                int final_row_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
+                merge(original_row_values, final_row_values);
+                for (int col = 0; row < MAX_BOARD_DIMENSION; col++) {
+                    board[row][col] = final_row_values[col];
+                }
             }
-            return true;
             break;
         default:
             return false; // Invalid direction
