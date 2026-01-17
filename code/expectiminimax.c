@@ -4,8 +4,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+#include <string.h>
 #include <stdbool.h>
+#include <math.h>
 
 #include "expectiminimax.h"
 
@@ -22,7 +23,7 @@ typedef enum {
     RIGHT // 3 -> 4
 } Direction;
 
-const int SNAKE_HEURISTIC_3[4][4] = {
+const int SNAKE_HEURISTIC_3[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION] = {
     {4096, 2048, 1024, 512},
     {64, 128, 256, 512},
     {64, 32, 16, 8},
@@ -38,7 +39,7 @@ int DEPTH = 5; // The defalt depth for Expectiminimax
  * 
  * @return The board's snake heuristic score.
  */
-long long get_heuristic_score(int board[4][4]) {
+long long get_heuristic_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
     long long board_heuristic = 0;
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
@@ -86,7 +87,7 @@ int *merge(int list[4]) {
  * 
  * @return True if the tiles on the board have changed positions, False otherwise.
  */
-bool shift(int board[4][4], int original_board[4][4], int direction) {
+bool shift(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int original_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int direction) {
     switch (direction) {
         case UP:
             for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
@@ -149,7 +150,7 @@ bool shift(int board[4][4], int original_board[4][4], int direction) {
  * 
  * @return True if the board can merge cells, False otherwise.
  */
-bool potential_merges(int board[4][4]) {
+bool potential_merges(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION - 1; col++) {
             if (board[row][col] == board[row][col+1] || board[col][row] == board[col+1][row]) {
@@ -170,7 +171,7 @@ bool potential_merges(int board[4][4]) {
  * 
  * @return A list of all open cells.
  */
-int **get_open_cells(int board[4][4], int *num_open_cells) {
+int **get_open_cells(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int *num_open_cells) {
     int **open_cells = (int **) malloc(sizeof(int*) * MAX_NUM_TILES);
     assert(open_cells);
     *num_open_cells = 0;
@@ -197,7 +198,7 @@ int **get_open_cells(int board[4][4], int *num_open_cells) {
  * 
  * @return The average/best heuristic score of the board overall.
  */
-long long get_best_score(int board[4][4], int current_depth, bool players_turn) {
+long long get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int current_depth, bool players_turn) {
     if (current_depth == 0) return get_heuristic_score(board);
 /*
     if current_depth == 0: return self.getHeuristicScore(board)
@@ -210,10 +211,10 @@ long long get_best_score(int board[4][4], int current_depth, bool players_turn) 
         highest_heuristic = 0
         original_board = [row[:] for row in board]
         for direction in Direction:
-            board_copy = [row[:] for row in board]
-            board_changed = self.__shift(board_copy, original_board, direction.value)
+            copy_board = [row[:] for row in board]
+            board_changed = self.__shift(copy_board, original_board, direction.value)
             if board_changed:
-                heuristic = self.__getBestScore(board_copy, current_depth - 1, False)
+                heuristic = self.__getBestScore(copy_board, current_depth - 1, False)
                 if heuristic > highest_heuristic: highest_heuristic = heuristic
         return highest_heuristic
     else: # Game's Turn: Random tile spawn
@@ -221,20 +222,20 @@ long long get_best_score(int board[4][4], int current_depth, bool players_turn) 
             sum_heuristic_2 = 0
             sum_heuristic_4 = 0
             for cell in open_cells:
-                board_copy_2 = [row[:] for row in board]
-                board_copy_4 = [row[:] for row in board]
+                copy_board_2 = [row[:] for row in board]
+                copy_board_4 = [row[:] for row in board]
                 y, x = cell
-                board_copy_2[y][x] = 2
-                board_copy_4[y][x] = 4
-                sum_heuristic_2 += self.__getBestScore(board_copy_2, current_depth - 1, True)
-                sum_heuristic_4 += self.__getBestScore(board_copy_4, current_depth - 1, True)
+                copy_board_2[y][x] = 2
+                copy_board_4[y][x] = 4
+                sum_heuristic_2 += self.__getBestScore(copy_board_2, current_depth - 1, True)
+                sum_heuristic_4 += self.__getBestScore(copy_board_4, current_depth - 1, True)
 
             avg_heuristic_2 = sum_heuristic_2 / num_open_cells
             avg_heuristic_4 = sum_heuristic_4 / num_open_cells
             return m.floor(avg_heuristic_2 * self.TILE_2_CHANCE + avg_heuristic_4 * self.TILE_4_CHANCE)
         else:
-            board_copy = [row[:] for row in board]
-            return self.__getBestScore(board_copy, current_depth - 1, True)
+            copy_board = [row[:] for row in board]
+            return self.__getBestScore(copy_board, current_depth - 1, True)
 */
 
 }
@@ -247,23 +248,24 @@ long long get_best_score(int board[4][4], int current_depth, bool players_turn) 
  * 
  * @return The best direction to move: 1: UP, 2: DOWN, 3: LEFT, 4: RIGHT
  */
-int get_next_direction(int depth, int board[4][4]) {
+int get_next_direction(int depth, int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
     DEPTH = depth;
     Direction best_direction = UP;
     long long highest_heuristic = 0;
-/*
-    best_direction = Direction.UP
-    highest_heuristic = 0
-    original_board = [row[:] for row in board]
-    for direction in Direction:
-        board_copy = [row[:] for row in board]
-        board_changed = self.__shift(board_copy, original_board, direction.value)
-        if board_changed:
-            heuristic = self.__getBestScore(board_copy, self.depth - 1, False)
-            if heuristic > highest_heuristic:
-                highest_heuristic = heuristic
-                best_direction = direction
-    return best_direction.value
-*/
+    int original_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
+    memcpy(board, original_board, sizeof(board));
+
+    for (int direction = UP; direction <= RIGHT; direction++) {
+        int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
+        memcpy(board, original_board, sizeof(board));
+        bool board_changed = shift(copy_board, original_board, direction);
+        if (board_changed) {
+            long long heuristic = get_best_score(copy_board, DEPTH - 1, false);
+            if (heuristic > highest_heuristic) {
+                highest_heuristic = heuristic;
+                best_direction = direction;
+            }
+        }
+    }
     return best_direction + 1;
 }

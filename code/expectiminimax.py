@@ -102,10 +102,10 @@ class Expectiminimax2048():
         highest_heuristic = 0
         original_board = [row[:] for row in board]
         for direction in Direction:
-            board_copy = [row[:] for row in board]
-            board_changed = self.__shift(board_copy, original_board, direction.value)
+            copy_board = [row[:] for row in board]
+            board_changed = self.__shift(copy_board, original_board, direction.value)
             if board_changed:
-                heuristic = self.__getBestScore(board_copy, self.depth - 1, False)
+                heuristic = self.__getBestScore(copy_board, self.depth - 1, False)
                 if heuristic > highest_heuristic:
                     highest_heuristic = heuristic
                     best_direction = direction
@@ -134,10 +134,10 @@ class Expectiminimax2048():
             highest_heuristic = 0
             original_board = [row[:] for row in board]
             for direction in Direction:
-                board_copy = [row[:] for row in board]
-                board_changed = self.__shift(board_copy, original_board, direction.value)
+                copy_board = [row[:] for row in board]
+                board_changed = self.__shift(copy_board, original_board, direction.value)
                 if board_changed:
-                    heuristic = self.__getBestScore(board_copy, current_depth - 1, False)
+                    heuristic = self.__getBestScore(copy_board, current_depth - 1, False)
                     if heuristic > highest_heuristic: highest_heuristic = heuristic
             return highest_heuristic
         else: # Game's Turn: Random tile spawn
@@ -145,20 +145,20 @@ class Expectiminimax2048():
                 sum_heuristic_2 = 0
                 sum_heuristic_4 = 0
                 for cell in open_cells:
-                    board_copy_2 = [row[:] for row in board]
-                    board_copy_4 = [row[:] for row in board]
+                    copy_board_2 = [row[:] for row in board]
+                    copy_board_4 = [row[:] for row in board]
                     y, x = cell
-                    board_copy_2[y][x] = 2
-                    board_copy_4[y][x] = 4
-                    sum_heuristic_2 += self.__getBestScore(board_copy_2, current_depth - 1, True)
-                    sum_heuristic_4 += self.__getBestScore(board_copy_4, current_depth - 1, True)
+                    copy_board_2[y][x] = 2
+                    copy_board_4[y][x] = 4
+                    sum_heuristic_2 += self.__getBestScore(copy_board_2, current_depth - 1, True)
+                    sum_heuristic_4 += self.__getBestScore(copy_board_4, current_depth - 1, True)
 
                 avg_heuristic_2 = sum_heuristic_2 / num_open_cells
                 avg_heuristic_4 = sum_heuristic_4 / num_open_cells
                 return m.floor(avg_heuristic_2 * self.TILE_2_CHANCE + avg_heuristic_4 * self.TILE_4_CHANCE)
             else:
-                board_copy = [row[:] for row in board]
-                return self.__getBestScore(board_copy, current_depth - 1, True)
+                copy_board = [row[:] for row in board]
+                return self.__getBestScore(copy_board, current_depth - 1, True)
 
     def __getAllOpenCells(self, board: list) -> list:
         """
