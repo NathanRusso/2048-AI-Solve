@@ -1,10 +1,14 @@
 from enum import Enum
 import random as r
 import pygame as pg
+import ctypes
+import os
 from model import Model2048, Direction
 from expectiminimax import Expectiminimax2048
 from montecarlo import MonteCarlo2048
-
+import platform
+print(platform.architecture())
+c_expectiminimax = ctypes.CDLL(os.path.abspath("code/expectiminimax.dll"))
 
 class UIMode(Enum):
     """
@@ -264,7 +268,8 @@ class UI2048:
             case UIMode.RANDOM.value:
                 self.model.playAction(r.randint(1, 4))
             case UIMode.EXPECTIMINIMAX.value:
-                self.model.playAction(self.expectiminimax.getNextDirection(self.model.getBoard()))
+                #self.model.playAction(self.expectiminimax.getNextDirection(self.model.getBoard()))
+                self.model.playAction(c_expectiminimax.get_next_direction(5, self.model.getBoard()));
             case UIMode.MCTS.value:
                 self.model.playAction(self.mcts.getNextDirection(self.model.getBoard()))
             case UIMode.MCTS_EMM.value:
