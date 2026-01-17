@@ -284,11 +284,6 @@ int get_next_direction(int depth, int *flat_board) {
             original_board[row][col] = flat_board[row * MAX_BOARD_DIMENSION + col];
         }
     }
-    for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
-        for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
-            //printf("Start: %d\n", original_board[row][col]);
-        }
-    }
     for (int direction = UP; direction <= RIGHT; direction++) {
         int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
         memcpy(copy_board, original_board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
@@ -306,7 +301,7 @@ int get_next_direction(int depth, int *flat_board) {
 }
 
 int main() {
-    int *board = {0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    printf("5");
+    int board[16] = {0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    printf("xyz\n");
     printf("%d", get_next_direction(5, board));
 }
