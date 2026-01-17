@@ -71,8 +71,8 @@ class MCTSNode:
             self.game_over = False
             if players_turn:
                 for direction in Direction:
-                    board_copy = [row[:] for row in board]
-                    board_changed = self.__shift(board_copy, board, direction.value)
+                    copy_board = [row[:] for row in board]
+                    board_changed = self.__shift(copy_board, board, direction.value)
                     if board_changed: self.all_actions.append(direction.value)
             else:
                 self.all_actions = open_cells
@@ -119,19 +119,19 @@ class MCTSNode:
         :rtype: MCTSNode
         """
         action = self.available_actions.pop()
-        board_copy = [row[:] for row in self.board]
+        copy_board = [row[:] for row in self.board]
         child = None
         if self.players_turn:
-            board_changed = self.__shift(board_copy, self.board, action)
-            child = MCTSNode(board_copy, self, action, not self.players_turn)
+            board_changed = self.__shift(copy_board, self.board, action)
+            child = MCTSNode(copy_board, self, action, not self.players_turn)
         else:
             y, x  = action
             tile_probability_num = r.random()
             if tile_probability_num < self.TILE_2_CHANCE:
-                board_copy[y][x] = 2
+                copy_board[y][x] = 2
             else:
-                board_copy[y][x] = 4
-            child = MCTSNode(board_copy, self, None, not self.players_turn)
+                copy_board[y][x] = 4
+            child = MCTSNode(copy_board, self, None, not self.players_turn)
         self.children.append(child)
         return child
 
