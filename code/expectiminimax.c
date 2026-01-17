@@ -271,7 +271,7 @@ int get_next_direction(int depth, int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMEN
     memcpy(original_board, board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
     for (int direction = UP; direction <= RIGHT; direction++) {
         int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
-        memcpy(original_board, board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
+        memcpy(copy_board, board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
         bool board_changed = shift(copy_board, original_board, direction);
         if (board_changed) {
             long long heuristic = get_best_score(copy_board, DEPTH - 1, false);
