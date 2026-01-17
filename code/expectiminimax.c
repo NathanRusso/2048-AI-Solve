@@ -218,10 +218,10 @@ long long get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], in
     long long final_heuristic = 0;
     if (players_turn) { // Player's Turn: Tiles shift
         int original_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
-        memcpy(board, original_board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
+        memcpy(original_board, board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
         for (int direction = UP; direction <= RIGHT; direction++) {
             int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
-            memcpy(original_board, copy_board, sizeof(original_board));
+            memcpy(copy_board, original_board, sizeof(original_board));
             bool board_changed = shift(copy_board, original_board, direction);
             if (board_changed) {
                 long long heuristic = get_best_score(copy_board, current_depth - 1, false);
@@ -234,8 +234,8 @@ long long get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], in
         for (int i = 0; i < num_open_cells; i++) {
             int copy_board_2[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
             int copy_board_4[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
-            memcpy(board, copy_board_2, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
-            memcpy(board, copy_board_4, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
+            memcpy(copy_board_2, board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
+            memcpy(copy_board_4, board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
             int row = open_cells[i][0];
             int col = open_cells[i][1];
             copy_board_2[row][col] = 2;
@@ -246,7 +246,7 @@ long long get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], in
         final_heuristic = floor(avg_heuristic_2 * TILE_2_CHANCE + avg_heuristic_4 * TILE_4_CHANCE);
     } else { // Game's Turn: Random tile spawn, no tile are open
         int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
-        memcpy(board, copy_board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
+        memcpy(copy_board, board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
         final_heuristic = get_best_score(copy_board, current_depth - 1, false);
     }
 
@@ -268,10 +268,10 @@ int get_next_direction(int depth, int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMEN
     Direction best_direction = UP;
     long long highest_heuristic = 0;
     int original_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
-    memcpy(board, original_board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
+    memcpy(original_board, board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
     for (int direction = UP; direction <= RIGHT; direction++) {
         int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
-        memcpy(board, original_board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
+        memcpy(original_board, board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
         bool board_changed = shift(copy_board, original_board, direction);
         if (board_changed) {
             long long heuristic = get_best_score(copy_board, DEPTH - 1, false);

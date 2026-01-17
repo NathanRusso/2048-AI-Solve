@@ -6,9 +6,7 @@ import os
 from model import Model2048, Direction
 from expectiminimax import Expectiminimax2048
 from montecarlo import MonteCarlo2048
-import platform
-print(platform.architecture())
-c_expectiminimax = ctypes.CDLL(os.path.abspath("code/expectiminimax.dll"))
+c_expectiminimax = ctypes.CDLL(os.path.abspath("expectiminimax.dll"))
 
 class UIMode(Enum):
     """
@@ -269,7 +267,14 @@ class UI2048:
                 self.model.playAction(r.randint(1, 4))
             case UIMode.EXPECTIMINIMAX.value:
                 #self.model.playAction(self.expectiminimax.getNextDirection(self.model.getBoard()))
-                self.model.playAction(c_expectiminimax.get_next_direction(5, self.model.getBoard()));
+                current_board = self.model.getBoard()
+                Int4 = ctypes.c_int * self.MAX_BOARD_DIMENSION
+                Matrix4x4 = Int4 * self.MAX_BOARD_DIMENSION
+                c_board = Matrix4x4(*[Int4(*row) for row in current_board])
+                c_expectiminimax.get_next_direction.argtypes = [ctypes.c_int, Matrix4x4]
+                c_expectiminimax.get_next_direction.restype = ctypes.c_int
+                direction = c_expectiminimax.get_next_direction(5, c_board)
+                self.model.playAction(direction)
             case UIMode.MCTS.value:
                 self.model.playAction(self.mcts.getNextDirection(self.model.getBoard()))
             case UIMode.MCTS_EMM.value:
