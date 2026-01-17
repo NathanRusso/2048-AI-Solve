@@ -288,4 +288,8 @@ int get_next_direction(int depth, int *flat_board) {
     return best_direction + 1;
 }
 
-int main() {}
+int main() {
+    int *board = {0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    printf("5");
+    printf("%d", get_next_direction(5, board));
+}
