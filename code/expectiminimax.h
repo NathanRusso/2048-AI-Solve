@@ -19,6 +19,6 @@ int **get_open_cells(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int *n
 
 long long get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int current_depth, bool players_turn);
 
-int get_next_direction(int depth, int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]);
+int get_next_direction(int depth, int *flat_board);
 
 #endif

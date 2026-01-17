@@ -259,19 +259,23 @@ long long get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], in
  * This returns the "best" direction to shift the tiles in the given board.
  * 
  * @param depth The search depth of the AI Expectiminimax solver/search.
- * @param board The given 4x4 2048 board.
+ * @param flat_board The given 1x16 2048 board.
  * 
  * @return The best direction to move: 1: UP, 2: DOWN, 3: LEFT, 4: RIGHT
  */
-int get_next_direction(int depth, int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
+int get_next_direction(int depth, int *flat_board) {
     DEPTH = depth;
     Direction best_direction = UP;
     long long highest_heuristic = 0;
     int original_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
-    memcpy(original_board, board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
+    for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
+        for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
+            original_board[row][col] = flat_board[row * MAX_BOARD_DIMENSION + col];
+        }
+    }
     for (int direction = UP; direction <= RIGHT; direction++) {
         int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
-        memcpy(copy_board, board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
+        memcpy(copy_board, original_board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
         bool board_changed = shift(copy_board, original_board, direction);
         if (board_changed) {
             long long heuristic = get_best_score(copy_board, DEPTH - 1, false);

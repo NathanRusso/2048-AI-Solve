@@ -268,10 +268,10 @@ class UI2048:
             case UIMode.EXPECTIMINIMAX.value:
                 #self.model.playAction(self.expectiminimax.getNextDirection(self.model.getBoard()))
                 current_board = self.model.getBoard()
-                Int4 = ctypes.c_int * self.MAX_BOARD_DIMENSION
-                Matrix4x4 = Int4 * self.MAX_BOARD_DIMENSION
-                c_board = Matrix4x4(*[Int4(*row) for row in current_board])
-                c_expectiminimax.get_next_direction.argtypes = [ctypes.c_int, Matrix4x4]
+                current_board_flat = [tile for row in current_board for tile in row]
+                CBoardType = ctypes.c_int * (self.MAX_BOARD_DIMENSION * self.MAX_BOARD_DIMENSION)
+                c_board = CBoardType(*current_board_flat)
+                c_expectiminimax.get_next_direction.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
                 c_expectiminimax.get_next_direction.restype = ctypes.c_int
                 direction = c_expectiminimax.get_next_direction(5, c_board)
                 self.model.playAction(direction)
