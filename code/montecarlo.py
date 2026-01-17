@@ -251,30 +251,31 @@ class MCTSNode:
         :return: True if the tiles on the board have changed positions, False otherwise.
         :rtype: bool
         """
-        if direction == Direction.UP.value:
-            for col in range(self.MAX_BOARD_DIMENSION):
-                original_col_values = [row[col] for row in board][::-1] # Column in reverse order (going up)
-                final_col_values = self.__merge(original_col_values)[::-1]
+        match direction:
+            case Direction.UP.value:
+                for col in range(self.MAX_BOARD_DIMENSION):
+                    original_col_values = [row[col] for row in board][::-1] # Column in reverse order (going up)
+                    final_col_values = self.__merge(original_col_values)[::-1]
+                    for row in range(self.MAX_BOARD_DIMENSION):
+                        board[row][col] = final_col_values[row]
+            case Direction.DOWN.value:
+                for col in range(self.MAX_BOARD_DIMENSION):
+                    original_col_values = [row[col] for row in board] # Column in normal order (going down)
+                    final_col_values = self.__merge(original_col_values)
+                    for row in range(self.MAX_BOARD_DIMENSION):
+                        board[row][col] = final_col_values[row]
+            case Direction.LEFT.value:
                 for row in range(self.MAX_BOARD_DIMENSION):
-                    board[row][col] = final_col_values[row]
-        elif direction == Direction.DOWN.value:
-            for col in range(self.MAX_BOARD_DIMENSION):
-                original_col_values = [row[col] for row in board] # Column in normal order (going down)
-                final_col_values = self.__merge(original_col_values)
+                    original_row_values = board[row][::-1] # Row in reverse order
+                    final_row_values = self.__merge(original_row_values)[::-1]
+                    board[row] = final_row_values
+            case Direction.RIGHT.value:
                 for row in range(self.MAX_BOARD_DIMENSION):
-                    board[row][col] = final_col_values[row]
-        elif direction == Direction.LEFT.value:
-            for row in range(self.MAX_BOARD_DIMENSION):
-                original_row_values = board[row][::-1] # Row in reverse order
-                final_row_values = self.__merge(original_row_values)[::-1]
-                board[row] = final_row_values
-        elif direction == Direction.RIGHT.value:
-            for row in range(self.MAX_BOARD_DIMENSION):
-                original_row_values = board[row] # Row in normal order
-                final_row_values = self.__merge(original_row_values)
-                board[row] = final_row_values
-        else:
-            return False # Invalid direction
+                    original_row_values = board[row] # Row in normal order
+                    final_row_values = self.__merge(original_row_values)
+                    board[row] = final_row_values
+            case _:
+                return False # Invalid direction
 
         return original_board != board
 
