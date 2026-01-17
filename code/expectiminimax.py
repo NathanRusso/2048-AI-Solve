@@ -1,5 +1,6 @@
 from model import Model2048, Direction
 import math as m
+import ctypes
 
 class Expectiminimax2048():
     """
