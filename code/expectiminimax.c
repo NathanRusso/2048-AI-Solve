@@ -187,25 +187,19 @@ bool potential_merges(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
  * The cells and board must be freed later.
  * 
  * @param board The given 4x4 2048 board.
+ * @param open_cells The list to add all open cells.
  * @param num_open_cells A pointer to a variable holding the number of open cells.
- * 
- * @return A list of all open cells.
  */
-int **get_open_cells(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int *num_open_cells) {
-    int **open_cells = (int **) malloc(sizeof(int*) * MAX_NUM_TILES);
-    assert(open_cells);
+int **get_open_cells(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int open_cells[MAX_BOARD_DIMENSION][2], int *num_open_cells) {
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
             if (board[row][col] == BLANK_TILE) {
-                open_cells[*num_open_cells] = (int *) malloc(sizeof(int) * 2);
-                assert(open_cells[*num_open_cells]);
                 open_cells[*num_open_cells][0] = row;
                 open_cells[*num_open_cells][1] = col;
                 (*num_open_cells)++;
             }
         }
     }
-    return open_cells;
 }
 
 /**
@@ -220,21 +214,23 @@ int **get_open_cells(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int *n
 long long get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int current_depth, bool players_turn) {
     if (current_depth == 0) return get_heuristic_score(board);
     int num_open_cells = 0;
-    int **open_cells = get_open_cells(board, &num_open_cells);
-    long long final_heuristic = 0;
+    int open_cells[MAX_BOARD_DIMENSION][2];
+    get_open_cells(board, open_cells, &num_open_cells);
 
     if (num_open_cells == 0 && !potential_merges(board)) {  // Game over for the board
-        final_heuristic = get_heuristic_score(board);
+        return get_heuristic_score(board);
     } else if (players_turn) { // Player's Turn: Tiles shift
+        long long highest_heuristic = 0;
         for (int direction = UP; direction <= RIGHT; direction++) {
             int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
             memcpy(copy_board, board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
             bool board_changed = shift(copy_board, board, direction);
             if (board_changed) {
                 long long heuristic = get_best_score(copy_board, current_depth - 1, false);
-                if (heuristic > final_heuristic) final_heuristic = heuristic;
+                if (heuristic > highest_heuristic) highest_heuristic = heuristic;
             }
         }
+        return highest_heuristic;
     } else if (num_open_cells != 0) { // Game's Turn: Random tile spawn, tiles are open
         long long avg_heuristic_2 = 0;
         long long avg_heuristic_4 = 0;
@@ -250,16 +246,12 @@ long long get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], in
             avg_heuristic_2 += get_best_score(copy_board_2, current_depth - 1, true) / num_open_cells;
             avg_heuristic_4 += get_best_score(copy_board_4, current_depth - 1, true) / num_open_cells;
         }
-        final_heuristic = floor(avg_heuristic_2 * TILE_2_CHANCE + avg_heuristic_4 * TILE_4_CHANCE);
+        return floor(avg_heuristic_2 * TILE_2_CHANCE + avg_heuristic_4 * TILE_4_CHANCE);
     } else { // Game's Turn: Random tile spawn, no tile are open ~ SHOULD NOT HAPPEN
         int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
         memcpy(copy_board, board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
-        final_heuristic = get_best_score(copy_board, current_depth - 1, false);
+        return get_best_score(copy_board, current_depth - 1, false);
     }
-
-    for (int i = 0; i < num_open_cells; i++) free(open_cells[i]);
-    free(open_cells);
-    return final_heuristic;
 }
 
 /**

@@ -15,7 +15,7 @@ bool shift(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int original_boa
 
 bool potential_merges(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]);
 
-int **get_open_cells(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int *num_open_cells);
+int **get_open_cells(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int open_cells[MAX_BOARD_DIMENSION][2], int *num_open_cells);
 
 long long get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int current_depth, bool players_turn);
 
