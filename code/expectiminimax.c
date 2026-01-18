@@ -38,7 +38,6 @@ long long get_heuristic_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION
     long long board_heuristic = 0;
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
-            //printf("Heuristic: %d and %d\n", board[row][col], SNAKE_HEURISTIC_3[row][col]);
             board_heuristic += (long long)board[row][col] * SNAKE_HEURISTIC_3[row][col];
         }
     }
@@ -73,15 +72,15 @@ void merge(int original_list[MAX_BOARD_DIMENSION], int new_list[MAX_BOARD_DIMENS
             j++;
         }
     }
-    int final_list_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
+    //int final_list_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
     int index = 3;
     int i = original_list_values_length - 1;
     while (i >= 0) {
         if (i - 1 >= 0 && original_list_values[i] == original_list_values[i-1]) {
-            final_list_values[index] = original_list_values[i] * 2;
+            new_list[index] = original_list_values[i] * 2;
             i -= 2;
         } else {
-            final_list_values[index] = original_list_values[i];
+            new_list[index] = original_list_values[i];
             i--;
         }
         index--;
@@ -97,7 +96,7 @@ void merge(int original_list[MAX_BOARD_DIMENSION], int new_list[MAX_BOARD_DIMENS
  * 
  * @return True if the tiles on the board have changed positions, False otherwise.
  */
-bool shift(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int original_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int direction) {
+bool shift(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int original_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int direction) {  
     switch (direction) {
         case UP:
             for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
@@ -290,7 +289,6 @@ int get_next_direction(int depth, int *flat_board) {
         bool board_changed = shift(copy_board, original_board, direction);
         if (board_changed) {
             long long heuristic = get_best_score(copy_board, DEPTH - 1, false);
-            //printf("%d", heuristic);
             if (heuristic > highest_heuristic) {
                 highest_heuristic = heuristic;
                 best_direction = direction;
@@ -302,6 +300,6 @@ int get_next_direction(int depth, int *flat_board) {
 
 int main() {
     int board[16] = {0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    printf("xyz\n");
+    printf("test\n");
     printf("%d", get_next_direction(5, board));
 }
