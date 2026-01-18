@@ -290,5 +290,5 @@ int get_next_direction(int depth, int *flat_board) {
 int main() {
     int board[16] = {0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     printf("test\n");
-    printf("%d", get_next_direction(7, board));
+    printf("%d", get_next_direction(8, board));
 }
