@@ -6,7 +6,7 @@ import os
 from model import Model2048, Direction
 from expectiminimax import Expectiminimax2048
 from montecarlo import MonteCarlo2048
-c_expectiminimax = ctypes.CDLL(os.path.abspath("code/expectiminimax.dll"))
+EMM_DEPTH = 6
 
 class UIMode(Enum):
     """
@@ -43,6 +43,10 @@ class UI2048:
         """
         pg.init() # Starts pygame
         pg.font.init()
+        self.c_expectiminimax = ctypes.CDLL(os.path.abspath("code/expectiminimax.dll"))
+        self.c_expectiminimax.get_next_direction.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
+        self.c_expectiminimax.get_next_direction.restype = ctypes.c_int
+        self.CBoardType = ctypes.c_int * (self.MAX_BOARD_DIMENSION * self.MAX_BOARD_DIMENSION)
         self.model = model
         self.expectiminimax = expectiminimax
         self.mcts = mcts
@@ -267,18 +271,11 @@ class UI2048:
                 self.model.playAction(r.randint(1, 4))
             case UIMode.EXPECTIMINIMAX.value:
                 #self.model.playAction(self.expectiminimax.getNextDirection(self.model.getBoard()))
-                #return
-                #"""
                 current_board = self.model.getBoard()
                 current_board_flat = [tile for row in current_board for tile in row]
-                CBoardType = ctypes.c_int * (self.MAX_BOARD_DIMENSION * self.MAX_BOARD_DIMENSION)
-                c_board = CBoardType(*current_board_flat)
-                c_expectiminimax.get_next_direction.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
-                c_expectiminimax.get_next_direction.restype = ctypes.c_int
-                direction = c_expectiminimax.get_next_direction(5, c_board)
-                print(direction)
+                c_board = self.CBoardType(*current_board_flat)
+                direction = self.c_expectiminimax.get_next_direction(EMM_DEPTH, c_board)
                 self.model.playAction(direction)
-                #"""
             case UIMode.MCTS.value:
                 self.model.playAction(self.mcts.getNextDirection(self.model.getBoard()))
             case UIMode.MCTS_EMM.value:
@@ -325,7 +322,7 @@ class UI2048:
 
 def main():
     model = Model2048()
-    expectiminimax = Expectiminimax2048(6, 3) # Search depth of 5 is the max before the time increase becomes too much!
+    expectiminimax = Expectiminimax2048(EMM_DEPTH, 3) # Search depth of 5 is the max before the time increase becomes too much!
     expectiminimax_weak = Expectiminimax2048(3, 3)
     montecarlo = MonteCarlo2048(1500, 30, 1.4, None)
     mcts_emm = MonteCarlo2048(50, 30, 1.25, expectiminimax_weak)

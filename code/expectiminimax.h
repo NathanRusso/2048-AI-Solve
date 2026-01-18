@@ -7,7 +7,7 @@
 #define TILE_2_CHANCE 0.9
 #define TILE_4_CHANCE 0.1
 
-long long get_heuristic_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]);
+long long get_heuristic_score(const int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]);
 
 void merge(int original_list[MAX_BOARD_DIMENSION], int new_list[MAX_BOARD_DIMENSION]);
 

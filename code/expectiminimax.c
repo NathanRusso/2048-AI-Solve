@@ -34,7 +34,7 @@ int DEPTH = 5; // The defalt depth for Expectiminimax
  * 
  * @return The board's snake heuristic score.
  */
-long long get_heuristic_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
+long long get_heuristic_score(const int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
     long long board_heuristic = 0;
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
@@ -60,20 +60,19 @@ void merge(int original_list[MAX_BOARD_DIMENSION], int new_list[MAX_BOARD_DIMENS
         return;
     }
 
+    int original_list_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
     int original_list_values_length = MAX_BOARD_DIMENSION;
-    for (int i = 0; i < MAX_BOARD_DIMENSION; i++) {
-        if (original_list[i] == BLANK_TILE) original_list_values_length--;
-    }
-    int original_list_values[original_list_values_length];
     int j = 0;
     for (int i = 0; i < MAX_BOARD_DIMENSION; i++) {
-        if (original_list[i] != BLANK_TILE) {
+        if (original_list[i] == BLANK_TILE) {
+            original_list_values_length--;
+        } else {
             original_list_values[j] = original_list[i];
             j++;
         }
     }
-    //int final_list_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
-    int index = 3;
+
+    int index = MAX_BOARD_DIMENSION - 1;
     int i = original_list_values_length - 1;
     while (i >= 0) {
         if (i - 1 >= 0 && original_list_values[i] == original_list_values[i-1]) {
@@ -195,7 +194,6 @@ bool potential_merges(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
 int **get_open_cells(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int *num_open_cells) {
     int **open_cells = (int **) malloc(sizeof(int*) * MAX_NUM_TILES);
     assert(open_cells);
-    *num_open_cells = 0;
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
             if (board[row][col] == BLANK_TILE) {
@@ -301,5 +299,5 @@ int get_next_direction(int depth, int *flat_board) {
 int main() {
     int board[16] = {0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     printf("test\n");
-    printf("%d", get_next_direction(5, board));
+    printf("%d", get_next_direction(7, board));
 }
