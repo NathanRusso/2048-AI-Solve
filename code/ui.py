@@ -6,7 +6,7 @@ import os
 from model import Model2048, Direction
 from expectiminimax import Expectiminimax2048
 from montecarlo import MonteCarlo2048
-EMM_DEPTH_MAX = 7
+EMM_DEPTH_MAX = 8
 
 class UIMode(Enum):
     """
@@ -322,7 +322,7 @@ class UI2048:
 
 def main():
     model = Model2048()
-    expectiminimax = Expectiminimax2048(EMM_DEPTH_MAX - 2, 3) # Search depth of 5 is the max before the time increase becomes too much!
+    expectiminimax = Expectiminimax2048(EMM_DEPTH_MAX - 3, 3) # Search depth of 5 is the max before the time increase becomes too much!
     expectiminimax_weak = Expectiminimax2048(3, 3)
     montecarlo = MonteCarlo2048(1500, 30, 1.4, None)
     mcts_emm = MonteCarlo2048(50, 30, 1.25, expectiminimax_weak)
