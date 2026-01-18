@@ -221,12 +221,11 @@ long long get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], in
     if (current_depth == 0) return get_heuristic_score(board);
     int num_open_cells = 0;
     int **open_cells = get_open_cells(board, &num_open_cells);
-    if (num_open_cells == 0 && !potential_merges(board)) {
-        return get_heuristic_score(board); // Game over for the board
-    }
-
     long long final_heuristic = 0;
-    if (players_turn) { // Player's Turn: Tiles shift
+
+    if (num_open_cells == 0 && !potential_merges(board)) {  // Game over for the board
+        final_heuristic = get_heuristic_score(board);
+    } else if (players_turn) { // Player's Turn: Tiles shift
         for (int direction = UP; direction <= RIGHT; direction++) {
             int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
             memcpy(copy_board, board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);

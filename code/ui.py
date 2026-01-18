@@ -6,7 +6,7 @@ import os
 from model import Model2048, Direction
 from expectiminimax import Expectiminimax2048
 from montecarlo import MonteCarlo2048
-EMM_DEPTH = 6
+EMM_DEPTH_MAX = 7
 
 class UIMode(Enum):
     """
@@ -274,7 +274,7 @@ class UI2048:
                 current_board = self.model.getBoard()
                 current_board_flat = [tile for row in current_board for tile in row]
                 c_board = self.CBoardType(*current_board_flat)
-                direction = self.c_expectiminimax.get_next_direction(EMM_DEPTH, c_board)
+                direction = self.c_expectiminimax.get_next_direction(EMM_DEPTH_MAX, c_board)
                 self.model.playAction(direction)
             case UIMode.MCTS.value:
                 self.model.playAction(self.mcts.getNextDirection(self.model.getBoard()))
@@ -322,7 +322,7 @@ class UI2048:
 
 def main():
     model = Model2048()
-    expectiminimax = Expectiminimax2048(EMM_DEPTH, 3) # Search depth of 5 is the max before the time increase becomes too much!
+    expectiminimax = Expectiminimax2048(EMM_DEPTH_MAX - 2, 3) # Search depth of 5 is the max before the time increase becomes too much!
     expectiminimax_weak = Expectiminimax2048(3, 3)
     montecarlo = MonteCarlo2048(1500, 30, 1.4, None)
     mcts_emm = MonteCarlo2048(50, 30, 1.25, expectiminimax_weak)
