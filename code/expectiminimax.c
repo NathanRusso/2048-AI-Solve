@@ -18,14 +18,32 @@ typedef enum {
     RIGHT // 3 -> 4
 } Direction;
 
+const int SNAKE_HEURISTIC_1[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION] = {
+    {32768, 16384, 8192, 4096},
+    {256, 512, 1024, 2048},
+    {128, 64, 32, 16},
+    {1, 2, 4, 8}
+};
+const int SNAKE_HEURISTIC_2[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION] = {
+    {1073741824, 268435456, 67108864, 16777216},
+    {65536, 262144, 1048576, 4194304},
+    {16384, 4096, 1024, 256},
+    {1, 4, 16, 64}
+};
 const int SNAKE_HEURISTIC_3[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION] = {
     {4096, 2048, 1024, 512},
     {64, 128, 256, 512},
     {64, 32, 16, 8},
     {1, 2, 4, 8}
 };
+const int SNAKE_HEURISTIC_4[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION] = {
+    {16777216, 4194304, 1048576, 262144},
+    {4096, 16384, 65536, 262144},
+    {4096, 1024, 256, 64},
+    {1, 4, 16, 64}
+};
 
-int DEPTH = 5; // The defalt depth for Expectiminimax
+int DEPTH = 8; // The defalt depth for Expectiminimax
 
 /**
  * This gets the board heuristic score.
@@ -289,6 +307,6 @@ int get_next_direction(int depth, int *flat_board) {
 
 int main() {
     int board[16] = {0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    printf("test\n");
+    printf("test!!\n");
     printf("%d", get_next_direction(8, board));
 }
