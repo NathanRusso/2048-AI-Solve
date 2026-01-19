@@ -332,6 +332,6 @@ int get_next_direction(int depth, int heuristic_num, int *flat_board) {
 
 int main() {
     int board[16] = {0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    printf("test!!\n");
+    printf("test!!!!\n");
     printf("%d", get_next_direction(DEPTH, HEURISTIC_NUM, board));
 }
