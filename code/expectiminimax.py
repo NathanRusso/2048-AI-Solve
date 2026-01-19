@@ -1,3 +1,6 @@
+"""
+This file is no longer in use as the C file far surpasses the speed of this file.
+"""
 from model import Model2048, Direction
 import math as m
 

@@ -1,7 +1,15 @@
 from model import Direction
 import math as m
 import random as r
-from expectiminimax import Expectiminimax2048
+import ctypes
+import os
+# NO LONGER IN USE: from expectiminimax import Expectiminimax2048
+
+expectiminimax_c = ctypes.CDLL(os.path.abspath("code/expectiminimax.dll")) # Shared library to connect Python and C
+expectiminimax_c.get_next_direction.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
+expectiminimax_c.get_next_direction.restype = ctypes.c_int
+CBoardType = ctypes.c_int * (16)
+
 
 class MCTSNode:
     """
@@ -135,13 +143,14 @@ class MCTSNode:
         self.children.append(child)
         return child
 
-    def simulateNode(self, expansion_depth: int, expectiminimax) -> int:
+    def simulateNode(self, expansion_depth: int, expectiminimax_depth: int) -> int:
         """
         Given the current node, this simulates a game with a max number of turns and return the final board score.
         
         :param expansion_depth: How many turns to simulate in the 2048 game.
         :type expansion_depth: int
-        :param expectiminimax: The model for Expectiminimax which may be None.
+        :param expectiminimax_depth: The search depth to be used in the Expectiminimax solver to chose the next direction, which may be None.
+        :type expectiminimax_depth: int
         :return: The heuristic score of the final board.
         :rtype: int
         """
@@ -151,8 +160,10 @@ class MCTSNode:
         players_turn = self.players_turn
         while i < expansion_depth and not game_over:
             if players_turn:
-                if expectiminimax:
-                    direction = expectiminimax.getNextDirection(simulation_board)
+                if expectiminimax_depth:
+                    simulation_board_flat = [tile for row in simulation_board for tile in row]
+                    simulation_board_flat_c = CBoardType(*simulation_board_flat)
+                    direction = expectiminimax_c.get_next_direction(expectiminimax_depth, simulation_board_flat_c)
                     board_changed = self.__shift(simulation_board, simulation_board, direction)
                     if not board_changed and direction == Direction.UP.value: game_over = True
                 else:
@@ -311,7 +322,7 @@ class MonteCarlo2048:
     This classes uses the Monte Carlo Tree Search algorithm to determine the "best" next move in 2048.
     """
 
-    def __init__(self, selection_iterations: int, expansion_depth: int, C: float, expectiminimax):
+    def __init__(self, selection_iterations: int, expansion_depth: int, C: float, expectiminimax_depth: int):
         """
         This sets up the variables needed for MCTS to function.
         
@@ -321,12 +332,13 @@ class MonteCarlo2048:
         :type expansion_depth: int
         :param C: The exploration constant used to adjust weighting in UCB1.
         :type C: float
-        :param expectiminimax: The model for Expectiminimax which may be None.
+        :param expectiminimax_depth: The search depth to be used in the Expectiminimax solver to chose the next direction, which may be None.
+        :type C: int
         """
         self.selection_iterations = selection_iterations
         self.expansion_depth = expansion_depth
         self.C = C
-        self.emm = expectiminimax
+        self.expectiminimax_depth = expectiminimax_depth
 
     def getNextDirection(self, original_board: list) -> int:
         """
@@ -344,14 +356,14 @@ class MonteCarlo2048:
             node = root
 
             while not node.game_over and len(node.available_actions) == 0:
-                node = node.selectBestChild(self.C)                         # Selection
+                node = node.selectBestChild(self.C)                                         # Selection
 
             if not node.game_over and len(node.available_actions) > 0:
-                node = node.expandNode()                                    # Expansion
+                node = node.expandNode()                                                    # Expansion
 
-            heuristic = node.simulateNode(self.expansion_depth, self.emm)   # Simulation
+            heuristic = node.simulateNode(self.expansion_depth, self.expectiminimax_depth)  # Simulation
 
-            node.backPropagation(heuristic)                                 # Backpropagation
+            node.backPropagation(heuristic)                                                 # Backpropagation
 
         best_direction = Direction.UP.value
         best_visits = 0
