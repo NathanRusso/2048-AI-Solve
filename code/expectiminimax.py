@@ -38,18 +38,18 @@ class Expectiminimax2048():
         [4**0, 4**1, 4**2, 4**3]
     ]
 
-    def __init__(self, depth: int, snake: int):
+    def __init__(self, depth: int, heuristic_num: int):
         """
         This sets up the variables needed for Expectiminimax to function.
         
         :param depth: The search depth of the AI solver/search.
         :type depth: int
-        :param snake: Which snake heuristic to use.
-        :type snake: int
+        :param heuristic_num: The number indicating which heuristic to use when calculating the board's score.
+        :type heuristic_num: int
         
         """
         self.depth = depth # How deep are algorithm will search
-        self.snake = snake # If the heuristic will be the snake 1
+        self.heuristic_num = heuristic_num # If the heuristic will be the snake 1
 
     def getHeuristicScore(self, board: list) -> int:
         """
@@ -60,7 +60,7 @@ class Expectiminimax2048():
         :return: The heuristic score.
         :rtype: int
         """
-        match self.snake:
+        match self.heuristic_num:
             case 1:
                 return self.__getHeuristicSnakeScore(board, self.SNAKE_HEURISTIC_1)
             case 2:
@@ -78,7 +78,7 @@ class Expectiminimax2048():
                 
         :param b: The given 4x4 2048 board.
         :type b: list
-        :param h: The snake heuristic to be used when getting the board's score.
+        :param h: The snake heuristic to use when calculating the board's score.
         :type h: list
         :return: The heuristic score.
         :rtype: int

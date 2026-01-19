@@ -8,7 +8,7 @@ from montecarlo import MonteCarlo2048
 # NO LONGER IN USE: from expectiminimax import Expectiminimax2048
 
 expectiminimax_c = ctypes.CDLL(os.path.abspath("code/expectiminimax.dll")) # Shared library to connect Python and C
-expectiminimax_c.get_next_direction.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
+expectiminimax_c.get_next_direction.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
 expectiminimax_c.get_next_direction.restype = ctypes.c_int
 CBoardType = ctypes.c_int * (16)
 
@@ -38,19 +38,23 @@ class UI2048:
     COLOR_BUTTON_BACKGROUND = COLOR_BOARD
     RUN = True
 
-    def __init__(self, model, expectiminimax_depth: int, mcts, mcts_emm):
+    def __init__(self, model, expectiminimax_depth: int, heuristic_num: int, mcts, mcts_emm):
         """
         This sets up the variables need for the UI to function.
         
         :param model: A game model for 2048.
         :param expectiminimax_depth: The search depth to be used in the Expectiminimax solver to chose the next direction.
         :type expectiminimax_depth: int
+        :param heuristic_num: The number indicating which heuristic to use when calculating the board's score.
+        :type heuristic_num: int
         :param mcts: A Monte Carlo Tree Search solver to chose the next direction.
+        :param mcts_emm: A Monte Carlo Tree Search solver to chose the next direction that uses Expectiminimax during simulation.
         """
         pg.init() # Starts pygame
         pg.font.init()
         self.model = model
         self.emm_depth = expectiminimax_depth
+        self.heuristic_num = heuristic_num
         self.mcts = mcts
         self.mcts_emm = mcts_emm
         self.pause = False
@@ -276,7 +280,7 @@ class UI2048:
                 board = self.model.getBoard()
                 board_flat = [tile for row in board for tile in row]
                 board_flat_c = CBoardType(*board_flat)
-                self.model.playAction(expectiminimax_c.get_next_direction(self.emm_depth, board_flat_c))
+                self.model.playAction(expectiminimax_c.get_next_direction(self.emm_depth, self.heuristic_num, board_flat_c))
             case UIMode.MCTS.value:
                 self.model.playAction(self.mcts.getNextDirection(self.model.getBoard()))
             case UIMode.MCTS_EMM.value:
@@ -330,10 +334,11 @@ def main():
     """
     EMM_DEPTH = 8
     EMM_DEPTH_WEAK = 6
+    HEURISTIC_NUM = 3
     model = Model2048()
-    montecarlo = MonteCarlo2048(1500, 30, 1.4, None)
-    mcts_emm = MonteCarlo2048(50, 30, 1.25, EMM_DEPTH_WEAK)
-    game = UI2048(model, EMM_DEPTH, montecarlo, mcts_emm)
+    montecarlo = MonteCarlo2048(1500, 30, 1.4, None, HEURISTIC_NUM)
+    mcts_emm = MonteCarlo2048(50, 30, 1.25, EMM_DEPTH_WEAK, HEURISTIC_NUM)
+    game = UI2048(model, EMM_DEPTH, HEURISTIC_NUM, montecarlo, mcts_emm)
     game.run()
 
 if __name__ == '__main__':

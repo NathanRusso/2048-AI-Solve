@@ -6,7 +6,7 @@ import os
 # NO LONGER IN USE: from expectiminimax import Expectiminimax2048
 
 expectiminimax_c = ctypes.CDLL(os.path.abspath("code/expectiminimax.dll")) # Shared library to connect Python and C
-expectiminimax_c.get_next_direction.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
+expectiminimax_c.get_next_direction.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
 expectiminimax_c.get_next_direction.restype = ctypes.c_int
 CBoardType = ctypes.c_int * (16)
 
@@ -143,7 +143,7 @@ class MCTSNode:
         self.children.append(child)
         return child
 
-    def simulateNode(self, expansion_depth: int, expectiminimax_depth: int) -> int:
+    def simulateNode(self, expansion_depth: int, expectiminimax_depth: int, heuristic_num: int) -> int:
         """
         Given the current node, this simulates a game with a max number of turns and return the final board score.
         
@@ -151,6 +151,8 @@ class MCTSNode:
         :type expansion_depth: int
         :param expectiminimax_depth: The search depth to be used in the Expectiminimax solver to chose the next direction, which may be None.
         :type expectiminimax_depth: int
+        :param heuristic_num: The number indicating which heuristic to use when calculating the board's score.
+        :type heuristic_num: int
         :return: The heuristic score of the final board.
         :rtype: int
         """
@@ -163,7 +165,7 @@ class MCTSNode:
                 if expectiminimax_depth:
                     simulation_board_flat = [tile for row in simulation_board for tile in row]
                     simulation_board_flat_c = CBoardType(*simulation_board_flat)
-                    direction = expectiminimax_c.get_next_direction(expectiminimax_depth, simulation_board_flat_c)
+                    direction = expectiminimax_c.get_next_direction(expectiminimax_depth, heuristic_num, simulation_board_flat_c)
                     board_changed = self.__shift(simulation_board, simulation_board, direction)
                     if not board_changed and direction == Direction.UP.value: game_over = True
                 else:
@@ -191,7 +193,7 @@ class MCTSNode:
             players_turn = not players_turn
             i += 1
 
-        return self.getHeuristicSnakeScore(simulation_board)
+        return self.getHeuristicScore(simulation_board, heuristic_num)
 
     def backPropagation(self, reward: int):
         """
@@ -231,17 +233,42 @@ class MCTSNode:
         #print(f"Exploit: {exploit}, Explore: {explore}")
         return exploit + explore                        # UCB1 typical
 
-    def getHeuristicSnakeScore(self, board: list) -> int:
+    def getHeuristicScore(self, board: list, heuristic_num: int) -> int:
         """
-        Given the current node, this gets its board snake heuristic score.
-                
-        :param b: The given 4x4 2048 board.
-        :type b: list
+        This gets the board's heuristic score.
+        
+        :param board: The given 4x4 2048 board.
+        :type board: list
+        :param heuristic_num: The number indicating which heuristic to use when calculating the board's score.
+        :type heuristic_num: int
         :return: The heuristic score.
         :rtype: int
         """
-        br0, br1, br2, br3 = board                      # Board rows
-        hr0, hr1, hr2, hr3 = self.SNAKE_HEURISTIC_3     # Snake heuristic rows
+        match heuristic_num:
+            case 1:
+                return self.__getHeuristicSnakeScore(board, self.SNAKE_HEURISTIC_1)
+            case 2:
+                return self.__getHeuristicSnakeScore(board, self.SNAKE_HEURISTIC_2)
+            case 3:
+                return self.__getHeuristicSnakeScore(board, self.SNAKE_HEURISTIC_3)
+            case 4:
+                return self.__getHeuristicSnakeScore(board, self.SNAKE_HEURISTIC_4)
+            case _:
+                return self.__getHeuristicSnakeScore(board, self.SNAKE_HEURISTIC_2)
+
+    def __getHeuristicSnakeScore(self, board: list, snake_heuristic: list) -> int:
+        """
+        This gets the board snake heuristic score.
+                
+        :param b: The given 4x4 2048 board.
+        :type b: list
+        :param h: The snake heuristic to use when calculating the board's score.
+        :type h: list
+        :return: The heuristic score.
+        :rtype: int
+        """
+        br0, br1, br2, br3 = board              # Board rows
+        hr0, hr1, hr2, hr3 = snake_heuristic    # Snake heuristic rows
         return (
             br0[0]*hr0[0] + br0[1]*hr0[1] + br0[2]*hr0[2] + br0[3]*hr0[3] +
             br1[0]*hr1[0] + br1[1]*hr1[1] + br1[2]*hr1[2] + br1[3]*hr1[3] +
@@ -322,7 +349,7 @@ class MonteCarlo2048:
     This classes uses the Monte Carlo Tree Search algorithm to determine the "best" next move in 2048.
     """
 
-    def __init__(self, selection_iterations: int, expansion_depth: int, C: float, expectiminimax_depth: int):
+    def __init__(self, selection_iterations: int, expansion_depth: int, C: float, expectiminimax_depth: int, heuristic_num: int):
         """
         This sets up the variables needed for MCTS to function.
         
@@ -333,12 +360,15 @@ class MonteCarlo2048:
         :param C: The exploration constant used to adjust weighting in UCB1.
         :type C: float
         :param expectiminimax_depth: The search depth to be used in the Expectiminimax solver to chose the next direction, which may be None.
-        :type C: int
+        :type expectiminimax_depth: int
+        :param heuristic_num: The number indicating which heuristic to use when calculating the board's score.
+        :type heuristic_num: int
         """
         self.selection_iterations = selection_iterations
         self.expansion_depth = expansion_depth
         self.C = C
         self.expectiminimax_depth = expectiminimax_depth
+        self.heuristic_num = heuristic_num
 
     def getNextDirection(self, original_board: list) -> int:
         """
@@ -350,27 +380,26 @@ class MonteCarlo2048:
         :rtype: int
         """
         root = MCTSNode(original_board, None, None, True)
-        #original_heuristic = root.getHeuristicSnakeScore(original_board)
+        #original_heuristic = root.getHeuristicScore(original_board)
         
         for i in range(self.selection_iterations):
             node = root
 
             while not node.game_over and len(node.available_actions) == 0:
-                node = node.selectBestChild(self.C)                                         # Selection
+                node = node.selectBestChild(self.C)                     # Selection
 
             if not node.game_over and len(node.available_actions) > 0:
-                node = node.expandNode()                                                    # Expansion
+                node = node.expandNode()                                # Expansion
 
-            heuristic = node.simulateNode(self.expansion_depth, self.expectiminimax_depth)  # Simulation
+            heuristic = node.simulateNode(self.expansion_depth, self.expectiminimax_depth, self.heuristic_num)
+                                                                        # Simulation
 
-            node.backPropagation(heuristic)                                                 # Backpropagation
+            node.backPropagation(heuristic)                             # Backpropagation
 
         best_direction = Direction.UP.value
         best_visits = 0
         for child in root.children:
-            #print(child.reward)
             if child.visits > best_visits:
                 best_direction = child.direction
                 best_visits = child.visits
-        #print(best_direction)
         return best_direction

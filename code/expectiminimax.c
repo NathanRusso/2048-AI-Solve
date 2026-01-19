@@ -44,22 +44,46 @@ const int SNAKE_HEURISTIC_4[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION] = {
 };
 
 int DEPTH = 8; // The defalt depth for Expectiminimax
+int HEURISTIC_NUM = 3; // The default number indicating which heuristic to use
+
+/**
+ * This gets the board snake heuristic score.
+ * 
+ * @param board The given 4x4 2048 board.
+ * @param snake_heuristic The snake heuristic to use when calculating the board's score.
+ * 
+ * @return The board's snake heuristic score.
+ */
+long long get_heuristic_snake_score(const int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], const int snake_heuristic[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
+    long long board_heuristic = 0;
+    for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
+        for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
+            board_heuristic += (long long)board[row][col] * snake_heuristic[row][col];
+        }
+    }
+    return board_heuristic;
+}
 
 /**
  * This gets the board heuristic score.
  * 
  * @param board The given 4x4 2048 board.
  * 
- * @return The board's snake heuristic score.
+ * @return The board's heuristic score.
  */
 long long get_heuristic_score(const int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
-    long long board_heuristic = 0;
-    for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
-        for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
-            board_heuristic += (long long)board[row][col] * SNAKE_HEURISTIC_3[row][col];
-        }
+    switch (HEURISTIC_NUM) {
+        case 1:
+            return get_heuristic_snake_score(board, SNAKE_HEURISTIC_1);
+        case 2:
+            return get_heuristic_snake_score(board, SNAKE_HEURISTIC_2);
+        case 3:
+            return get_heuristic_snake_score(board, SNAKE_HEURISTIC_3);
+        case 4:
+            return get_heuristic_snake_score(board, SNAKE_HEURISTIC_4);
+        default:
+            return get_heuristic_snake_score(board, SNAKE_HEURISTIC_3);
     }
-    return board_heuristic;
 }
 
 /**
@@ -276,12 +300,13 @@ long long get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], in
  * This returns the "best" direction to shift the tiles in the given board.
  * 
  * @param depth The search depth of the AI Expectiminimax solver/search.
+ * @param heuristic_num The number indicating which heuristic to use when calculating the board's score.
  * @param flat_board The given 1x16 2048 board.
  * 
  * @return The best direction to move: 1: UP, 2: DOWN, 3: LEFT, 4: RIGHT
  */
-int get_next_direction(int depth, int *flat_board) {
-    DEPTH = depth;
+int get_next_direction(int depth, int heuristic_num, int *flat_board) {
+    HEURISTIC_NUM = heuristic_num;
     Direction best_direction = UP;
     long long highest_heuristic = 0;
     int original_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
@@ -295,7 +320,7 @@ int get_next_direction(int depth, int *flat_board) {
         memcpy(copy_board, original_board, sizeof(int) * MAX_BOARD_DIMENSION * MAX_BOARD_DIMENSION);
         bool board_changed = shift(copy_board, original_board, direction);
         if (board_changed) {
-            long long heuristic = get_best_score(copy_board, DEPTH - 1, false);
+            long long heuristic = get_best_score(copy_board, depth - 1, false);
             if (heuristic > highest_heuristic) {
                 highest_heuristic = heuristic;
                 best_direction = direction;
@@ -308,5 +333,5 @@ int get_next_direction(int depth, int *flat_board) {
 int main() {
     int board[16] = {0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     printf("test!!\n");
-    printf("%d", get_next_direction(8, board));
+    printf("%d", get_next_direction(DEPTH, HEURISTIC_NUM, board));
 }
