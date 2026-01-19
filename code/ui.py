@@ -10,7 +10,7 @@ from montecarlo import MonteCarlo2048
 expectiminimax_c = ctypes.CDLL(os.path.abspath("code/expectiminimax.dll")) # Shared library to connect Python and C
 expectiminimax_c.get_next_direction.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
 expectiminimax_c.get_next_direction.restype = ctypes.c_int
-CBoardType = ctypes.c_int * (16)
+CBoardType = ctypes.c_int * 16
 
 
 class UIMode(Enum):
