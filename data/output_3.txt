@@ -17,4 +17,3 @@ E1 Highest Tile Sum: 78336, Avg: 3916.8
 E2 Highest Tile Sum: 84480, Avg: 4224.0
 E3 Highest Tile Sum: 100352, Avg: 5017.6
 E4 Highest Tile Sum: 72704, Avg: 3635.2
-

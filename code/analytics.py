@@ -139,7 +139,6 @@ def testExpectiminimaxC():
 
         for i in range(1, 5):
             f.write(f"E{i} Highest Tile Sum: {sum(e_highest_tiles_all[i-1])}, Avg: {sum(e_highest_tiles_all[i-1]) / 20}" + "\n")
-        f.write("\n")
 
 def main():
     """
