@@ -42,6 +42,18 @@ const int SNAKE_HEURISTIC_4[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION] = {
     {4096, 1024, 256, 64},
     {1, 4, 16, 64}
 };
+const int SNAKE_HEURISTIC_5[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION] = {
+    {4096, 2048, 1024, 256},
+    {32, 128, 256, 512},
+    {64, 32, 16, 4},
+    {1, 2, 4, 8}
+};
+const int SNAKE_HEURISTIC_6[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION] = {
+    {512, 256, 128, 64},
+    {16, 32, 64, 64},
+    {16, 16, 8, 8},
+    {1, 2, 4, 8}
+};
 
 int DEPTH = 8; // The defalt depth for Expectiminimax
 int HEURISTIC_NUM = 3; // The default number indicating which heuristic to use
@@ -81,6 +93,10 @@ long long get_heuristic_score(const int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIM
             return get_heuristic_snake_score(board, SNAKE_HEURISTIC_3);
         case 4:
             return get_heuristic_snake_score(board, SNAKE_HEURISTIC_4);
+        case 5:
+            return get_heuristic_snake_score(board, SNAKE_HEURISTIC_5);
+        case 6:
+            return get_heuristic_snake_score(board, SNAKE_HEURISTIC_6);
         default:
             return get_heuristic_snake_score(board, SNAKE_HEURISTIC_3);
     }
