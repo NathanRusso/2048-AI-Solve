@@ -68,11 +68,14 @@ int HEURISTIC_NUM = 3; // The default number indicating which heuristic to use
  */
 long long get_heuristic_snake_score(const int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], const int snake_heuristic[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
     long long board_heuristic = 0;
+    // int open_cells = 0;
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
+            // if (board[row][col] == BLANK_TILE) open_cells++;
             board_heuristic += (long long)board[row][col] * snake_heuristic[row][col];
         }
     }
+    // return floor(board_heuristic + board_heuristic * open_cells / 16 * 0.1);
     return board_heuristic;
 }
 
