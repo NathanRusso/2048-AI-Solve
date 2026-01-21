@@ -36,6 +36,7 @@ class UI2048:
     COLOR_LABEL_TEXT = "#736452"
     COLOR_BUTTON_TEXT = "#FFFFFF" # "#f2f0e5"
     COLOR_BUTTON_BACKGROUND = COLOR_BOARD
+    COLOR_MODE_INDICATOR = "#f70707"
     RUN = True
 
     def __init__(self, model, expectiminimax_depth: int, heuristic_num: int, mcts, mcts_emm):
@@ -61,6 +62,7 @@ class UI2048:
         self.pause = False
         self.speed_limiter = True
         self.screen = None
+        self.mode = UIMode.MANUAL.value
         self.clock = pg.time.Clock()
         self.board_rect = pg.Rect((10, 110, 530, 530))
         self.tile_rects = [
@@ -97,7 +99,6 @@ class UI2048:
         self.tile_font_2 = pg.font.SysFont("Clear Sans Bold", 56)
         self.tile_font_3 = pg.font.SysFont("Clear Sans Bold", 48)
         self.info_font = pg.font.SysFont("Clear Sans Bold", 32)
-        self.mode = UIMode.MANUAL.value
 
     def run(self):
         """
@@ -132,14 +133,9 @@ class UI2048:
                             else:
                                 self.setMode(index)                         # Changes game modes based on a button click
 
-                if event.type == pg.KEYUP:
-                    self.handleKeyboardInput(event.key)
-
-                #if self.mode == UIMode.MANUAL.value: self.handleMovementInput() # Handle per event if manual
+                if event.type == pg.KEYUP: self.handleKeyboardInput(event.key)
 
             self.handleAutomaticMovement()
-
-            #if self.mode != UIMode.MANUAL.value: self.handleMovementInput()
             
             pg.display.update() # Updates the screen to show changes
             if self.mode != UIMode.MANUAL.value and self.speed_limiter:
@@ -170,6 +166,8 @@ class UI2048:
         self.drawButton(6, "Go" if self.pause else "Pause")
         self.drawButton(7, "Reset")
         self.drawButton(8, "Quit")
+
+        self.drawModeIndicator()
 
         self.drawBoard()
 
@@ -208,6 +206,14 @@ class UI2048:
         button_text = self.info_font.render(button_display_text, True, self.COLOR_BUTTON_TEXT)
         button_text_rect = button_text.get_rect(center=rect.center)
         self.screen.blit(button_text, button_text_rect)
+
+    def drawModeIndicator(self):
+        """
+        This draws a marker to identify which game made the game is in.
+        """
+        button_rect = self.button_rects[self.mode]
+        x, y = button_rect.topright
+        pg.draw.circle(self.screen, self.COLOR_MODE_INDICATOR, (x + 17, y + 15), 8)
 
     def drawBoard(self):
         """
@@ -293,6 +299,9 @@ class UI2048:
                 self.model.playAction(Direction.RIGHT.value)
 
     def handleAutomaticMovement(self):
+        """
+        This handles shifting tiles and adding a new tile for the automatic/AI modes.
+        """
         if self.mode == UIMode.MANUAL.value or self.pause or self.game_over: return
         match self.mode:
             case UIMode.RANDOM.value:
