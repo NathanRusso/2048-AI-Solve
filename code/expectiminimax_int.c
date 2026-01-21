@@ -9,7 +9,7 @@
 #include <math.h>
 #include <assert.h>
 
-#include "expectiminimax.h"
+#include "expectiminimax_int.h"
 
 typedef enum {
     UP, // 0 -> 1
@@ -72,10 +72,10 @@ int HEURISTIC_NUM = 3; // The default number indicating which heuristic to use
  * 
  * @return the 4-bit tile value
  */
-uint64_t get_tile_from_board(uint64_t board, int index) {
+int get_tile_from_board(uint64_t board, int index) {
     uint64_t shifted_tile = board << (4 * index);
     shifted_tile = shifted_tile >> 60;
-    return shifted_tile;
+    return (int) shifted_tile;
 }
 
 /**
@@ -85,7 +85,7 @@ uint64_t get_tile_from_board(uint64_t board, int index) {
  * @param index The 0-15 index of where the tile value will be.
  * @param tile The tile value to put into the board.
  */
-void replace_tile_in_board(uint64_t *board, int index, uint64_t tile) {
+void replace_tile_in_board(uint64_t *board, int index, int tile) {
     if (tile > 15) tile = 15;
     int shift = 60 - 4 * index;
     *board &= ~(0xFULL << shift);   // Clear the 4-bit slot
@@ -182,24 +182,26 @@ void merge(int original_list[MAX_BOARD_DIMENSION], int new_list[MAX_BOARD_DIMENS
 /**
  * This shifts the tiles of the given board in one of the 4 cardinal directions.
  * 
- * @param board The given 64-bit 2048 board to shift.
+ * @param board A pointer to the given 64-bit 2048 board.
  * @param original_board The original 4x4 2048 board before the shift.
  * @param direction The direction to shift the board tiles.
  * 
  * @return True if the tiles on the board have changed positions, False otherwise.
  */
-bool shift(uint64_t board, uint64_t original_board, int direction) {  
+bool shift(uint64_t *board, uint64_t original_board, int direction) {  
     switch (direction) {
         case UP:
             for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
                 int original_col_values[MAX_BOARD_DIMENSION];
                 for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
-                    original_col_values[row] = board[3 - row][col]; // Column in reverse order (going up)
+                    int index = (3 - row) * MAX_BOARD_DIMENSION + col; // Column in reverse order (going up)
+                    original_col_values[row] = get_tile_from_board(*board, index);
                 }
                 int final_col_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
                 merge(original_col_values, final_col_values);
                 for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
-                    board[row][col] = final_col_values[3 - row];
+                    int index = row * MAX_BOARD_DIMENSION + col;
+                    replace_tile_in_board(board, index, final_col_values[3 - row]);
                 }
             }
             break;
@@ -207,12 +209,14 @@ bool shift(uint64_t board, uint64_t original_board, int direction) {
             for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
                 int original_col_values[MAX_BOARD_DIMENSION];
                 for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
-                    original_col_values[row] = board[row][col]; // Column in normal order (going down)
+                    int index = row * MAX_BOARD_DIMENSION + col; // Column in normal order (going down)
+                    original_col_values[row] = get_tile_from_board(*board, index);
                 }
                 int final_col_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
                 merge(original_col_values, final_col_values);
                 for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
-                    board[row][col] = final_col_values[row];
+                    int index = row * MAX_BOARD_DIMENSION + col;
+                    replace_tile_in_board(board, index, final_col_values[row]);
                 }
             }
             break;
@@ -220,12 +224,14 @@ bool shift(uint64_t board, uint64_t original_board, int direction) {
             for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
                 int original_row_values[MAX_BOARD_DIMENSION];
                 for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
-                    original_row_values[col] = board[row][3 - col]; // Row in reverse order
+                    int index = row * MAX_BOARD_DIMENSION + 3 - col; // Row in reverse order
+                    original_row_values[row] = get_tile_from_board(*board, index);
                 }
                 int final_row_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
                 merge(original_row_values, final_row_values);
                 for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
-                    board[row][col] = final_row_values[3 - col];
+                    int index = row * MAX_BOARD_DIMENSION + col;
+                    replace_tile_in_board(board, index, final_row_values[3 - col]);
                 }
             }
             break;
@@ -233,12 +239,14 @@ bool shift(uint64_t board, uint64_t original_board, int direction) {
             for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
                 int original_row_values[MAX_BOARD_DIMENSION];
                 for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
-                    original_row_values[col] = board[row][col]; // Row in normal order
+                    int index = row * MAX_BOARD_DIMENSION + col; // Row in normal order
+                    original_row_values[row] = get_tile_from_board(*board, index);
                 }
                 int final_row_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
                 merge(original_row_values, final_row_values);
                 for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
-                    board[row][col] = final_row_values[col];
+                    int index = row * MAX_BOARD_DIMENSION + col;
+                    replace_tile_in_board(board, index, final_row_values[col]);
                 }
             }
             break;
@@ -246,20 +254,13 @@ bool shift(uint64_t board, uint64_t original_board, int direction) {
             return false; // Invalid direction
     }
 
-    for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
-        for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
-            if (board[row][col] != original_board[row][col]) {
-                return true; // Board changed
-            }
-        }
-    }
-    return false; // Board didn't change 
+    return *board != original_board; // True if changed, False otherwise
 }
 
 /**
  * This checks if any cells can be merged together.
  * 
- * @param The current 4x4 2048 board to check.
+ * @param board The given 64-bit 2048 board to check.
  * 
  * @return True if the board can merge cells, False otherwise.
  */
@@ -322,7 +323,7 @@ uint64_t get_best_score(uint64_t board, int current_depth, bool players_turn) {
         uint64_t highest_heuristic = 0;
         for (int direction = UP; direction <= RIGHT; direction++) {
             uint64_t copy_board = board;
-            bool board_changed = shift(copy_board, board, direction);
+            bool board_changed = shift(&copy_board, board, direction);
             if (board_changed) {
                 uint64_t heuristic = get_best_score(copy_board, current_depth - 1, false);
                 if (heuristic > highest_heuristic) highest_heuristic = heuristic;
@@ -337,8 +338,9 @@ uint64_t get_best_score(uint64_t board, int current_depth, bool players_turn) {
             uint64_t copy_board_4 = board;
             int row = open_cells[i][0];
             int col = open_cells[i][1];
-            replace_tile_in_board(&copy_board_2, row * MAX_BOARD_DIMENSION + col, 2);
-            replace_tile_in_board(&copy_board_4, row * MAX_BOARD_DIMENSION + col, 4);
+            int index = row * MAX_BOARD_DIMENSION + col;
+            replace_tile_in_board(&copy_board_2, index, 2);
+            replace_tile_in_board(&copy_board_4, index, 4);
             avg_heuristic_2 += get_best_score(copy_board_2, current_depth - 1, true) / num_open_cells;
             avg_heuristic_4 += get_best_score(copy_board_4, current_depth - 1, true) / num_open_cells;
         }
@@ -376,7 +378,7 @@ int get_next_direction(int depth, int heuristic_num, int *flat_board) {
 
     for (int direction = UP; direction <= RIGHT; direction++) {
         uint64_t copy_board = original_board;
-        bool board_changed = shift(copy_board, original_board, direction);
+        bool board_changed = shift(&copy_board, original_board, direction);
         if (board_changed) {
             uint64_t heuristic = get_best_score(copy_board, depth - 1, false);
             if (heuristic > highest_heuristic) {
