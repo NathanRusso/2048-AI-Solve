@@ -1,14 +1,13 @@
 from model import Direction
-import math as m
 import random as r
-import ctypes
+import math as m
+import ctypes as ct
 import os
-# NO LONGER IN USE: from expectiminimax import Expectiminimax2048
 
-expectiminimax_c = ctypes.CDLL(os.path.abspath("code/expectiminimax.dll")) # Shared library to connect Python and C
-expectiminimax_c.get_next_direction.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
-expectiminimax_c.get_next_direction.restype = ctypes.c_int
-CBoardType = ctypes.c_int * 16
+expectiminimax_c = ct.CDLL(os.path.abspath("code/expectiminimax.dll")) # Shared library to connect Python and C
+expectiminimax_c.get_next_direction.argtypes = [ct.c_int, ct.c_int, ct.POINTER(ct.c_int)]
+expectiminimax_c.get_next_direction.restype = ct.c_int
+CBoardType = ct.c_int * 16
 
 
 class MCTSNode:

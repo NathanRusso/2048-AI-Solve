@@ -1,16 +1,15 @@
+from model import Model2048, Direction
+from montecarlo import MonteCarlo2048
 from enum import Enum
 import random as r
 import pygame as pg
-import ctypes
+import ctypes as ct
 import os
-from model import Model2048, Direction
-from montecarlo import MonteCarlo2048
-# NO LONGER IN USE: from expectiminimax import Expectiminimax2048
 
-expectiminimax_c = ctypes.CDLL(os.path.abspath("code/expectiminimax.dll")) # Shared library to connect Python and C
-expectiminimax_c.get_next_direction.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
-expectiminimax_c.get_next_direction.restype = ctypes.c_int
-CBoardType = ctypes.c_int * 16
+expectiminimax_c = ct.CDLL(os.path.abspath("code/expectiminimax.dll")) # Shared library to connect Python and C
+expectiminimax_c.get_next_direction.argtypes = [ct.c_int, ct.c_int, ct.POINTER(ct.c_int)]
+expectiminimax_c.get_next_direction.restype = ct.c_int
+CBoardType = ct.c_int * 16
 
 
 class UIMode(Enum):
@@ -307,7 +306,6 @@ class UI2048:
             case UIMode.RANDOM.value:
                 self.model.playAction(r.randint(1, 4))
             case UIMode.EXPECTIMINIMAX.value:
-                # NO LONGER IN USE: self.model.playAction(self.expectiminimax.getNextDirection(self.model.getBoard()))
                 board = self.model.getBoard()
                 board_flat = [tile for row in board for tile in row]
                 board_flat_c = CBoardType(*board_flat)
@@ -331,9 +329,6 @@ class UI2048:
 def main():
     """
     This loads all of the necessary objects for the UI and starts thr UI.
-    \nNO LONGER IN USE:
-    - expectiminimax = Expectiminimax2048(5, 3) # Search depth of 5 is the max before the time increase becomes too much!
-    - expectiminimax_weak = Expectiminimax2048(3, 3)
     """
     EMM_DEPTH = 8
     EMM_DEPTH_WEAK = 6
