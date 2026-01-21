@@ -266,7 +266,7 @@ int **get_open_cells(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int op
 /**
  * Returns the best heuristic score for the given board and depth.
  * 
- * @param board The current 4x4 2048 board to check.
+ * @param board The given 4x4 2048 board to check.
  * @param current_depth The current search depth.
  * @param players_turn If it is the player's turn, shifting tiles.
  * 

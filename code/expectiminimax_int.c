@@ -65,9 +65,37 @@ int DEPTH = 8; // The defalt depth for Expectiminimax
 int HEURISTIC_NUM = 3; // The default number indicating which heuristic to use
 
 /**
+ * Gets the 4-bit tile value from the board.
+ * 
+ * @param board A copy of the given 64-bit 2048 board.
+ * @param index The 0-15 index of where the tile value would be.
+ * 
+ * @return the 4-bit tile value
+ */
+uint64_t get_tile_from_board(uint64_t board, int index) {
+    uint64_t shifted_tile = board << (4 * index);
+    shifted_tile = shifted_tile >> 60;
+    return shifted_tile;
+}
+
+/**
+ * This replaces a 4-bit tile value in the board with a new 4-bit tile value.
+ * 
+ * @param board A pointer to the given 64-bit 2048 board.
+ * @param index The 0-15 index of where the tile value will be.
+ * @param tile The tile value to put into the board.
+ */
+void replace_tile_in_board(uint64_t *board, int index, uint64_t tile) {
+    if (tile > 15) tile = 15;
+    int shift = 60 - 4 * index;
+    *board &= ~(0xFULL << shift);   // Clear the 4-bit slot
+    *board |= tile << shift;        // Replaces the 4-bits in the board
+}
+
+/**
  * This gets the board snake heuristic score.
  * 
- * @param board The given 4x4 2048 board.
+ * @param board The given 64-bit 2048 board.
  * @param snake_heuristic The snake heuristic to use when calculating the board's score.
  * 
  * @return The board's snake heuristic score.
@@ -76,7 +104,8 @@ uint64_t get_heuristic_snake_score(const uint64_t board, const int snake_heurist
     uint64_t board_heuristic = 0;
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
-            board_heuristic += (uint64_t) board[row][col] * snake_heuristic[row][col];
+            int index = row * MAX_BOARD_DIMENSION + col;
+            board_heuristic += (uint64_t) get_tile_from_board(board, index) * snake_heuristic[row][col];
         }
     }
     return board_heuristic;
@@ -85,7 +114,7 @@ uint64_t get_heuristic_snake_score(const uint64_t board, const int snake_heurist
 /**
  * This gets the board heuristic score.
  * 
- * @param board The given 4x4 2048 board.
+ * @param board The given 64-bit 2048 board.s
  * 
  * @return The board's heuristic score.
  */
@@ -153,7 +182,7 @@ void merge(int original_list[MAX_BOARD_DIMENSION], int new_list[MAX_BOARD_DIMENS
 /**
  * This shifts the tiles of the given board in one of the 4 cardinal directions.
  * 
- * @param board The given 4x4 2048 board to shift.
+ * @param board The given 64-bit 2048 board to shift.
  * @param original_board The original 4x4 2048 board before the shift.
  * @param direction The direction to shift the board tiles.
  * 
@@ -237,7 +266,12 @@ bool shift(uint64_t board, uint64_t original_board, int direction) {
 bool potential_merges(uint64_t board) {
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION - 1; col++) {
-            if (board[row][col] == board[row][col+1] || board[col][row] == board[col+1][row]) {
+            int index_row_1 = row * MAX_BOARD_DIMENSION + col;
+            int index_row_2 = index_row_1 + 1;
+            int index_col_1 = col * MAX_BOARD_DIMENSION + row;
+            int index_col_2 = (col + 1) * MAX_BOARD_DIMENSION + row;
+            if (get_tile_from_board(board, index_row_1) == get_tile_from_board(board, index_row_2) || 
+                get_tile_from_board(board, index_col_1) == get_tile_from_board(board, index_col_2)) {
                 return true;
             }
         }
@@ -250,14 +284,15 @@ bool potential_merges(uint64_t board) {
  * \n
  * The cells and board must be freed later.
  * 
- * @param board The given 4x4 2048 board.
+ * @param board The given 64-bit 2048 board.
  * @param open_cells The list to add all open cells.
  * @param num_open_cells A pointer to a variable holding the number of open cells.
  */
 int **get_open_cells(uint64_t board, int open_cells[MAX_BOARD_DIMENSION][2], int *num_open_cells) {
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
-            if (board[row][col] == BLANK_TILE) {
+            int index = row * MAX_BOARD_DIMENSION + col;
+            if (get_tile_from_board(board, index) == BLANK_TILE) {
                 open_cells[*num_open_cells][0] = row;
                 open_cells[*num_open_cells][1] = col;
                 (*num_open_cells)++;
@@ -269,7 +304,7 @@ int **get_open_cells(uint64_t board, int open_cells[MAX_BOARD_DIMENSION][2], int
 /**
  * Returns the best heuristic score for the given board and depth.
  * 
- * @param board The current 4x4 2048 board to check.
+ * @param board The given 4x4 2048 board to check.
  * @param current_depth The current search depth.
  * @param players_turn If it is the player's turn, shifting tiles.
  * 
@@ -300,12 +335,10 @@ uint64_t get_best_score(uint64_t board, int current_depth, bool players_turn) {
         for (int i = 0; i < num_open_cells; i++) {
             uint64_t copy_board_2 = board;
             uint64_t copy_board_4 = board;
-            memcpy(copy_board_2, board, sizeof(int) * MAX_NUM_TILES);
-            memcpy(copy_board_4, board, sizeof(int) * MAX_NUM_TILES);
             int row = open_cells[i][0];
             int col = open_cells[i][1];
-            copy_board_2[row][col] = 2;
-            copy_board_4[row][col] = 4;
+            replace_tile_in_board(&copy_board_2, row * MAX_BOARD_DIMENSION + col, 2);
+            replace_tile_in_board(&copy_board_4, row * MAX_BOARD_DIMENSION + col, 4);
             avg_heuristic_2 += get_best_score(copy_board_2, current_depth - 1, true) / num_open_cells;
             avg_heuristic_4 += get_best_score(copy_board_4, current_depth - 1, true) / num_open_cells;
         }

@@ -9,6 +9,10 @@
 #define TILE_2_CHANCE 0.9
 #define TILE_4_CHANCE 0.1
 
+uint64_t get_tile_from_board(uint64_t board, int index);
+
+void replace_tile_in_board(uint64_t *board, int index, uint64_t tile);
+
 uint64_t get_heuristic_snake_score(const uint64_t board, const int snake_heuristic[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]);
 
 uint64_t get_heuristic_score(const uint64_t board);
