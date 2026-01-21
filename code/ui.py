@@ -57,6 +57,7 @@ class UI2048:
         self.heuristic_num = heuristic_num
         self.mcts = mcts
         self.mcts_emm = mcts_emm
+        self.game_over = False
         self.pause = False
         self.speed_limiter = True
         self.screen = None
@@ -106,6 +107,7 @@ class UI2048:
         self.screen = pg.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
 
         while self.RUN:
+            self.game_over = self.model.gameOver()
             self.displayCurrentGame()
 
             mouse = pg.mouse.get_pos()
@@ -130,9 +132,14 @@ class UI2048:
                             else:
                                 self.setMode(index)                         # Changes game modes based on a button click
 
-                if self.mode == UIMode.MANUAL.value: self.handleMovementInput() # Handle per event if manual
+                if event.type == pg.KEYUP:
+                    self.handleKeyboardInput(event.key)
 
-            if self.mode != UIMode.MANUAL.value: self.handleMovementInput()
+                #if self.mode == UIMode.MANUAL.value: self.handleMovementInput() # Handle per event if manual
+
+            self.handleAutomaticMovement()
+
+            #if self.mode != UIMode.MANUAL.value: self.handleMovementInput()
             
             pg.display.update() # Updates the screen to show changes
             if self.mode != UIMode.MANUAL.value and self.speed_limiter:
@@ -148,7 +155,7 @@ class UI2048:
 
         self.drawLabel(f"Best Score: {self.model.getBestScore()}", (10, 10))
         self.drawLabel(f"Current Score: {self.model.getScore()}", (10, 40))
-        if self.model.gameOver(): self.drawLabel("GAME OVER!", (10, 70))
+        if self.game_over: self.drawLabel("GAME OVER!", (10, 70))
         self.drawLabel("GAME MODES:", (580, 10))
         self.drawLabel("CONTROLS:", (595, 250))
 
@@ -254,25 +261,40 @@ class UI2048:
             case 131072: return "#000000"   # The max tile is 131072
             case _: return "#000000"        # Default case in case there is a bug
 
-    def handleMovementInput(self):
+    def handleKeyboardInput(self, key):
         """
-        This checks and handles if the game mode has been altered. 
-        It then handles a play action either with manual key presses or AI modes.
+        This handles keyboard commands for Manual Mode, Quit, Reset, Pause, Speed, and switching modes.
+        :param key: The current event.key.
         """
-        key = pg.key.get_pressed()
-        mode_changed = self.checkSetMode(key) # Changes game modes based on keyboard input
-        if mode_changed or self.pause: return
+        if key == pg.K_q:
+            pg.quit()
+        elif key == pg.K_p:
+            self.pause = not self.pause # Pause or continues the game
+        elif key == pg.K_l:
+            self.speed_limiter = not self.speed_limiter # Limit tile shift speed
+        elif key == pg.K_r or key == pg.K_0:
+            self.setMode(UIMode.MANUAL.value) # Accounts for Reset
+        elif key == pg.K_1:
+            self.setMode(UIMode.RANDOM.value)
+        elif key == pg.K_2:
+            self.setMode(UIMode.EXPECTIMINIMAX.value)
+        elif key == pg.K_3:
+            self.setMode(UIMode.MCTS.value)
+        elif key == pg.K_4:
+            self.setMode(UIMode.MCTS_EMM.value)
+        elif self.mode == UIMode.MANUAL.value and not self.pause and not self.game_over:
+            if key == pg.K_w or key == pg.K_UP:
+                self.model.playAction(Direction.UP.value)
+            elif key == pg.K_s or key == pg.K_DOWN:
+                self.model.playAction(Direction.DOWN.value)
+            elif key == pg.K_a or key == pg.K_LEFT:
+                self.model.playAction(Direction.LEFT.value)
+            elif key == pg.K_d or key == pg.K_RIGHT:
+                self.model.playAction(Direction.RIGHT.value)
 
+    def handleAutomaticMovement(self):
+        if self.mode == UIMode.MANUAL.value or self.pause or self.game_over: return
         match self.mode:
-            case UIMode.MANUAL.value:
-                if key[pg.K_w] or key[pg.K_UP]:
-                    self.model.playAction(Direction.UP.value)
-                elif key[pg.K_s] or key[pg.K_DOWN]:
-                    self.model.playAction(Direction.DOWN.value)
-                elif key[pg.K_a] or key[pg.K_LEFT]:
-                    self.model.playAction(Direction.LEFT.value)
-                elif key[pg.K_d] or key[pg.K_RIGHT]:
-                    self.model.playAction(Direction.RIGHT.value)
             case UIMode.RANDOM.value:
                 self.model.playAction(r.randint(1, 4))
             case UIMode.EXPECTIMINIMAX.value:
@@ -284,36 +306,7 @@ class UI2048:
             case UIMode.MCTS.value:
                 self.model.playAction(self.mcts.getNextDirection(self.model.getBoard()))
             case UIMode.MCTS_EMM.value:
-                self.model.playAction(self.mcts_emm.getNextDirection(self.model.getBoard()))                
-
-    def checkSetMode(self, key) -> bool:
-        """
-        This changes the game mode if requested and returns if the mode changed.
-        
-        :param key: The key holding booleans for each key if it was pressed or not.
-        :return: True if the game mode has changed, False otherwise.
-        :rtype: bool
-        """
-        mode_changed = True
-        if key[pg.K_q]:
-            pg.quit()
-        elif key[pg.K_p]:
-            self.pause = not self.pause # Pause or continues the game
-        elif key[pg.K_l]:
-            self.speed_limiter = not self.speed_limiter # Limit tile shift speed
-        elif key[pg.K_r] or key[pg.K_0]:
-            self.setMode(UIMode.MANUAL.value) # Accounts for Reset
-        elif key[pg.K_1]:
-            self.setMode(UIMode.RANDOM.value)
-        elif key[pg.K_2]:
-            self.setMode(UIMode.EXPECTIMINIMAX.value)
-        elif key[pg.K_3]:
-            self.setMode(UIMode.MCTS.value)
-        elif key[pg.K_4]:
-            self.setMode(UIMode.MCTS_EMM.value)
-        else:
-            mode_changed = False
-        return mode_changed
+                self.model.playAction(self.mcts_emm.getNextDirection(self.model.getBoard()))              
 
     def setMode(self, mode: int):
         """
@@ -324,6 +317,7 @@ class UI2048:
         """
         self.model.restart()
         self.mode = mode
+        self.game_over = False
 
 def main():
     """
