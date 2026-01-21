@@ -36,6 +36,12 @@ const int SNAKE_HEURISTIC_3[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION] = {
     {64, 32, 16, 8},
     {1, 2, 4, 8}
 };
+const int SNAKE_HEURISTIC_33[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION] = {
+    {12, 11, 10, 9},
+    {6, 7, 8, 9},
+    {6, 5, 4, 3},
+    {0, 1, 2, 3}
+};
 const int SNAKE_HEURISTIC_4[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION] = {
     {16777216, 4194304, 1048576, 262144},
     {4096, 16384, 65536, 262144},
@@ -66,16 +72,13 @@ int HEURISTIC_NUM = 3; // The default number indicating which heuristic to use
  * 
  * @return The board's snake heuristic score.
  */
-uint64_t get_heuristic_snake_score(const int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], const int snake_heuristic[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
+uint64_t get_heuristic_snake_score(const uint64_t board, const int snake_heuristic[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
     uint64_t board_heuristic = 0;
-    // int open_cells = 0;
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
-            // if (board[row][col] == BLANK_TILE) open_cells++;
             board_heuristic += (uint64_t) board[row][col] * snake_heuristic[row][col];
         }
     }
-    // return floor(board_heuristic + board_heuristic * open_cells / 16 * 0.1);
     return board_heuristic;
 }
 
@@ -86,7 +89,7 @@ uint64_t get_heuristic_snake_score(const int board[MAX_BOARD_DIMENSION][MAX_BOAR
  * 
  * @return The board's heuristic score.
  */
-uint64_t get_heuristic_score(const int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
+uint64_t get_heuristic_score(const uint64_t board) {
     switch (HEURISTIC_NUM) {
         case 1:
             return get_heuristic_snake_score(board, SNAKE_HEURISTIC_1);
@@ -156,7 +159,7 @@ void merge(int original_list[MAX_BOARD_DIMENSION], int new_list[MAX_BOARD_DIMENS
  * 
  * @return True if the tiles on the board have changed positions, False otherwise.
  */
-bool shift(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int original_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int direction) {  
+bool shift(uint64_t board, uint64_t original_board, int direction) {  
     switch (direction) {
         case UP:
             for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
@@ -231,7 +234,7 @@ bool shift(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int original_boa
  * 
  * @return True if the board can merge cells, False otherwise.
  */
-bool potential_merges(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
+bool potential_merges(uint64_t board) {
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION - 1; col++) {
             if (board[row][col] == board[row][col+1] || board[col][row] == board[col+1][row]) {
@@ -251,7 +254,7 @@ bool potential_merges(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
  * @param open_cells The list to add all open cells.
  * @param num_open_cells A pointer to a variable holding the number of open cells.
  */
-int **get_open_cells(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int open_cells[MAX_BOARD_DIMENSION][2], int *num_open_cells) {
+int **get_open_cells(uint64_t board, int open_cells[MAX_BOARD_DIMENSION][2], int *num_open_cells) {
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
             if (board[row][col] == BLANK_TILE) {
@@ -272,7 +275,7 @@ int **get_open_cells(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int op
  * 
  * @return The average/best heuristic score of the board overall.
  */
-uint64_t get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int current_depth, bool players_turn) {
+uint64_t get_best_score(uint64_t board, int current_depth, bool players_turn) {
     if (current_depth == 0) return get_heuristic_score(board);
     int num_open_cells = 0;
     int open_cells[MAX_BOARD_DIMENSION][2];
@@ -283,8 +286,7 @@ uint64_t get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int
     } else if (players_turn) { // Player's Turn: Tiles shift
         uint64_t highest_heuristic = 0;
         for (int direction = UP; direction <= RIGHT; direction++) {
-            int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
-            memcpy(copy_board, board, sizeof(int) * MAX_NUM_TILES);
+            uint64_t copy_board = board;
             bool board_changed = shift(copy_board, board, direction);
             if (board_changed) {
                 uint64_t heuristic = get_best_score(copy_board, current_depth - 1, false);
@@ -296,8 +298,8 @@ uint64_t get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int
         uint64_t avg_heuristic_2 = 0;
         uint64_t avg_heuristic_4 = 0;
         for (int i = 0; i < num_open_cells; i++) {
-            int copy_board_2[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
-            int copy_board_4[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
+            uint64_t copy_board_2 = board;
+            uint64_t copy_board_4 = board;
             memcpy(copy_board_2, board, sizeof(int) * MAX_NUM_TILES);
             memcpy(copy_board_4, board, sizeof(int) * MAX_NUM_TILES);
             int row = open_cells[i][0];
@@ -309,8 +311,7 @@ uint64_t get_best_score(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int
         }
         return floor(avg_heuristic_2 * TILE_2_CHANCE + avg_heuristic_4 * TILE_4_CHANCE);
     } else { // Game's Turn: Random tile spawn, no tile are open ~ SHOULD NOT HAPPEN
-        int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
-        memcpy(copy_board, board, sizeof(int) * MAX_NUM_TILES);
+        uint64_t copy_board = board;
         return get_best_score(copy_board, current_depth - 1, false);
     }
 }
@@ -329,7 +330,7 @@ int get_next_direction(int depth, int heuristic_num, int *flat_board) {
     Direction best_direction = UP;
     uint64_t highest_heuristic = 0;
 
-    /*uint64_t original_board = 0; // A 64-bit number to store all tiles of the board!
+    uint64_t original_board = 0; // A 64-bit number to store all tiles of the board!
     for (int tile_index = 0; tile_index < MAX_NUM_TILES; tile_index++) {
         int tile = flat_board[tile_index];
         if (tile != BLANK_TILE) {
@@ -338,17 +339,10 @@ int get_next_direction(int depth, int heuristic_num, int *flat_board) {
             uint64_t shifted_tile = adjusted_tile << (60 - 4 * tile_index);
             original_board |= shifted_tile;
         }
-    }*/
-
-    int original_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
-    for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
-        for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
-            original_board[row][col] = flat_board[row * MAX_BOARD_DIMENSION + col];
-        }
     }
+
     for (int direction = UP; direction <= RIGHT; direction++) {
-        int copy_board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION];
-        memcpy(copy_board, original_board, sizeof(int) * MAX_NUM_TILES);
+        uint64_t copy_board = original_board;
         bool board_changed = shift(copy_board, original_board, direction);
         if (board_changed) {
             uint64_t heuristic = get_best_score(copy_board, depth - 1, false);
@@ -358,6 +352,7 @@ int get_next_direction(int depth, int heuristic_num, int *flat_board) {
             }
         }
     }
+
     return best_direction + 1;
 }
 
