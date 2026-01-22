@@ -86,10 +86,12 @@ int get_tile_from_board(uint64_t board, int index) {
  * @param tile The tile value to put into the board.
  */
 void replace_tile_in_board(uint64_t *board, int index, int tile) {
+    //printf("Tile: %d, Index: %d, Board: %llu, ", tile, index, *board);
     if (tile > 15) tile = 15;
     int shift = 60 - 4 * index;
-    *board &= ~(0xFULL << shift);   // Clear the 4-bit slot
-    *board |= tile << shift;        // Replaces the 4-bits in the board
+    *board &= ~(0xFULL << shift);           // Clear the 4-bit slot
+    *board |= ((uint64_t)tile) << shift;    // Replaces the 4-bits in the board
+    //printf("Tile: %d, Index: %d, Board: %llu\n", tile, index, *board);
 }
 
 /**
@@ -101,11 +103,16 @@ void replace_tile_in_board(uint64_t *board, int index, int tile) {
  * @return The board's snake heuristic score.
  */
 uint64_t get_heuristic_snake_score(const uint64_t board, const int snake_heuristic[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
+    //printf("Board: %llu\n", board);
     uint64_t board_heuristic = 0;
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
             int index = row * MAX_BOARD_DIMENSION + col;
-            board_heuristic += (uint64_t) pow(get_tile_from_board(board, index), 2) * snake_heuristic[row][col];
+            int tile = get_tile_from_board(board, index);
+            //printf("%d\n", tile);
+            if (tile != BLANK_TILE) {
+                board_heuristic += (uint64_t) pow(2, tile) * snake_heuristic[row][col];
+            }
         }
     }
     return board_heuristic;
@@ -188,22 +195,32 @@ void merge(int original_list[MAX_BOARD_DIMENSION], int new_list[MAX_BOARD_DIMENS
  * 
  * @return True if the tiles on the board have changed positions, False otherwise.
  */
-bool shift(uint64_t *board, uint64_t original_board, int direction) {  
+bool shift(uint64_t *board, uint64_t original_board, int direction) {
+    //printf("Shift Board: %llu\n", *board);
     switch (direction) {
         case UP:
             for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
                 int original_col_values[MAX_BOARD_DIMENSION];
                 for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
                     int index = (3 - row) * MAX_BOARD_DIMENSION + col; // Column in reverse order (going up)
-                    original_col_values[row] = get_tile_from_board(*board, index);
+                    int tile = get_tile_from_board(*board, index);
+                    //printf("%d, ", tile);
+                    original_col_values[row] = tile;
                 }
                 int final_col_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
                 merge(original_col_values, final_col_values);
                 for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
                     int index = row * MAX_BOARD_DIMENSION + col;
+                    ////printf("%d, ", final_col_values[3 - row]);
                     replace_tile_in_board(board, index, final_col_values[3 - row]);
                 }
+                //printf("\n");
+
             }
+            //printf("UP Board: %llu\n", *board);
+            uint64_t h = get_heuristic_score(*board);
+            //printf("H Board: %llu\n", h);
+
             break;
         case DOWN:
             for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
@@ -378,9 +395,11 @@ int get_next_direction(int depth, int heuristic_num, int *flat_board) {
 
     for (int direction = UP; direction <= RIGHT; direction++) {
         uint64_t copy_board = original_board;
+        //printf("Copy Board: %llu\n", copy_board);
         bool board_changed = shift(&copy_board, original_board, direction);
         if (board_changed) {
             uint64_t heuristic = get_best_score(copy_board, depth - 1, false);
+            //printf("H: %llu\n", heuristic);
             if (heuristic > highest_heuristic) {
                 highest_heuristic = heuristic;
                 best_direction = direction;

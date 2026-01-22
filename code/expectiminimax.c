@@ -72,6 +72,7 @@ uint64_t get_heuristic_snake_score(const int board[MAX_BOARD_DIMENSION][MAX_BOAR
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
             // if (board[row][col] == BLANK_TILE) open_cells++;
+            //printf("%d\n", board[row][col]);
             board_heuristic += (uint64_t) board[row][col] * snake_heuristic[row][col];
         }
     }
@@ -340,6 +341,7 @@ int get_next_direction(int depth, int heuristic_num, int *flat_board) {
         bool board_changed = shift(copy_board, original_board, direction);
         if (board_changed) {
             uint64_t heuristic = get_best_score(copy_board, depth - 1, false);
+            //printf("%d\n", heuristic);
             if (heuristic > highest_heuristic) {
                 highest_heuristic = heuristic;
                 best_direction = direction;
