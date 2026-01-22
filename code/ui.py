@@ -6,7 +6,7 @@ import pygame as pg
 import ctypes as ct
 import os
 
-expectiminimax_c = ct.CDLL(os.path.abspath("code/expectiminimax_int.dll")) # Shared library to connect Python and C
+expectiminimax_c = ct.CDLL(os.path.abspath("code/expectiminimax.dll")) # Shared library to connect Python and C
 expectiminimax_c.get_next_direction.argtypes = [ct.c_int, ct.c_int, ct.POINTER(ct.c_int)]
 expectiminimax_c.get_next_direction.restype = ct.c_int
 CBoardType = ct.c_int * 16
@@ -309,10 +309,7 @@ class UI2048:
                 board = self.model.getBoard()
                 board_flat = [tile for row in board for tile in row]
                 board_flat_c = CBoardType(*board_flat)
-                direction = expectiminimax_c.get_next_direction(self.emm_depth, self.heuristic_num, board_flat_c)
-                print(direction)
-                self.model.playAction(direction)
-                #self.model.playAction(expectiminimax_c.get_next_direction(self.emm_depth, self.heuristic_num, board_flat_c))
+                self.model.playAction(expectiminimax_c.get_next_direction(self.emm_depth, self.heuristic_num, board_flat_c))
             case UIMode.MCTS.value:
                 self.model.playAction(self.mcts.getNextDirection(self.model.getBoard()))
             case UIMode.MCTS_EMM.value:
