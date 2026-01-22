@@ -105,7 +105,7 @@ uint64_t get_heuristic_snake_score(const uint64_t board, const int snake_heurist
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
             int index = row * MAX_BOARD_DIMENSION + col;
-            board_heuristic += (uint64_t) pow(2, get_tile_from_board(board, index)) * snake_heuristic[row][col];
+            board_heuristic += (uint64_t) pow(get_tile_from_board(board, index), 2) * snake_heuristic[row][col];
         }
     }
     return board_heuristic;
