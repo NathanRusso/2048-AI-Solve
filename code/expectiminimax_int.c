@@ -105,7 +105,7 @@ uint64_t get_heuristic_snake_score(const uint64_t board, const int snake_heurist
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
             int index = row * MAX_BOARD_DIMENSION + col;
-            board_heuristic += (uint64_t) get_tile_from_board(board, index) * snake_heuristic[row][col];
+            board_heuristic += (uint64_t) pow(get_tile_from_board(board, index), 2) * snake_heuristic[row][col];
         }
     }
     return board_heuristic;
@@ -169,7 +169,7 @@ void merge(int original_list[MAX_BOARD_DIMENSION], int new_list[MAX_BOARD_DIMENS
     int i = original_list_values_length - 1;
     while (i >= 0) {
         if (i - 1 >= 0 && original_list_values[i] == original_list_values[i-1]) {
-            new_list[index] = original_list_values[i] * 2;
+            new_list[index] = original_list_values[i] + 1;
             i -= 2;
         } else {
             new_list[index] = original_list_values[i];
@@ -225,7 +225,7 @@ bool shift(uint64_t *board, uint64_t original_board, int direction) {
                 int original_row_values[MAX_BOARD_DIMENSION];
                 for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
                     int index = row * MAX_BOARD_DIMENSION + 3 - col; // Row in reverse order
-                    original_row_values[row] = get_tile_from_board(*board, index);
+                    original_row_values[col] = get_tile_from_board(*board, index);
                 }
                 int final_row_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
                 merge(original_row_values, final_row_values);
@@ -240,7 +240,7 @@ bool shift(uint64_t *board, uint64_t original_board, int direction) {
                 int original_row_values[MAX_BOARD_DIMENSION];
                 for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
                     int index = row * MAX_BOARD_DIMENSION + col; // Row in normal order
-                    original_row_values[row] = get_tile_from_board(*board, index);
+                    original_row_values[col] = get_tile_from_board(*board, index);
                 }
                 int final_row_values[MAX_BOARD_DIMENSION] = {0, 0, 0, 0};
                 merge(original_row_values, final_row_values);
@@ -289,7 +289,7 @@ bool potential_merges(uint64_t board) {
  * @param open_cells The list to add all open cells.
  * @param num_open_cells A pointer to a variable holding the number of open cells.
  */
-int **get_open_cells(uint64_t board, int open_cells[MAX_BOARD_DIMENSION][2], int *num_open_cells) {
+void get_open_cells(uint64_t board, int open_cells[MAX_BOARD_DIMENSION][2], int *num_open_cells) {
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
             int index = row * MAX_BOARD_DIMENSION + col;

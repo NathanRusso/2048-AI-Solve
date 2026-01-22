@@ -23,7 +23,7 @@ bool shift(uint64_t *board, uint64_t original_board, int direction);
 
 bool potential_merges(uint64_t board);
 
-int **get_open_cells(uint64_t board, int open_cells[MAX_BOARD_DIMENSION][2], int *num_open_cells);
+void get_open_cells(uint64_t board, int open_cells[MAX_BOARD_DIMENSION][2], int *num_open_cells);
 
 uint64_t get_best_score(uint64_t board, int current_depth, bool players_turn);
 

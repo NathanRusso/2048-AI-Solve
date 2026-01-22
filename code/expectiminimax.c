@@ -251,7 +251,7 @@ bool potential_merges(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
  * @param open_cells The list to add all open cells.
  * @param num_open_cells A pointer to a variable holding the number of open cells.
  */
-int **get_open_cells(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int open_cells[MAX_BOARD_DIMENSION][2], int *num_open_cells) {
+void get_open_cells(int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], int open_cells[MAX_BOARD_DIMENSION][2], int *num_open_cells) {
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
             if (board[row][col] == BLANK_TILE) {
