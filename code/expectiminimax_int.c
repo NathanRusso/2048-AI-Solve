@@ -339,12 +339,12 @@ uint64_t get_best_score(uint64_t board, int current_depth, bool players_turn) {
             int row = open_cells[i][0];
             int col = open_cells[i][1];
             int index = row * MAX_BOARD_DIMENSION + col;
-            replace_tile_in_board(&copy_board_2, index, 2);
-            replace_tile_in_board(&copy_board_4, index, 4);
-            avg_heuristic_2 += get_best_score(copy_board_2, current_depth - 1, true) / num_open_cells;
-            avg_heuristic_4 += get_best_score(copy_board_4, current_depth - 1, true) / num_open_cells;
+            replace_tile_in_board(&copy_board_2, index, 1);
+            replace_tile_in_board(&copy_board_4, index, 2);
+            avg_heuristic_2 += get_best_score(copy_board_2, current_depth - 1, true);
+            avg_heuristic_4 += get_best_score(copy_board_4, current_depth - 1, true);
         }
-        return floor(avg_heuristic_2 * TILE_2_CHANCE + avg_heuristic_4 * TILE_4_CHANCE);
+        return (uint64_t) (avg_heuristic_2 * TILE_2_CHANCE + avg_heuristic_4 * TILE_4_CHANCE) / num_open_cells;
     } else { // Game's Turn: Random tile spawn, no tile are open ~ SHOULD NOT HAPPEN
         uint64_t copy_board = board;
         return get_best_score(copy_board, current_depth - 1, false);
