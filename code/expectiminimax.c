@@ -68,11 +68,8 @@ int HEURISTIC_NUM = 3; // The default number indicating which heuristic to use
  */
 uint64_t get_heuristic_snake_score(const int board[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION], const int snake_heuristic[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION]) {
     uint64_t board_heuristic = 0;
-    // int open_cells = 0;
     for (int row = 0; row < MAX_BOARD_DIMENSION; row++) {
         for (int col = 0; col < MAX_BOARD_DIMENSION; col++) {
-            // if (board[row][col] == BLANK_TILE) open_cells++;
-            //printf("%d\n", board[row][col]);
             board_heuristic += (uint64_t) board[row][col] * snake_heuristic[row][col];
         }
     }
@@ -341,7 +338,6 @@ int get_next_direction(int depth, int heuristic_num, int *flat_board) {
         bool board_changed = shift(copy_board, original_board, direction);
         if (board_changed) {
             uint64_t heuristic = get_best_score(copy_board, depth - 1, false);
-            //printf("%d\n", heuristic);
             if (heuristic > highest_heuristic) {
                 highest_heuristic = heuristic;
                 best_direction = direction;
@@ -353,6 +349,6 @@ int get_next_direction(int depth, int heuristic_num, int *flat_board) {
 
 int main() {
     int board[16] = {0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    printf("test5\n");
-    printf("%d", get_next_direction(DEPTH, HEURISTIC_NUM, board));
+    printf("Test Expectiminimax\n");
+    printf("Next Direction: %d\n", get_next_direction(DEPTH, HEURISTIC_NUM, board));
 }
