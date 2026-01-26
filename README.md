@@ -3,6 +3,7 @@ This project is a recreation of the game 2048 with additional functionality to b
 
 Table of Contents:
 * [About the Application](#about-the-application)
+* [How Is AI Used to Solve 2048](#how-is-ai-used-to-solve-2048)
 * [Preparing and Using the the Application](#preparing-and-using-the-the-application)
 * [Resources](#resources)
 
@@ -31,13 +32,13 @@ Once the game is running you will see two markers for your "Best Score" and "Cur
     * Reset - This restarts the board so that it is blank asides from the two random initial tile, and it resets the current score to 0.
     * Quit - This stops the application entirely.
 
-### How Is AI Used to Solve 2048
+## How Is AI Used to Solve 2048
 
-#### Expectiminimax (EMM)
+### Expectiminimax (EMM)
 
-#### Monte Carlo Tree Search (MCTS)
+### Monte Carlo Tree Search (MCTS)
 
-#### MCTS x EMM Combination (MCTSxEMM)
+### MCTS x EMM Combination (MCTSxEMM)
 
 ## Preparing and Using the the Application
 
