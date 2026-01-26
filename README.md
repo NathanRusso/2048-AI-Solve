@@ -1,8 +1,34 @@
 # 2048-AI-Solve
 I am going to recreate and improve a class project that uses AI search algorithms to solve 2048.
 
-## 2048 Game Requirements
-1. pip install pygame
+## About the Application
+
+### What is 2048
+...
+
+### How Is AI Used to Solve 2048
+...
+
+## Preparing and Using the the Application
+
+### 2048 Game Requirements
+1. Python 3+ (64-bit recommended)
+    * To check your Python version, run `python --version` or `python3 --version`.
+    * To check your Python architecture, run `python -c "import platform; print(platform.architecture())"`.
+    * Downloads can be found at https://www.python.org/downloads/.
+2. PyGame
+    * To install PyGame into your system's Python, run `pip install pygame`.
+3. MinGW
+    * If you opted for a 64-bit version of Python, you must have a 64-bit version of MinGW installed.
+        * Downloads can be found at https://www.mingw-w64.org/downloads/.
+    * If you opted for a 32-bit version of Python, you must have a 32-bit version of MinGW installed, but this has not been tested.
+        * Downloads can be found at https://www.winlibs.com/.
+4. You must be in either the top level or /code directory.
+
+### How To Run (Options)
+1. If you are in the top directory, run `python code/ui.py` or `python3 code/ui.py`.
+2. If you are in the /code directory, run `python ui.py` or `python3 ui.py`.
+3. If you are using an IDE that handles Python, click the play button to run the ui.py file.
 
 ## Resources
 ### Expectiminimax
