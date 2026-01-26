@@ -1,5 +1,5 @@
 # 2048-AI-Solve
-I am going to recreate and improve a class project that uses AI search algorithms to solve 2048.
+This project is a recreation of the game 2048 with additional functionality to be solved using AI search algorithms.
 
 ## About the Application
 
