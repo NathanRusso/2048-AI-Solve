@@ -4,7 +4,15 @@ import math as m
 import ctypes as ct
 import os
 
-expectiminimax_c = ct.CDLL(os.path.abspath("code/expectiminimax.dll")) # Shared library to connect Python and C
+try:
+    expectiminimax_c = ct.CDLL(os.path.abspath("expectiminimax.dll")) # Shared library to connect Python and C
+except FileNotFoundError:
+    try:
+        expectiminimax_c = ct.CDLL(os.path.abspath("code/expectiminimax.dll")) # Shared library to connect Python and C
+    except FileNotFoundError as f:
+        print(f"There was an error loading Expectiminimax: {f}\n")
+except Exception as e:
+    print(f"There was an error loading Expectiminimax: {e}\n")
 expectiminimax_c.get_next_direction.argtypes = [ct.c_int, ct.c_int, ct.POINTER(ct.c_int)]
 expectiminimax_c.get_next_direction.restype = ct.c_int
 CBoardType = ct.c_int * 16
