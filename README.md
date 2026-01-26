@@ -1,5 +1,5 @@
 # 2048-AI-Solve
-This project is a recreation of the game 2048 with additional functionality to be solved using AI search algorithms.
+This project is a recreation of the game 2048 with additional functionality to be solved using AI search algorithms. The highlight of this project is the use of the [Expectiminimax](#expectiminimax-emm) algorithm which successfully solves 2048 and consistently reaches tiles with values of 4096 and even 8192!
 
 Table of Contents:
 * [About the Application](#about-the-application)
@@ -22,9 +22,9 @@ Once the game is running you will see two markers for your "Best Score" and "Cur
 * Each of the "Game Mode" buttons sets the player into each mode, resets the current score to 0, and resets the board.
     * Manual Play [Default Mode] - This mode emulates the traditional 2048 game. The player can shift the tiles using either WASD or their arrow keys.
     * Random Play - This mode shifts the tiles in a random direction based on python's built in randomizer.
-    * Expectiminimax ([EMM](#expectiminimax)) - This shifts the tiles in the best direction based on the decision of the Expectiminimax algorithm.
-    * Monte Carlo Tree Search ([MCTS](#monte-carlo-tree-search)) - This mode shifts the tiles in the best direction based on the decision of the Monte Carlo Tree Search Algorithm algorithm.
-    * MCTS x EMM ([MCTSxEMM]())- This shifts the tiles in the best direction based on a combination of both the Expectiminimax and Monte Carlo Tree Search algorithms.
+    * Expectiminimax ([EMM](#expectiminimax-emm)) - This shifts the tiles in the best direction based on the decision of the Expectiminimax algorithm.
+    * Monte Carlo Tree Search ([MCTS](#monte-carlo-tree-search-mcts)) - This mode shifts the tiles in the best direction based on the decision of the Monte Carlo Tree Search algorithm.
+    * MCTS x EMM ([MCTSxEMM](#mcts-x-emm-combination-mctsxemm))- This shifts the tiles in the best direction based on a combination of both the Expectiminimax and Monte Carlo Tree Search algorithms.
 * Each of the "Control" buttons alters application.
     * Unlimit/Limit Speed - (Unlimit Speed) Drops the built in limiter holding back the speed of the program. (Limit Speed) slows down the program so it does not blitz by.
     * Pause/Go - (Pause) stops the board from changing no matter what mode. (Go) continues the game and allows board changes.
@@ -61,6 +61,8 @@ Once the game is running you will see two markers for your "Best Score" and "Cur
 3. If you are using an IDE that handles Python, click the play button to run the ui.py file.
 
 ## Resources
+Below are some of the resources/links I used when developing this application.
+
 ### Expectiminimax
 - https://www.geeksforgeeks.org/dsa/expectimax-algorithm-in-game-theory/
 - https://www.geeksforgeeks.org/artificial-intelligence/expectimax-search-algorithm-in-ai/
