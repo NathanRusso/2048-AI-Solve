@@ -15,11 +15,29 @@ The game starts with a 4x4 board. A random 2 or 4 tile will spawn randomly on th
 
 The goal of the game is to get the 2048 tile, but the game can and will continue beyond that point. The player can obtain tiles with values of 4096, 8192, 16384, 3276, 65536, and 131072 (the maximum theoretical tile).
 
-### How to Play 2048
-Before playing 2048, make sure you have all of the requirements met and run the application, see [Test](#preparing-and-using-the-the-application).
+### How to Play My 2048
+Before playing 2048, make sure you have all of the [requirements](#2048-game-requirements) met and have [started](#how-to-run-options) the application.
+
+Once the game is running you will see two markers for your "Best Score" and "Current Score". On the right side of the application, you will see 5 "Game Mode" buttons and 4 "Control" buttons. The functions of each as as follows:
+* Each of the "Game Mode" buttons sets the player into each mode, resets the current score to 0, and resets the board.
+    * Manual Play [Default Mode] - This mode emulates the traditional 2048 game. The player can shift the tiles using either WASD or their arrow keys.
+    * Random Play - This mode shifts the tiles in a random direction based on python's built in randomizer.
+    * Expectiminimax ([EMM](#expectiminimax)) - This shifts the tiles in the best direction based on the decision of the Expectiminimax algorithm.
+    * Monte Carlo Tree Search ([MCTS](#monte-carlo-tree-search)) - This mode shifts the tiles in the best direction based on the decision of the Monte Carlo Tree Search Algorithm algorithm.
+    * MCTS x EMM ([MCTSxEMM]())- This shifts the tiles in the best direction based on a combination of both the Expectiminimax and Monte Carlo Tree Search algorithms.
+* Each of the "Control" buttons alters application.
+    * Unlimit/Limit Speed - (Unlimit Speed) Drops the built in limiter holding back the speed of the program. (Limit Speed) slows down the program so it does not blitz by.
+    * Pause/Go - (Pause) stops the board from changing no matter what mode. (Go) continues the game and allows board changes.
+    * Reset - This restarts the board so that it is blank asides from the two random initial tile, and it resets the current score to 0.
+    * Quit - This stops the application entirely.
 
 ### How Is AI Used to Solve 2048
-...
+
+#### Expectiminimax (EMM)
+
+#### Monte Carlo Tree Search (MCTS)
+
+#### MCTS x EMM Combination (MCTSxEMM)
 
 ## Preparing and Using the the Application
 
