@@ -1,5 +1,5 @@
 # 2048-AI-Solve
-This project is a recreation of the game 2048 with additional functionality to be solved using AI search algorithms. The highlight of this project is the use of the [Expectiminimax](#expectiminimax-emm) algorithm which successfully solves 2048 and consistently reaches tiles with values of 4096 and even 8192!
+This project is a recreation of the game 2048 with additional functionality to be solved using AI search algorithms. The highlight of this project is the [Expectiminimax](#expectiminimax-emm) algorithm which successfully solves 2048 and consistently reaches tiles with values of 4096 and even 8192!
 
 Table of Contents:
 * [About the Application](#about-the-application)
@@ -35,10 +35,16 @@ Once the game is running you will see two markers for your "Best Score" and "Cur
 ## How Is AI Used to Solve 2048
 
 ### Expectiminimax (EMM)
+...
 
 ### Monte Carlo Tree Search (MCTS)
+...
 
 ### MCTS x EMM Combination (MCTSxEMM)
+...
+
+### Snake Heuristic
+...
 
 ## Preparing and Using the Application
 
