@@ -43,7 +43,8 @@ class UI2048:
     COLOR_LABEL_TEXT = "#736452"
     COLOR_BUTTON_TEXT = "#FFFFFF" # "#f2f0e5"
     COLOR_BUTTON_BACKGROUND = COLOR_BOARD
-    COLOR_MODE_INDICATOR = "#f70707"
+    COLOR_MODE_STOP = "#CC0202"
+    COLOR_MODE_GO = "#02CC02"
     RUN = True
 
     def __init__(self, model, expectiminimax_depth: int, heuristic_num: int, mcts, mcts_emm):
@@ -220,7 +221,7 @@ class UI2048:
         """
         button_rect = self.button_rects[self.mode]
         x, y = button_rect.topright
-        pg.draw.circle(self.screen, self.COLOR_MODE_INDICATOR, (x + 17, y + 15), 8)
+        pg.draw.circle(self.screen, self.COLOR_MODE_STOP if self.pause else self.COLOR_MODE_GO, (x + 17, y + 15), 8)
 
     def drawBoard(self):
         """
