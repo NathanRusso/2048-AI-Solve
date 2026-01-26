@@ -1,17 +1,22 @@
 # 2048-AI-Solve
 This project is a recreation of the game 2048 with additional functionality to be solved using AI search algorithms.
 
+Table of Contents:
+* [About the Application](#about-the-application)
+* [Preparing and Using the the Application](#preparing-and-using-the-the-application)
+* [Resources](#resources)
+
 ## About the Application
 
 ### What is 2048
 2048 is a game where the player attempts to slide tiles together in order to create a tile with a value of 2048. You can play the official 2048 game at https://play2048.co/.
 
-The game starts with a 4x4 board. A random 2 or 4 tile will spawn randomly on the board, twice. The chance of a 2 tile spawning in is 90% while the chance for a 4 tile is 10%. The player than has the option to shift all tiles on the board in one of the 4 cardinal directions. If the tiles or their locations on the board change, a new 2 or 4 tiles will spawn in based on the prior chances. If two tiles of the same value are next to each other in the direction of a shift, they will combine together into a tile twice either of the original's value. This new tile value will then be added to the score. This process of shifting and spawning repeats until the board can no longer be altered.
+The game starts with a 4x4 board. A random 2 or 4 tile will spawn randomly on the board, twice. The chance of a 2 tile spawning is 90% while the chance for a 4 tile is 10%. The player then has the option to shift all tiles on the board in one of the 4 cardinal directions. If two tiles of the same value are next to each other in the direction of a shift, they will combine together into a tile twice either of the original values. This new tile's value will then be added to the score. If the tiles or their locations on the board change, a new 2 or 4 tiles will spawn in based on the prior chances. This process of shifting and spawning repeats until the board can no longer be altered.
 
-The goal of the game is to get the 2048 tile, but the game can and will continue beyond that point. The player can obtain tiles with values of 4096, 8192, 16384, 3276, 65536, and 131072 (The maximum theoretical tile).
+The goal of the game is to get the 2048 tile, but the game can and will continue beyond that point. The player can obtain tiles with values of 4096, 8192, 16384, 3276, 65536, and 131072 (the maximum theoretical tile).
 
 ### How to Play 2048
-1. 
+Before playing 2048, make sure you have all of the requirements met and run the application, see [Test](#preparing-and-using-the-the-application).
 
 ### How Is AI Used to Solve 2048
 ...
