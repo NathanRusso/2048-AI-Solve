@@ -46,7 +46,7 @@ In order to solve 2048, AI search algorithms were implemented. Each of these alg
 * Expansion Depth: 30
 
 ### MCTS x EMM Combination (MCTSxEMM)
-This functions the same as MCTS except for the moves made during simulation. Rather than being random, the move made is the move determined to be the best move by Expectiminimax.
+This algorithm functions the same as MCTS except for the moves made during the Simulation. Rather than being random, each move made is the "best move" determined by Expectiminimax.
 * MCTS C: 1.4
 * MCTS Iterations: 50
 * MCTS Expansion Depth: 30
