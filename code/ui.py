@@ -318,7 +318,8 @@ class UI2048:
                 board = self.model.getBoard()
                 board_flat = [tile for row in board for tile in row]
                 board_flat_c = CBoardType(*board_flat)
-                self.model.playAction(expectiminimax_c.get_next_direction(self.emm_depth, self.heuristic_num, board_flat_c))
+                direction = expectiminimax_c.get_next_direction(self.emm_depth, self.heuristic_num, board_flat_c)
+                self.model.playAction(direction)
             case UIMode.MCTS.value:
                 self.model.playAction(self.mcts.getNextDirection(self.model.getBoard()))
             case UIMode.MCTS_EMM.value:

@@ -44,7 +44,32 @@ Once the game is running you will see two markers for your "Best Score" and "Cur
 ...
 
 ### Snake Heuristic
-...
+In order to generate a heuristic score for the 4x4 boards, each value in the board is multiplied by its corresponding value in the heuristic board, and then those values are summed together. The "snake heuristic" has been shown to be very effective as it fascinates merging and rewards higher pieces effectively. Through multiple test, I have found that Snake Heuristic 3 is the best on average. My lowering the value when the snake changes rows, I have decreased the rate at which smaller tiles get stuck in the corners.
+
+Snake Heuristic 1:
+| 32768 | 16384 | 8192 | 4096 |
+| 256   | 512   | 1024 | 2048 |
+| 128   | 64    | 32   | 16   |
+| 1     | 2     | 4    | 8    |
+
+Snake Heuristic 2:
+| 1073741824 | 268435456 | 67108864 | 16777216 |
+| 65536      | 262144    | 1048576  | 4194304 |
+| 16384      | 4096      | 1024     | 256     |
+| 1          | 4         | 16       | 64      |
+
+Snake Heuristic 3: BEST
+| 4096 | 2048 | 1024 | 512 |
+| 64   | 128  | 256  | 512 |
+| 64   | 32   | 16   | 8   |
+| 1    | 2    | 4    | 8   |
+
+Snake Heuristic 4:
+| 16777216 | 4194304 | 1048576 | 262144 |
+| 4096     | 16384   | 65536   | 262144 |
+| 4096     | 1024    | 256     | 64     |
+| 1        | 4       | 16      | 64     |
+
 
 ## Preparing and Using the Application
 
