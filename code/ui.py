@@ -341,11 +341,11 @@ def main():
     This loads all of the necessary objects for the UI and starts thr UI.
     """
     EMM_DEPTH = 8
-    EMM_DEPTH_WEAK = 6
+    EMM_DEPTH_WEAK = 5
     HEURISTIC_NUM = 3
     model = Model2048()
     montecarlo = MonteCarlo2048(1500, 30, 1.4, None, HEURISTIC_NUM)
-    mcts_emm = MonteCarlo2048(50, 30, 1.25, EMM_DEPTH_WEAK, HEURISTIC_NUM)
+    mcts_emm = MonteCarlo2048(50, 30, 1.4, EMM_DEPTH_WEAK, HEURISTIC_NUM)
     game = UI2048(model, EMM_DEPTH, HEURISTIC_NUM, montecarlo, mcts_emm)
     game.run()
 

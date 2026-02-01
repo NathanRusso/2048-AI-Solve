@@ -33,15 +33,24 @@ Once the game is running you will see two markers for your "Best Score" and "Cur
     * Quit - This stops the application entirely.
 
 ## How Is AI Used to Solve 2048
+In order to solve 2048, AI search algorithms were implemented. Each of these algorithms, given the current board, return the next best move as determined by its search/test. Every move in automatically played as its decided by the algorithm. While Monte Carlo Tree Search is still a work in progress, Expectiminimax has been shown to be very effective as it achieves 2048 most of the time, 4096 very often, and 8192 relativity often. All algorithms below use the same [heuristic](#snake-heuristic), Snake Heuristic 3, to score a board on its current state.
 
 ### Expectiminimax (EMM)
 ...
+* Depth: 8
 
 ### Monte Carlo Tree Search (MCTS)
 ...
+* C: 1.4
+* Iterations: 1500
+* Expansion Depth: 30
 
 ### MCTS x EMM Combination (MCTSxEMM)
-...
+This functions the same as MCTS except for the moves made during simulation. Rather than being random, the move made is the move determined to be the best move by Expectiminimax.
+* MCTS C: 1.4
+* MCTS Iterations: 50
+* MCTS Expansion Depth: 30
+* EMM Depth: 5
 
 ### Snake Heuristic
 In order to generate a heuristic score for the 4x4 boards, each value in the board is multiplied by its corresponding value in the heuristic board, and then those values are summed together. The "snake heuristic" has been shown to be very effective as it fascinates merging and rewards higher pieces effectively. Through multiple test, I have found that Snake Heuristic 3 is the best on average. My lowering the value when the snake changes rows, I have decreased the rate at which smaller tiles get stuck in the corners.
