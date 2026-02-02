@@ -36,7 +36,7 @@ Once the game is running you will see two markers for your "Best Score" and "Cur
 In order to solve 2048, AI search algorithms were implemented. Each of these algorithms, given the current board, return the next best move as determined by its search/test. Every move in automatically played as its decided by the algorithm. While Monte Carlo Tree Search is still a work in progress, Expectiminimax has been shown to be very effective as it achieves 2048 most of the time, 4096 very often, and 8192 relativity often. All algorithms below use the same [heuristic](#snake-heuristic), Snake Heuristic 3, to score a board on its current state.
 
 ### Expectiminimax (EMM)
-...
+Expectiminimax is a variation of on Minmax that accounts for randomness, which is specifically needed for a game like 2048 with its random tile spawning. In Minmax, there are two agents, the Max Player and the Min Player. In EMM, there is still the Max Player, but now instead of the Min Player, there is the Game Player itself, which averages out all possible random moves. ...
 * Depth: 8
 
 ### Monte Carlo Tree Search (MCTS)
@@ -53,7 +53,7 @@ This algorithm functions the same as MCTS except for the moves made during the S
 * EMM Depth: 5
 
 ### Snake Heuristic
-In order to generate a heuristic score for the 4x4 boards, each value in the board is multiplied by its corresponding value in the heuristic board, and then those values are summed together. The "snake heuristic" has been shown to be very effective as it fascinates merging and rewards higher pieces effectively. Through multiple test, I have found that Snake Heuristic 3 is the best on average. My lowering the value when the snake changes rows, I have decreased the rate at which smaller tiles get stuck in the corners.
+In order to generate a heuristic score for the 4x4 boards, each value in the board is multiplied by its corresponding value in the heuristic board, and then those values are summed together. The "snake heuristic" has been shown to be very effective as it facilitates merging and rewards higher pieces effectively. Through multiple test, I have found that Snake Heuristic 3 is the best on average. My lowering the value when the snake changes rows, I have decreased the rate at which smaller tiles get stuck in the corners.
 
 Snake Heuristic 1:
 |       |       |      |      |
