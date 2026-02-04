@@ -7,6 +7,9 @@ Table of Contents:
 * [Preparing and Using the Application](#preparing-and-using-the-the-application)
 * [Resources](#resources)
 
+Best Game:
+![2048 Best Game](images/2048_game_best_8192.png)
+
 ## About the Application
 
 ### What Is 2048
