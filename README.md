@@ -39,16 +39,30 @@ In order to solve 2048, AI search algorithms were implemented. Each of these alg
 Expectiminimax is a variation of Minimax that incorporates randomness, which is essential for games like 2048 due to the random spawning of tiles. In standard Minimax, two agents are involved: a Max player and a Min player. In EMM, the Max player (the Shifter) remains, but the Min player is replaced by the Avg Player (the Game), which models randomness by averaging over all possible outcomes.
 
 EMM begins at the player’s turn with a specified search depth. The algorithm simulates shifting the board in all four directions and recursively evaluates the resulting states. The best move chosen is the direction with the highest score. When the search depth reaches zero, the board is evaluated using the [heuristic](#snake-heuristic). If it is the Shifter's turn, EMM simulates all four possible shifts, recursively evaluates each resulting board with one less depth and the turn set to the Game, and returns the maximum score among them. If it is the Game’s turn, EMM simulates the random spawning of a tile (2 or 4) in every empty cell. Each resulting board is recursively evaluated with one less depth and the turn set to the Shifter. The average score of all these outcomes is then returned.
+
+Set Parameters:
 * Depth: 8
 
 ### Monte Carlo Tree Search (MCTS)
-...
+Monte Carlo Tree Search operates in 4 phases: Selection, Expansion, Simulation, and Backpropagation. It is also given two input parameters, the # of iteration and expansion depth. MCTS operates over the same tree, starting at the root, for each of its iterations. For each iteration, it is as follows.
+1. Selection - MCTS selects the next best child node based off of which one has the highest UCB1 score.
+2. Expansion - A new node is branched off of the selected node.
+3. Simulation - A # of random moves are simulated on the game board based off of the expansion depth.
+3. Backpropagation - The final board is evaluated using the [heuristic](#snake-heuristic), the score is added to the node, and then the score is propagated back up through all of its parents.
+
+#### Upper Confidence Bound 1 (UCB1)
+The UCB1 score is meant to show which node should be searched next based on a balance between the given node's reward, its visits, and its parent visits. The C variable is meant to adjust the formula to correct it. The $`\sqrt{2}`$, about 1.4, has been shown to be effective for bounded problem. But the heurisitic in 2048 is not bounded, so this causes issues. The formula is as follows:
+UCB1 = $`\text{exploit} + \text{explore} = \left[\text{average reward based on the \# of node visits}\right] + [C \sqrt{\frac{\ln(\text{parent\_visits})}{\text{node\_visits}}}]`$.
+
+Set Parameters:
 * C: 1.4
 * Iterations: 1500
 * Expansion Depth: 30
 
 ### MCTS x EMM Combination (MCTSxEMM)
 This algorithm functions the same as MCTS except for the moves made during the Simulation. Rather than being random, each move made is the "best move" determined by Expectiminimax.
+
+Set Parameters:
 * MCTS C: 1.4
 * MCTS Iterations: 50
 * MCTS Expansion Depth: 30

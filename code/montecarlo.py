@@ -389,7 +389,7 @@ class MonteCarlo2048:
         root = MCTSNode(original_board, None, None, True)
         #original_heuristic = root.getHeuristicScore(original_board)
         
-        for i in range(self.selection_iterations):
+        for _ in range(self.selection_iterations):
             node = root
 
             while not node.game_over and len(node.available_actions) == 0:
