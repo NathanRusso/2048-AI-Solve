@@ -44,7 +44,7 @@ Expectiminimax is a variation of Minimax that incorporates randomness, which is 
 EMM begins at the player’s turn with a specified search depth. The algorithm simulates shifting the board in all four directions and recursively evaluates the resulting states. The best move chosen is the direction with the highest score. When the search depth reaches zero, the board is evaluated using the [heuristic](#snake-heuristic). If it is the Shifter's turn, EMM simulates all four possible shifts, recursively evaluates each resulting board with one less depth and the turn set to the Game, and returns the maximum score among them. If it is the Game’s turn, EMM simulates the random spawning of a tile (2 or 4) in every empty cell. Each resulting board is recursively evaluated with one less depth and the turn set to the Shifter. The average score of all these outcomes is then returned.
 
 Set Parameters:
-* Depth: 8
+* Depth: 7
 
 ### Monte Carlo Tree Search (MCTS)
 Monte Carlo Tree Search operates in 4 phases: Selection, Expansion, Simulation, and Backpropagation. It is also given two input parameters, the # of iteration and expansion depth. MCTS operates over the same tree, starting at the root, for each of its iterations. For each iteration, it is as follows.

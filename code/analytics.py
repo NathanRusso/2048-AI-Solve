@@ -16,7 +16,7 @@ expectiminimax_c.get_next_direction.argtypes = [ct.c_int, ct.c_int, ct.POINTER(c
 expectiminimax_c.get_next_direction.restype = ct.c_int
 CBoardType = ct.c_int * 16
 
-EMM_DEPTH_C = 8
+EMM_DEPTH_C = 7
 EMM_DEPTH_PY = 5
 HEURISTIC_NUM  = 3
 

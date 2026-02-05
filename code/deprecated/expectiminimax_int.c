@@ -61,7 +61,7 @@ const int SNAKE_HEURISTIC_6[MAX_BOARD_DIMENSION][MAX_BOARD_DIMENSION] = {
     {1, 2, 4, 8}
 };
 
-int DEPTH = 8; // The defalt depth for Expectiminimax
+int DEPTH = 7; // The defalt depth for Expectiminimax
 int HEURISTIC_NUM = 3; // The default number indicating which heuristic to use
 
 /**
