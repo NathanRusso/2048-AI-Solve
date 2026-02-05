@@ -2,6 +2,7 @@ from model import Model2048
 from montecarlo import MonteCarlo2048
 import ctypes as ct
 import os
+import time
 
 try:
     expectiminimax_c = ct.CDLL(os.path.abspath("expectiminimax.dll")) # Shared library to connect Python and C
@@ -106,12 +107,49 @@ def testExpectiminimaxC():
         for i in range(1, 5):
             f.write(f"E{i} Highest Tile Sum: {sum(e_highest_tiles_all[i-1])}, Avg: {sum(e_highest_tiles_all[i-1]) / 20}" + "\n")
 
+def testExpectiminimaxDepth():
+    model = Model2048()
+    emm_scores_all = []
+    emm_highest_tiles_all = []
+    emm_times_all = []
+
+    for d in range(1, 8): # Depths 1-7
+        emm_scores = []
+        emm_highest_tiles = []
+        emm_times = []
+        for i in range(100):
+            print(f"Depth: {d}, Expectiminimax: #{i+1}")
+            start_time = time.perf_counter()
+            while not model.gameOver():
+                board = model.getBoard()
+                board_flat = [tile for row in board for tile in row]
+                board_flat_c = CBoardType(*board_flat)
+                direction = expectiminimax_c.get_next_direction(d, HEURISTIC_NUM, board_flat_c)
+                board_changed = model.shift(direction)
+                if board_changed:
+                    model.addTile()
+                    model.updateGameOver()
+            end_time = time.perf_counter()
+            emm_scores.append(model.getScore())
+            emm_highest_tiles.append(model.getHighestTile())
+            emm_times.append(end_time - start_time)
+            model.restart()
+        emm_scores_all.append(emm_scores)
+        emm_highest_tiles_all.append(emm_highest_tiles)
+        emm_times_all.append(emm_times)
+
+    ### USE A CSV OR SOMETHING
+
+    with open("data/emm_depth_test.txt", "w") as f:
+        print()
+
 def main():
     """
     This runs different test for the 2048 algorithms and places out in /data.
     """
     #testMonteCarlo()
-    testExpectiminimaxC()
+    #testExpectiminimaxC()
+    #testExpectiminimaxDepth()
 
 if __name__ == '__main__':
     main()
