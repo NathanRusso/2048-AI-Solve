@@ -144,10 +144,16 @@ def testExpectiminimaxDepth():
     with open("data/emm_depth_test.csv", "w", newline="") as f:
         writer = csv.writer(f)
         emm_all_rows = zip(*emm_all_data)
+        writer.writerow(["Depth",
+            "1", "2", "3", "4", "5", "6", "7", "",
+            "1", "2", "3", "4", "5", "6", "7", "",
+            "1", "2", "3", "4", "5", "6", "7"
+        ])
         for row in emm_all_rows:
             row_list = list(row)
-            row_list.insert(7, "")
-            row_list.insert(15, "")
+            row_list.insert(0, "")
+            row_list.insert(8, "")
+            row_list.insert(16, "")
             writer.writerow(row_list)
 
 def main():
