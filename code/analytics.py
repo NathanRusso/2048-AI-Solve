@@ -2,7 +2,8 @@ from model import Model2048
 from montecarlo import MonteCarlo2048
 import ctypes as ct
 import os
-import time
+import time as t
+import csv
 
 try:
     expectiminimax_c = ct.CDLL(os.path.abspath("expectiminimax.dll")) # Shared library to connect Python and C
@@ -119,7 +120,7 @@ def testExpectiminimaxDepth():
         emm_times = []
         for i in range(100):
             print(f"Depth: {d}, Expectiminimax: #{i+1}")
-            start_time = time.perf_counter()
+            start_time = t.perf_counter()
             while not model.gameOver():
                 board = model.getBoard()
                 board_flat = [tile for row in board for tile in row]
@@ -129,7 +130,7 @@ def testExpectiminimaxDepth():
                 if board_changed:
                     model.addTile()
                     model.updateGameOver()
-            end_time = time.perf_counter()
+            end_time = t.perf_counter()
             emm_scores.append(model.getScore())
             emm_highest_tiles.append(model.getHighestTile())
             emm_times.append(end_time - start_time)
@@ -138,10 +139,16 @@ def testExpectiminimaxDepth():
         emm_highest_tiles_all.append(emm_highest_tiles)
         emm_times_all.append(emm_times)
 
-    ### USE A CSV OR SOMETHING
+    emm_all_data = emm_scores_all + emm_highest_tiles_all + emm_times_all
 
-    with open("data/emm_depth_test.txt", "w") as f:
-        print()
+    with open("data/emm_depth_test.csv", "w", newline="") as f:
+        writer = csv.writer(f)
+        emm_all_rows = zip(*emm_all_data)
+        for row in emm_all_rows:
+            row_list = list(row)
+            row_list.insert(7, "")
+            row_list.insert(15, "")
+            writer.writerow(row_list)
 
 def main():
     """
@@ -149,7 +156,7 @@ def main():
     """
     #testMonteCarlo()
     #testExpectiminimaxC()
-    #testExpectiminimaxDepth()
+    testExpectiminimaxDepth()
 
 if __name__ == '__main__':
     main()
