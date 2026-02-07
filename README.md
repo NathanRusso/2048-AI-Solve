@@ -4,6 +4,7 @@ This project is a recreation of the game 2048 with additional functionality to b
 Table of Contents:
 * [About the Application](#about-the-application)
 * [How Is AI Used to Solve 2048](#how-is-ai-used-to-solve-2048)
+* [Analytics and Data For 2048](#analytics-and-data-for-2048)
 * [Preparing and Using the Application](#preparing-and-using-the-the-application)
 * [Resources](#resources)
 
@@ -110,7 +111,7 @@ Snake Heuristic 4:
 The analytics for different AI algorithms are below. As of now, since MCTS doesn't work, it has been omitted.
 
 ### Expectiminimax (EMM) Metrics
-Below is the analytics for EMM. Overall, a higher depth leads to a better score and higher tile. Depth of 6 stands out to since it actually scores worse than Depth of 5. This could be purely randomness, or it could be because the tile spanning at that depth is being counter productive. There are large score, tile, and time jumps between (2, 3), (4, 5), & (6, 7). The score/tile jump happens because adding a new tile only changes the board by +2 or +4 points, which is then averaged out, so overall, the heuristic is mostly unchanged. Shifting on the other hand can drastically change a board's score, so that is why going from an even to an odd depth makes such a difference. The time increase happens because the shift operations is more expensive (slower) than the tile spawning. Depth of 7 is the 1st to show a relevant time jump.
+Below is the analytics for EMM. Overall, a higher depth leads to a better score and higher tile. Depth of 6 stands out to since it actually scores worse than Depth of 5. This could be purely randomness, or it could be because the tile spanning at that depth is being counter productive... but this is doubtful since a depth of 8 did better than a depth of 7. There are large score, tile, and time jumps between (2, 3), (4, 5), & (6, 7). The score/tile jump happens because adding a new tile only changes the board by +2 or +4 points, which is then averaged out, so overall, the heuristic is mostly unchanged. Shifting on the other hand can drastically change a board's score, so that is why going from an even to an odd depth makes such a difference. The time increase happens because the shift operations is more expensive (slower) than the tile spawning. Depth of 7 is the 1st to show a relevant time jump.
 
 #### EMM: Scores, Highest Tiles, and Times
 ![EMM: Scores, Highest Tiles, and Times](images/2048_emm_table_analytics.png)
