@@ -18,7 +18,7 @@ expectiminimax_c.get_next_direction.argtypes = [ct.c_int, ct.c_int, ct.POINTER(c
 expectiminimax_c.get_next_direction.restype = ct.c_int
 CBoardType = ct.c_int * 16
 
-EMM_DEPTH_C = 7
+EMM_DEPTH_C = 8
 EMM_DEPTH_PY = 5
 HEURISTIC_NUM  = 3
 
@@ -156,13 +156,73 @@ def testExpectiminimaxDepth():
             row_list.insert(16, "")
             writer.writerow(row_list)
 
+def testExpectiminimaxDepth8():
+    model = Model2048()
+    emm_scores_all = []
+    emm_highest_tiles_all = []
+    emm_times_all = []
+
+    for d in range(8, 9): # Depths 8
+        emm_scores = []
+        emm_highest_tiles = []
+        emm_times = []
+        for i in range(100):
+            print(f"Depth: {d}, Expectiminimax: #{i+1}")
+            start_time = t.perf_counter()
+            while not model.gameOver():
+                board = model.getBoard()
+                board_flat = [tile for row in board for tile in row]
+                board_flat_c = CBoardType(*board_flat)
+                direction = expectiminimax_c.get_next_direction(d, HEURISTIC_NUM, board_flat_c)
+                board_changed = model.shift(direction)
+                if board_changed:
+                    model.addTile()
+                    model.updateGameOver()
+            end_time = t.perf_counter()
+            emm_scores.append(model.getScore())
+            emm_highest_tiles.append(model.getHighestTile())
+            emm_times.append(end_time - start_time)
+            model.restart()
+        emm_scores_all.append(emm_scores)
+        emm_highest_tiles_all.append(emm_highest_tiles)
+        emm_times_all.append(emm_times)
+
+    emm_all_data = emm_scores_all + emm_highest_tiles_all + emm_times_all
+    print(emm_all_data)
+    emm_all_rows = list(zip(*emm_all_data))
+    print(emm_all_data)
+    rows = []
+
+    with open("data/emm_depth_test.csv", "r", newline="") as f:
+        reader = csv.reader(f)
+        i = -1
+        for row in reader:
+            new_row = row
+            if i == -1:
+                new_row.insert(8, "8")
+                new_row.insert(17, "8")
+                new_row.insert(26, "8")
+            else:
+                new_row.insert(8, emm_all_rows[i][0])
+                new_row.insert(17, emm_all_rows[i][1])
+                new_row.insert(26, emm_all_rows[i][2])
+            rows.append(new_row)       
+            i += 1
+
+    with open("data/emm_depth_test.csv", "w", newline="") as f:
+        writer = csv.writer(f)
+        for row in rows:
+            print(row)
+            writer.writerow(row)
+
 def main():
     """
     This runs different test for the 2048 algorithms and places out in /data.
     """
     #testMonteCarlo()
     #testExpectiminimaxC()
-    testExpectiminimaxDepth()
+    #testExpectiminimaxDepth()
+    #testExpectiminimaxDepth8()
 
 if __name__ == '__main__':
     main()

@@ -340,7 +340,7 @@ def main():
     """
     This loads all of the necessary objects for the UI and starts thr UI.
     """
-    EMM_DEPTH = 7
+    EMM_DEPTH = 8
     EMM_DEPTH_WEAK = 5
     HEURISTIC_NUM = 3
     model = Model2048()

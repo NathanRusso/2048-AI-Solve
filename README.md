@@ -44,7 +44,7 @@ Expectiminimax is a variation of Minimax that incorporates randomness, which is 
 EMM begins at the player’s turn with a specified search depth. The algorithm simulates shifting the board in all four directions and recursively evaluates the resulting states. The best move chosen is the direction with the highest score. When the search depth reaches zero, the board is evaluated using the [heuristic](#snake-heuristic). If it is the Shifter's turn, EMM simulates all four possible shifts, recursively evaluates each resulting board with one less depth and the turn set to the Game, and returns the maximum score among them. If it is the Game’s turn, EMM simulates the random spawning of a tile (2 or 4) in every empty cell. Each resulting board is recursively evaluated with one less depth and the turn set to the Shifter. The average score of all these outcomes is then returned.
 
 Set Parameters:
-* Depth: 7
+* Depth: 8
 
 ### Monte Carlo Tree Search (MCTS)
 Monte Carlo Tree Search operates in 4 phases: Selection, Expansion, Simulation, and Backpropagation. It is also given two input parameters, the # of iteration and expansion depth. MCTS operates over the same tree, starting at the root, for each of its iterations. For each iteration, it is as follows.
@@ -106,6 +106,23 @@ Snake Heuristic 4:
 | 4096     | 1024    | 256     | 64     |
 | 1        | 4       | 16      | 64     |
 
+## Analytics and Data For 2048
+The analytics for different AI algorithms are below. As of now, since MCTS doesn't work, it has been omitted.
+
+### Expectiminimax (EMM) Metrics
+Below is the analytics for EMM. Overall, a higher depth leads to a better score and higher tile. Depth of 6 stands out to since it actually scores worse than Depth of 5. This could be purely randomness, or it could be because the tile spanning at that depth is being counter productive. There are large score, tile, and time jumps between (2, 3), (4, 5), & (6, 7). The score/tile jump happens because adding a new tile only changes the board by +2 or +4 points, which is then averaged out, so overall, the heuristic is mostly unchanged. Shifting on the other hand can drastically change a board's score, so that is why going from an even to an odd depth makes such a difference. The time increase happens because the shift operations is more expensive (slower) than the tile spawning. Depth of 7 is the 1st to show a relevant time jump.
+
+#### EMM: Scores, Highest Tiles, and Times
+![EMM: Scores, Highest Tiles, and Times](images/2048_emm_table_analytics.png)
+
+#### EMM: What Depth Solves 2048
+![EMM: What Depth Solves 2048](images/2048_emm_graph_solved.png)
+
+#### EMM: Average Score vs Depth
+![EMM: Average Score vs Depth](images/2048_emm_graph_avg_score.png)
+
+#### EMM: Average Time vs Depth
+![EMM: Average Time vs Depth](images/2048_emm_graph_avg_time.png)
 
 ## Preparing and Using the Application
 
