@@ -5,7 +5,7 @@ Table of Contents:
 * [About the Application](#about-the-application)
 * [How Is AI Used to Solve 2048](#how-is-ai-used-to-solve-2048)
 * [Analytics and Data For 2048](#analytics-and-data-for-2048)
-* [Preparing and Using the Application](#preparing-and-using-the-the-application)
+* [Preparing and Using the Application](#preparing-and-using-the-application)
 * [Resources](#resources)
 
 Best Game:
